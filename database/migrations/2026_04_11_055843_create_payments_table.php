@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->enum('type', ['registration', 'monthly']);
+            $table->string('month')->nullable(); // contoh: 2026-03
+            $table->integer('amount');
+            $table->integer('original_amount')->after('month');
+            $table->string('proof_file')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+            Schema::table('payments', function (Blueprint $table) {
+            $table->dropColumn('original_amount');
+            $table->dropColumn('status');
+        });
+    }
+};
