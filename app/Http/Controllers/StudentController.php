@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -34,38 +35,59 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $request->validate([
             'name' => 'required|string',
-            'nik' => 'required|unique:students,nik',
-            'birth_date' => 'required|date',
+            'nik' => 'required|digits:16|unique:students,nik',
+            'birth_date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if (Carbon::parse($value)->age < 2) {
+                        $fail('Usia anak minimal 2 tahun');
+                    }
+                }
+            ],
             'gender' => 'required|in:L,P',
-            'address' => 'required',
+            'school_origin' => 'required|string|max:255',    
             'kk_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
             'birth_certificate_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        // 🔥 Upload file
+        // Upload file
         $kkPath = $request->file('kk_file')->store('kk', 'public');
         $aktaPath = $request->file('birth_certificate_file')->store('akta', 'public');
 
-        // 🔥 Generate email unik siswa
-        $baseEmail = Str::slug($request->name);
-        $email = $baseEmail . rand(100,999) . '@tpadta.com';
+        // Generate email unik siswa
+        // ambil nama (tanpa spasi)
+        $name = strtolower(str_replace(' ', '', $request->name));
 
-        // 🔥 Generate password dari tanggal lahir
+        // format tanggal lahir (ddmmyyyy)
+        $birth = Carbon::parse($request->birth_date)->format('dmY');
+
+        // gabungkan nama + tanggal lahir
+        $email = $name . $birth . '@gmail.com';
+
+        // CEK DUPLIKAT (WAJIB)
+        if (User::where('email', $email)->exists()) {
+            $email = $name . $birth . rand(10,99) . '@gmail.com';
+        }
+
+        // Generate password dari tanggal lahir
         $password = Hash::make($request->birth_date);
 
-        // 🔥 Buat akun siswa
+        // Buat akun siswa
         $user = User::create([
             'name' => $request->name,
             'email' => $email,
             'password' => $password,
-            'status' => 'approved'
+            'status' => 'nonaktif',
+            'approval_status' => 'approved'
         ]);
 
         $user->assignRole('siswa');
 
-        // 🔥 Simpan data siswa
+        // Simpan data siswa
         Student::create([
             'parent_id' => Auth::user()->id,
             'user_id' => $user->id,
@@ -74,7 +96,7 @@ class StudentController extends Controller
             'name' => $request->name,
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
-            'address' => $request->address,
+            'school_origin' => $request->school_origin,
             'kk_file' => $kkPath,
             'birth_certificate_file' => $aktaPath,
             'status' => 'nonaktif' // menunggu approval

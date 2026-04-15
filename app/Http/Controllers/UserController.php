@@ -4,32 +4,138 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    // 🔷 LIST USER + FILTER
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::where('id', '!=', auth()->id());
 
         // 🔍 filter nama
         if ($request->name) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        $users = $query->with('roles')->get();
+        if ($request->role) {
+        $query->whereHas('roles', function ($q) use ($request) {
+            $q->where('name', $request->role);
+        });
+    }
+        $users = $query->with('roles')->latest()->get();
 
         return view('users.index', compact('users'));
     }
 
+    // 🔷 BUAT USER
+    public function create()
+    {
+        return view('users.create');
+    }
+
+    // 🔷 SIMPAN USER
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'role' => 'required'
+        ]);
+
+        // \larang buat siswa manual
+        if ($request->role == 'siswa') {
+            return back()->with('error', 'Akun siswa dibuat otomatis dari data anak');
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'status' => 'aktif',
+            'approval_status' => 'approved'
+        ]);
+
+        $user->assignRole($request->role);
+
+        return redirect()->route('users.index')->with('success', 'User berhasil dibuat');
+    }
+
+    // 🔷 DETAIL USER
+    public function show($id)
+    {
+        $user = User::with('roles')->findOrFail($id);
+
+        return view('users.show', compact('user'));
+    }
+
+    // 🔷 FORM EDIT USER
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+        $roles = Role::all();
+
+        if ($user->id == auth()->id()) {
+            abort(403);
+        }
+
+        return view('users.edit', compact('user', 'roles'));
+    }
+
+    // 🔷 UPDATE DATA USER
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'status' => 'required',
+            'role' => 'required'
+        ]);
+
+        if ($user->hasRole('superadmin') && auth()->id() != $user->id) {
+            return back()->with('error', 'Tidak bisa mengubah superadmin lain');
+        }
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'status' => $request->status
+        ]);
+
+        // update role
+        $user->syncRoles([$request->role]);
+
+        return redirect()->route('users.index')->with('success', 'User berhasil diupdate');
+    }
+
+    // 🔷 UPDATE ROLE (CEPAT - DROPDOWN)
     public function updateRole(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
-        $user->syncRoles([$request->role]);
+        $currentRole = $user->roles->first()->name;
+        $newRole = $request->role;
+
+        // LARANG JADI SISWA
+        if ($newRole == 'siswa') {
+            return back()->with('error', 'Role siswa tidak bisa di-set manual');
+        }
+
+        // SUPERADMIN TIDAK BOLEH DIUBAH
+        if ($currentRole == 'superadmin') {
+            return back()->with('error', 'Role superadmin tidak boleh diubah');
+        }
+
+        $user->syncRoles([$newRole]);
 
         return back()->with('success', 'Role berhasil diubah');
     }
 
+    // 🔷 TOGGLE STATUS
     public function toggleStatus($id)
     {
         $user = User::findOrFail($id);
@@ -38,5 +144,20 @@ class UserController extends Controller
         $user->save();
 
         return back()->with('success', 'Status diubah');
+    }
+
+    // 🔷 DELETE USER
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        // jangan sampai hapus diri sendiri
+        if ($user->id == auth()->id()) {
+            return back()->with('error', 'Tidak bisa menghapus akun sendiri');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User berhasil dihapus');
     }
 }

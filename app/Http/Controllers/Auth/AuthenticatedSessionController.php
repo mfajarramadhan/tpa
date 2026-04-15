@@ -28,6 +28,27 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+
+        if (!$user->hasRole('superadmin')) {
+            // CEK APPROVAL
+            // if ($user->approval_status != 'approved') {
+            //     Auth::logout();
+
+            //     return back()->withErrors([
+            //         'email' => 'Akun anda belum disetujui oleh pengelola'
+            //     ]);
+            // }
+
+            if ($user->status == 'nonaktif') {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'email' => 'Akun anda tidak aktif'
+                ]);
+            }
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

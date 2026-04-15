@@ -16,14 +16,14 @@
 
                 <div class="mb-4">
                     <label>NIK</label>
-                    <input type="text" name="nik" class="w-full p-2 border rounded">
+                    <input type="text" name="nik" maxlength="16" inputmode="numeric" class="w-full p-2 border rounded">
                 </div>
 
                 <div class="mb-4">
                     <label>Tanggal Lahir</label>
-                    <input type="date" name="birth_date" class="w-full p-2 border rounded">
+                    <input type="date" name="birth_date" max="{{ now()->subYears(2)->format('Y-m-d') }}" class="w-full p-2 border rounded">
                 </div>
-
+                
                 <div class="mb-4">
                     <label>Jenis Kelamin</label>
                     <select name="gender" class="w-full p-2 border rounded">
@@ -33,10 +33,10 @@
                 </div>
 
                 <div class="mb-4">
-                    <label>Alamat</label>
-                    <textarea name="address" class="w-full p-2 border rounded"></textarea>
+                    <label>Sekolah Asal</label>
+                    <input type="text" name="school_origin" class="w-full p-2 border rounded" placeholder="Contoh: SDN Klari">
                 </div>
-
+                
                 <div class="mb-4">
                     <label>Upload KK</label>
                     <input type="file" name="kk_file">

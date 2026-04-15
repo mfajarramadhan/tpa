@@ -19,7 +19,8 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Fajar',
                 'password' => Hash::make('fajar12345'),
-                'status' => 'approved'
+                'approval_status' => 'approved',
+                'status' => 'aktif',
             ]
         );
 

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->enum('type', ['registration', 'monthly']);
             $table->string('month')->nullable(); // contoh: 2026-03
+            $table->integer('original_amount');
             $table->integer('amount');
-            $table->integer('original_amount')->after('month');
             $table->string('proof_file')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();

@@ -32,10 +32,22 @@ Route::middleware('auth')->group(function () {
     // Route Kelas
     Route::resource('students', StudentController::class);
 
-    // Approval Siswa Baru
-    Route::get('/approval/students', [ApprovalController::class, 'students'])->name('approval.students');
-    Route::post('/approval/students/{id}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');
-    Route::post('/approval/students/{id}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
+    // Khusus Superadmin
+    Route::middleware(['auth', 'role:superadmin'])->group(function () {
+        // Approval Siswa Baru
+        Route::get('/approval/students', [ApprovalController::class, 'students'])->name('approval.students');
+        Route::post('/approval/students/{id}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');
+        Route::post('/approval/students/{id}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
+
+        // Kelola User
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
 
     // Kehadiran
     Route::resource('attendances', AttendanceController::class);

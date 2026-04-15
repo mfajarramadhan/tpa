@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\AssignmentSubmission;
+use App\Models\Attendance;
+use App\Models\Classroom;
+use App\Models\Payment;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,12 +20,15 @@ class Student extends Model
     protected $fillable = [
         'parent_id',
         'user_id',
-        'class_id',
+        'classroom_id',
         'nik',
         'name',
         'birth_date',
         'gender',
-        'address',
+        'school_origin',
+        'reject_reason',
+        'kk_file',
+        'birth_certificate_file',
         'status'
     ];
 
@@ -37,7 +45,7 @@ class Student extends Model
     }
 
     // 🔹 Relasi ke kelas
-    public function class()
+    public function classroom()
     {
         return $this->belongsTo(Classroom::class);
     }
