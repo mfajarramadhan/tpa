@@ -3,71 +3,41 @@
         <h2 class="text-xl font-semibold">Upload Bukti Pembayaran</h2>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-3xl p-6 mx-auto bg-white rounded shadow">
+    <div class="max-w-lg py-6 mx-auto">
 
-            {{-- ERROR --}}
-            @if ($errors->any())
-                <div class="p-3 mb-4 text-red-700 bg-red-100 rounded">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>• {{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        <form method="POST"
+              action="{{ route('payments.store') }}"
+              enctype="multipart/form-data"
+              class="p-5 bg-white rounded shadow">
 
-            <form method="POST"
-                  action="{{ route('payments.store') }}"
-                  enctype="multipart/form-data">
-                @csrf
+            @csrf
 
-                {{-- PILIH ANAK --}}
-                <div class="mb-4">
-                    <label class="block mb-1">Pilih Anak</label>
-                    <select name="student_id" class="w-full p-2 border rounded">
-                        @foreach($students as $student)
-                            <option value="{{ $student->id }}">
-                                {{ $student->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            {{-- HIDDEN --}}
+            <input type="hidden" name="payment_id" value="{{ $payment->id }}">
 
-                {{-- BULAN --}}
-                <div class="mb-4">
-                    <label>Bulan</label>
-                    <input type="month"
-                           name="month"
-                           class="w-full p-2 border rounded">
-                </div>
+            {{-- INFO --}}
+            <div class="mb-4">
+                <p><strong>Nama:</strong> {{ $payment->student->name }}</p>
+                <p><strong>Bulan:</strong>
+                    {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
+                </p>
+                <p><strong>Nominal:</strong> Rp {{ number_format($payment->original_amount) }}</p>
+            </div>
 
-                {{-- NOMINAL --}}
-                <div class="mb-4">
-                    <label>Nominal</label>
-                    <input type="number"
-                           name="amount"
-                           class="w-full p-2 border rounded"
-                           placeholder="Contoh: 100000">
-                </div>
+            {{-- UPLOAD --}}
+            <div class="mb-3">
+                <label>Bukti Pembayaran</label>
+                <input type="file"
+                       name="proof_file"
+                       required
+                       class="w-full p-2 border rounded">
+            </div>
 
-                {{-- FILE --}}
-                <div class="mb-4">
-                    <label>Upload Bukti</label>
-                    <input type="file"
-                           name="proof_file"
-                           class="w-full p-2 border rounded">
-                </div>
+            <button class="px-4 py-2 text-white bg-blue-600 rounded">
+                Upload Bukti
+            </button>
 
-                {{-- SUBMIT --}}
-                <button
-                    onclick="this.disabled=true;this.form.submit();"
-                    class="px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700">
-                    Upload
-                </button>
+        </form>
 
-            </form>
-
-        </div>
     </div>
 </x-app-layout>

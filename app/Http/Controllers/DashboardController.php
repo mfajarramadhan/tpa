@@ -23,12 +23,14 @@ class DashboardController extends Controller
             $totalTeachers = User::role('guru')->count();
             $pendingStudents = Student::where('status', 'nonaktif')->count();
             $pendingPayments = Payment::where('status', 'pending')->count();
+            $rejectedStudents = Student::where('status', 'ditolak')->count();
 
             return view('dashboard.superadmin', compact(
                 'totalStudents',
                 'totalTeachers',
                 'pendingStudents',
-                'pendingPayments'
+                'pendingPayments',
+                'rejectedStudents'
             ));
         }
 

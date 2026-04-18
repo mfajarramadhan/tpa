@@ -9,7 +9,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -174,5 +176,125 @@ class StudentController extends Controller
         if ($student->parent_id !== Auth::id()) {
             abort(403);
         }
+    }
+
+    public function reapply($id)
+    {
+        $student = Student::findOrFail($id);
+
+        // 🔒 hanya yang ditolak
+        if ($student->status !== 'ditolak') {
+            abort(403);
+        }
+
+        return view('students.reapply', compact('student'));
+    }
+
+    public function submitReapply(Request $request, $id)
+    {
+        $student = Student::findOrFail($id);
+
+        if ($student->status !== 'ditolak') {
+            abort(403);
+        }
+
+        // 🔥 VALIDASI (TAMBAH INI)
+        $request->validate([
+            'name' => 'required|string',
+            'nik' => [
+                'required',
+                'digits:16',
+                Rule::unique('students', 'nik')->ignore($student->id)
+            ],
+            'birth_date' => 'required|date',
+            'gender' => 'required|in:L,P',
+            'school_origin' => 'required'
+        ]);
+
+        // 🔥 HANDLE FILE KK
+        if ($request->hasFile('kk_file')) {
+
+            if ($student->kk_file) {
+                Storage::disk('public')->delete($student->kk_file);
+            }
+
+            $student->kk_file = $request->file('kk_file')->store('kk', 'public');
+        }
+
+        // 🔥 HANDLE FILE AKTA
+        if ($request->hasFile('birth_certificate_file')) {
+
+            if ($student->birth_certificate_file) {
+                Storage::disk('public')->delete($student->birth_certificate_file);
+            }
+
+            $student->birth_certificate_file = $request->file('birth_certificate_file')->store('akta', 'public');
+        }
+
+        // 🔥 UPDATE DATA SISWA
+        $student->update([
+            'name' => $request->name,
+            'nik' => $request->nik,
+            'birth_date' => $request->birth_date,
+            'gender' => $request->gender,
+            'school_origin' => $request->school_origin,
+            'status' => 'nonaktif', // balik ke pending
+            'reject_reason' => null
+        ]);
+
+        // 🔥 HANDLE PAYMENT REGISTRATION
+        $payment = Payment::where('student_id', $student->id)
+            ->where('type', 'registration')
+            ->first();
+
+        if ($payment) {
+
+            // jika upload bukti baru
+            if ($request->hasFile('payment_proof')) {
+
+                // hapus file lama
+                if ($payment->proof_file) {
+                    Storage::disk('public')->delete($payment->proof_file);
+                }
+
+                $newProof = $request->file('payment_proof')->store('payments', 'public');
+
+                $payment->update([
+                    'proof_file' => $newProof,
+                    'status' => 'pending',
+                    'paid_at' => now()
+                ]);
+
+            } else {
+
+                // 🔥 TIDAK upload baru → tetap pakai lama
+                $payment->update([
+                    'status' => 'pending'
+                    // proof_file tetap
+                    // paid_at tetap
+                ]);
+            }
+
+        } else {
+
+            // 🔥 kalau belum ada (edge case)
+            if ($request->hasFile('payment_proof')) {
+
+                $newProof = $request->file('payment_proof')->store('payments', 'public');
+
+                Payment::create([
+                    'student_id' => $student->id,
+                    'type' => 'registration',
+                    'original_amount' => 100000,
+                    'amount' => 100000,
+                    'proof_file' => $newProof,
+                    'status' => 'pending',
+                    'paid_at' => now()
+                ]);
+            }
+        }
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Pendaftaran ulang berhasil, menunggu persetujuan');
     }
 }

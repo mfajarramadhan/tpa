@@ -24,6 +24,9 @@
                         <x-nav-link href="/approval/students">Approval</x-nav-link>
                         <x-nav-link href="/payments">Iuran</x-nav-link>
                         <x-nav-link href="/users">Kelola User</x-nav-link>     
+                        <x-nav-link href="/students/rejected">Siswa Ditolak</x-nav-link>     
+                        <x-nav-link href="/fees">Pengaturan Biaya</x-nav-link>     
+                        
                     @endif
 
                     @if($user->hasRole('guru'))

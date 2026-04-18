@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->string('proof_file')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
+            $table->timestamp('paid_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

@@ -81,4 +81,14 @@ class ApprovalController extends Controller
 
         return back()->with('success', 'Siswa ditolak');
     }
+
+    public function rejected()
+    {
+        $students = Student::where('status', 'ditolak')
+            ->with('parent')
+            ->latest()
+            ->get();
+
+        return view('students.rejected', compact('students'));
+    }
 }

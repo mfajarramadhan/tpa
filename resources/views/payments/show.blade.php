@@ -26,9 +26,10 @@
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="p-3">Bulan</th>
-                        <th class="p-3">Tanggal</th>
-                        <th class="p-3">Nominal</th>
+                        <th class="p-3">Tanggal Pembayaran</th>                        <th class="p-3">Nominal</th>
                         <th class="p-3">Status</th>
+                        <th class="p-3">Bukti</th>
+                        <th class="p-3 text-center">Aksi</th>
                     </tr>
                 </thead>
 
@@ -36,16 +37,33 @@
                     @foreach($payments as $payment)
 
                         @php
-                            $deadline = \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->startOfMonth();
-                            $isLate = now()->gt($deadline) && $payment->status != 'paid';
+                            $isLate = false;
+
+                            if ($payment->month) {
+                                $deadline = \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->startOfMonth();
+
+                                $isLate = now()->gt($deadline)
+                                    && $payment->status != 'paid'
+                                    && !$payment->proof_file;
+                            }
                         @endphp
 
                         <tr class="border-t hover:bg-gray-50">
 
-                            <td class="p-3">{{ $payment->month }}</td>
+                            <td class="p-3">
+                                @if($payment->month)
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
+                                @else
+                                    -
+                                @endif
+                            </td>
 
                             <td class="p-3">
-                                {{ $payment->created_at->format('d-m-Y') }}
+                                @if($payment->paid_at)
+                                    {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y') }}
+                                @else
+                                    -
+                                @endif
                             </td>
 
                             <td class="p-3">
@@ -55,19 +73,54 @@
                             <td class="p-3">
                                 <span class="px-2 py-1 text-white rounded text-xs
                                     @if($payment->status == 'paid') bg-green-500
+                                    @elseif($payment->proof_file) bg-yellow-500
                                     @elseif($isLate) bg-red-600
-                                    @else bg-yellow-500
+                                    @else bg-gray-400
                                     @endif">
 
                                     @if($payment->status == 'paid')
                                         Lunas
+                                    @elseif($payment->proof_file)
+                                        Pending
                                     @elseif($isLate)
                                         Telat
                                     @else
-                                        Pending
+                                        Belum Bayar
                                     @endif
 
                                 </span>
+                            </td>
+
+                            <td class="p-3">
+                                @if($payment->proof_file)
+                                    <img src="{{ asset('storage/' . $payment->proof_file) }}"
+                                        class="object-cover w-16 h-16 border rounded cursor-pointer"
+                                        onclick="window.open(this.src)">
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            
+                            <td class="p-3 text-center">
+                                @if($payment->proof_file && $payment->status == 'pending')
+
+                                    <form method="POST" action="{{ route('payments.approve', $payment->id) }}">
+                                        @csrf
+                                        <button class="px-2 py-1 text-white bg-green-600 rounded">
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="{{ route('payments.reject', $payment->id) }}">
+                                        @csrf
+                                        <button class="px-2 py-1 text-white bg-red-600 rounded">
+                                            Tolak
+                                        </button>
+                                    </form>
+
+                                @else
+                                    -
+                                @endif
                             </td>
 
                         </tr>
