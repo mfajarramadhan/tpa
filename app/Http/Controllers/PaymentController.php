@@ -62,7 +62,8 @@ class PaymentController extends Controller
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
-            'month' => 'required',
+            'month' => 'required|date_format:Y-m',
+            'type' => 'required|in:monthly',
             'amount' => 'required|numeric',
             'proof_file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
         ]);
@@ -76,6 +77,7 @@ class PaymentController extends Controller
         // ambil tunggakan sebelumnya (exclude bulan ini)
         $previousUnpaid = Payment::where('student_id', $request->student_id)
             ->where('status', 'pending')
+            ->where('type', 'monthly')
             ->where('month', '!=', $request->month)
             ->sum('amount');
 

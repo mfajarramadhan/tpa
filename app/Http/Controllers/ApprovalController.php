@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Student;
-use App\Models\Classroom;
 use App\Http\Controllers\Controller;
+use App\Models\Classroom;
+use App\Models\Payment;
+use App\Models\Student;
+use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
@@ -22,11 +23,26 @@ class ApprovalController extends Controller
 
     public function approveStudent(Request $request, $id)
     {
-        $request->validate([
+         $request->validate([
             'classroom_id' => 'required|exists:classrooms,id'
         ]);
 
         $student = Student::findOrFail($id);
+
+        // ambil payment registration
+        $payment = Payment::where('student_id', $student->id)
+            ->where('type', 'registration')
+            ->first();
+
+        // kalau belum upload bukti
+        if (!$payment || !$payment->proof_file) {
+            return back()->with('error', 'Bukti pembayaran belum diupload');
+        }
+
+        // SET PAYMENT JADI PAID
+        $payment->update([
+            'status' => 'paid'
+        ]);
 
         // update siswa di table student
         $student->update([

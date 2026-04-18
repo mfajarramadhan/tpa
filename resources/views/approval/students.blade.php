@@ -9,7 +9,7 @@
         @foreach ($students as $student)
             <div class="p-5 mb-4 bg-white rounded shadow">
 
-                {{-- 🔥 IDENTITAS --}}
+                {{-- IDENTITAS --}}
                 <div class="mb-3">
                     <p class="text-lg font-bold">{{ $student->name }}</p>
                     <p class="text-sm text-gray-500">
@@ -17,7 +17,7 @@
                     </p>
                 </div>
 
-                {{-- 🔥 DETAIL DATA --}}
+                {{-- DETAIL DATA --}}
                 <div class="grid grid-cols-2 gap-3 text-sm">
 
                     <p><strong>NIK:</strong> {{ $student->nik }}</p>
@@ -29,7 +29,7 @@
 
                 </div>
 
-                {{-- 🔥 FILE --}}
+                {{-- FILE --}}
                 <div class="mt-3 space-x-3">
 
                     @if($student->kk_file)
@@ -48,9 +48,58 @@
                         </a>
                     @endif
 
-                </div>
+                    @php
+                        $payment = $student->payments->where('type', 'registration')->first();
+                    @endphp
 
-                {{-- 🔥 ACTION --}}
+                    <div class="mt-3">
+
+                        <p class="text-sm font-semibold">Bukti Pembayaran:</p>
+
+                        {{-- 🔥 PREVIEW --}}
+                        @if($payment && $payment->proof_file)
+
+                            <img src="{{ asset('storage/' . $payment->proof_file) }}"
+                                class="w-32 mt-2 border rounded cursor-pointer"
+                                onclick="window.open(this.src)">
+
+                            <div>
+                                <a href="{{ asset('storage/' . $payment->proof_file) }}"
+                                target="_blank"
+                                class="text-sm text-blue-600 underline">
+                                    Lihat ukuran penuh
+                                </a>
+                            </div>
+
+                        @else
+                            <p class="text-sm text-gray-500">Belum upload bukti</p>
+                        @endif
+
+                        {{-- 🔥 STATUS --}}
+                        <div class="mt-2">
+
+                            @if(!$payment || !$payment->proof_file)
+                                <span class="text-sm text-gray-500">
+                                    ⏳ Menunggu pembayaran
+                                </span>
+
+                            @elseif($payment->status == 'pending')
+                                <span class="text-sm text-yellow-600">
+                                    ⏳ Menunggu verifikasi admin
+                                </span>
+
+                            @elseif($payment->status == 'paid')
+                                <span class="text-sm text-green-600">
+                                    ✔ Pembayaran terverifikasi
+                                </span>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                {{-- ACTION --}}
                 <div class="flex items-center gap-3 mt-4">
 
                     {{-- PILIH KELAS --}}
@@ -64,9 +113,15 @@
                             @endforeach
                         </select>
 
-                        <button class="px-3 py-1 text-white bg-green-600 rounded">
-                            Approve
-                        </button>
+                        @if($payment && $payment->proof_file)
+                            <button class="px-3 py-1 text-white bg-green-600 rounded">
+                                Approve
+                            </button>
+                        @else
+                            <button class="px-3 py-1 text-white bg-gray-400 rounded" disabled>
+                                Menunggu Pembayaran
+                            </button>
+                        @endif
                     </form>
 
                     {{-- REJECT --}}

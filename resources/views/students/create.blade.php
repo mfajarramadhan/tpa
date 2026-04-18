@@ -36,6 +36,18 @@
                     <label>Sekolah Asal</label>
                     <input type="text" name="school_origin" class="w-full p-2 border rounded" placeholder="Contoh: SDN Klari">
                 </div>
+
+                <div class="p-3 mt-4 bg-yellow-100 rounded">
+                    <strong>Biaya Pendaftaran:</strong> Rp 100.000
+                </div>
+
+                <div class="mt-3">
+                    <label>Bukti Pembayaran</label>
+                    <input type="file"
+                        name="proof_file"
+                        required
+                        class="w-full p-2 border rounded">
+                </div>
                 
                 <div class="mb-4">
                     <label>Upload KK</label>

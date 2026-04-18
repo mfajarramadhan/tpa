@@ -15,6 +15,7 @@ class Payment extends Model
         'student_id',
         'type',
         'month',
+        'original_amount',
         'amount',
         'proof_file',
         'status',

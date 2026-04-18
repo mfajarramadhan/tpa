@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
@@ -52,11 +53,13 @@ class StudentController extends Controller
             'school_origin' => 'required|string|max:255',    
             'kk_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
             'birth_certificate_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
+            'proof_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         // Upload file
         $kkPath = $request->file('kk_file')->store('kk', 'public');
         $aktaPath = $request->file('birth_certificate_file')->store('akta', 'public');
+        $proofPath = $request->file('proof_file')->store('payments', 'public');
 
         // Generate email unik siswa
         // ambil nama (tanpa spasi)
@@ -88,7 +91,7 @@ class StudentController extends Controller
         $user->assignRole('siswa');
 
         // Simpan data siswa
-        Student::create([
+        $student = Student::create([
             'parent_id' => Auth::user()->id,
             'user_id' => $user->id,
             'classroom_id' => null,
@@ -99,7 +102,18 @@ class StudentController extends Controller
             'school_origin' => $request->school_origin,
             'kk_file' => $kkPath,
             'birth_certificate_file' => $aktaPath,
-            'status' => 'nonaktif' // menunggu approval
+            'status' => 'nonaktif'
+        ]);
+
+        // Buat pembayaran registrasi
+        Payment::create([
+            'student_id' => $student->id,
+            'type' => 'registration',
+            'month' => null,
+            'original_amount' => 100000,
+            'amount' => 100000,
+            'proof_file' => $proofPath,
+            'status' => 'pending'
         ]);
 
         return redirect()->route('students.index')
