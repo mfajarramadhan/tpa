@@ -19,7 +19,10 @@ class Payment extends Model
         'amount',
         'proof_file',
         'status',
-        'approved_by'
+        'paid_at',
+        'approved_by',
+        'approved_at',
+        'reject_reason',
     ];
 
     public function student()
@@ -30,5 +33,10 @@ class Payment extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function getFinalAmountAttribute()
+    {
+        return $this->original_amount + $this->adjustment;
     }
 }

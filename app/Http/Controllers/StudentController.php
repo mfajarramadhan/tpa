@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fee;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
@@ -30,7 +31,8 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return view('students.create');
+        $fee = Fee::first();
+        return view('students.create', compact('fee'));
     }
 
     /**

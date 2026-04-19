@@ -71,10 +71,10 @@
                        required>
             </div>
 
-            <div class="mb-3">
-                <label class="block text-sm">Bukti Pembayaran (Opsional)</label>
+            {{-- BUKTI PEMBAYARAN --}}
+            <div class="mb-4">
+                <label class="block mb-1 text-sm font-medium">Bukti Pembayaran (Opsional)</label>
 
-                {{-- PREVIEW FILE LAMA --}}
                 @php
                     $payment = \App\Models\Payment::where('student_id', $student->id)
                         ->where('type', 'registration')
@@ -84,30 +84,62 @@
                 @if($payment && $payment->proof_file)
                     <div class="mb-2">
                         <img src="{{ asset('storage/' . $payment->proof_file) }}"
-                            class="w-32 border rounded">
-                        <p class="text-xs text-gray-500">Bukti sebelumnya</p>
+                            class="object-cover w-32 border rounded-lg h-28">
+                        <p class="mt-1 text-xs text-gray-500">Bukti sebelumnya</p>
                     </div>
                 @endif
 
                 <input type="file"
                     name="payment_proof"
-                    class="w-full p-2 border rounded">
+                    class="w-full p-2 text-sm border rounded-lg">
 
-                <p class="text-xs text-gray-400">
-                    Kosongkan jika tidak ingin mengganti bukti
+                <p class="mt-1 text-xs text-gray-400">
+                    Kosongkan jika tidak ingin mengganti
                 </p>
             </div>
 
+
             {{-- KK --}}
-            <div class="mb-3">
-                <label class="block text-sm">Upload KK (opsional)</label>
-                <input type="file" name="kk_file" class="w-full p-2 border rounded">
+            <div class="mb-4">
+                <label class="block mb-1 text-sm font-medium">KK (Opsional)</label>
+
+                @if($student->kk_file)
+                    <div class="mb-2">
+                        <img src="{{ asset('storage/' . $student->kk_file) }}"
+                            class="object-cover w-32 border rounded-lg h-28">
+                        <p class="mt-1 text-xs text-gray-500">File sebelumnya</p>
+                    </div>
+                @endif
+
+                <input type="file"
+                    name="kk_file"
+                    class="w-full p-2 text-sm border rounded-lg">
+
+                <p class="mt-1 text-xs text-gray-400">
+                    Kosongkan jika tidak ingin mengganti
+                </p>
             </div>
 
+
             {{-- AKTA --}}
-            <div class="mb-3">
-                <label class="block text-sm">Upload Akta (opsional)</label>
-                <input type="file" name="birth_certificate_file" class="w-full p-2 border rounded">
+            <div class="mb-4">
+                <label class="block mb-1 text-sm font-medium">Akta Kelahiran (Opsional)</label>
+
+                @if($student->birth_certificate_file)
+                    <div class="mb-2">
+                        <img src="{{ asset('storage/' . $student->birth_certificate_file) }}"
+                            class="object-cover w-32 border rounded-lg h-28">
+                        <p class="mt-1 text-xs text-gray-500">File sebelumnya</p>
+                    </div>
+                @endif
+
+                <input type="file"
+                    name="birth_certificate_file"
+                    class="w-full p-2 text-sm border rounded-lg">
+
+                <p class="mt-1 text-xs text-gray-400">
+                    Kosongkan jika tidak ingin mengganti
+                </p>
             </div>
 
             <p class="text-xs text-yellow-600">

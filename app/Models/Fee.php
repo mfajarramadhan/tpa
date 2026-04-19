@@ -6,5 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Fee extends Model
 {
-    //
+    protected $fillable = [
+        'registration_fee',
+        'monthly_fee',
+    ];
 }

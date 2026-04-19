@@ -15,13 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->enum('type', ['registration', 'monthly']);
-            $table->string('month')->nullable(); // contoh: 2026-03
+            $table->string('month')->nullable();
             $table->integer('original_amount');
+            $table->integer('adjustment')->default(0);
             $table->integer('amount');
             $table->string('proof_file')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
             $table->timestamp('paid_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at')->nullable();
+            $table->text('reject_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

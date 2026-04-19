@@ -88,12 +88,41 @@
 
             {{-- BUTTON BAYAR --}}
             @role('orang_tua')
+            {{-- Cek ada tagihan atau tidak --}}
+            @php
+                $payments = $selectedStudent->payments->where('type', 'monthly');
+
+                // tagihan normal (belum bayar)
+                $hasUnpaidNormal = $payments
+                    ->where('status', 'pending')
+                    ->whereNull('proof_file')
+                    ->count() > 0;
+
+                // ada yang ditolak
+                $hasRejected = $payments
+                    ->where('status', 'rejected')
+                    ->count() > 0;
+            @endphp
             @if($selectedStudent)
                 <div class="mb-3">
-                    <a href="{{ route('payments.create', ['student_id' => $selectedStudent->id]) }}"
-                    class="px-4 py-2 text-white bg-blue-600 rounded">
-                        Bayar Iuran
-                    </a>
+                    @if($hasUnpaidNormal)
+                        <a href="{{ route('payments.create', ['student_id' => $selectedStudent->id]) }}"
+                        class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                            Bayar Iuran
+                        </a>
+
+                    @elseif($hasRejected)
+                        <button disabled
+                            class="px-4 py-2 text-white bg-red-400 rounded cursor-not-allowed">
+                            Perbaiki Pembayaran Ditolak
+                        </button>
+
+                    @else
+                        <button disabled
+                            class="px-4 py-2 text-white bg-gray-400 rounded cursor-not-allowed">
+                            Tidak Ada Tagihan
+                        </button>
+                    @endif
                 </div>
             @endif
             @endrole
@@ -129,8 +158,26 @@
                         </td>
 
                         <td class="p-3">
-                            {{ $data['status'] }}
-                        </td>
+                        @php
+                            $status = $data['status'];
+
+                            if ($status == 'Lunas') {
+                                $class = 'bg-green-500';
+                            } elseif ($status == 'Menunggak') {
+                                $class = 'bg-red-600';
+                            } elseif ($status == 'Menunggu Konfirmasi') {
+                                $class = 'bg-yellow-500';
+                            } elseif ($status == 'Tidak ada tagihan') {
+                                $class = 'bg-gray-400';
+                            } else {
+                                $class = 'bg-gray-500'; // Belum Bayar
+                            }
+                        @endphp
+
+                        <span class="px-2 py-1 text-white rounded text-xs {{ $class }}">
+                            {{ $status }}
+                        </span>
+                    </td>
 
                         <td class="p-3 text-center">
                             <a href="{{ route('payments.student.show', $data['student']->id) }}"
@@ -159,6 +206,7 @@
                             <th class="p-3 text-right">Nominal</th>
                             <th class="p-3">Bukti</th>
                             <th class="p-3">Tanggal Bayar</th>
+                            <th class="p-3 text-center">Aksi</th>
                         </tr>
                     </thead>
 
@@ -182,20 +230,29 @@
                                     }
                                 @endphp
 
-                                <span class="px-2 py-1 text-white rounded text-xs
+                                <span class="px-2 py-1 rounded text-xs text-white
                                     @if($payment->status == 'paid') bg-green-500
+                                    @elseif($payment->status == 'rejected') bg-red-600
+                                    @elseif($payment->proof_file) bg-yellow-500
                                     @elseif($isLate) bg-red-600
-                                    @else bg-yellow-500
-                                    @endif">
+                                    @else bg-gray-500
+                                    @endif
+                                ">
 
                                     @if($payment->status == 'paid')
                                         Lunas
+
+                                    @elseif($payment->status == 'rejected')
+                                        Ditolak
+
                                     @elseif($payment->proof_file)
-                                        Pending
+                                        Menunggu Konfirmasi
+
                                     @elseif($isLate)
                                         Telat
+
                                     @else
-                                        Pending
+                                        Belum Bayar
                                     @endif
 
                                 </span>
@@ -203,7 +260,7 @@
 
                             {{-- NOMINAL --}}
                             <td class="p-3 text-right">
-                                Rp {{ number_format($payment->original_amount) }}
+                                Rp {{ number_format($payment->final_amount) }}
                             </td>
 
                             {{-- BUKTI --}}
@@ -224,6 +281,31 @@
                                 @else
                                     -
                                 @endif
+                            </td>
+
+                            <td class="p-3 text-center">
+
+                                {{-- ✔ SUDAH LUNAS --}}
+                                @if($payment->status == 'paid')
+                                    <span class="text-gray-400">-</span>
+
+                                {{-- ❌ DITOLAK --}}
+                                @elseif($payment->status == 'rejected')
+
+                                    <a href="{{ route('payments.create', ['student_id' => $payment->student_id]) }}"
+                                    class="px-2 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600">
+                                        Perbaiki & Bayar
+                                    </a>
+
+                                {{-- ⏳ SUDAH UPLOAD (MENUNGGU) --}}
+                                @elseif($payment->proof_file)
+                                    <span class="text-gray-400">-</span>
+
+                                {{-- ❌ BELUM BAYAR --}}
+                                @else
+                                    <span class="text-gray-400">-</span> 
+                                @endif
+
                             </td>
 
                         </tr>

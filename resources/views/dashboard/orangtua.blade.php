@@ -78,13 +78,12 @@
                                     $monthlyPayments = $student->payments->where('type', 'monthly');
 
                                     $sisaTagihan = $monthlyPayments
-                                        ->where('status', 'pending')
-                                        ->whereNull('proof_file') // belum bayar
-                                        ->sum('original_amount');
+                                        ->where('status', '!=', 'paid') // status belum paid maka blm bayar
+                                        ->sum(fn($p) => $p->original_amount + $p->adjustment);
 
                                     $sudahDibayar = $monthlyPayments
                                         ->where('status', 'paid')
-                                        ->sum('original_amount');
+                                        ->sum(fn($p) => $p->original_amount + $p->adjustment);
                                 @endphp
 
                                 <div class="p-3 rounded bg-gray-50">

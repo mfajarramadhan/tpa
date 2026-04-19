@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
@@ -56,7 +57,10 @@ Route::middleware('auth')->group(function () {
 
         // Pengaturan Biaya
         Route::get('/fees', [FeeController::class, 'index'])->name('fees.index');
-        Route::post('/fees', [FeeController::class, 'update'])->name('fees.update');
+        // Fees = Kenaikan biaya
+        Route::post('/fees/update', [FeeController::class, 'update'])->name('fees.update');
+        // Adjustment = Penurunan biaya
+        Route::post('/fees/adjustment', [AdjustmentController::class, 'apply'])->name('fees.adjustment.apply');
     });
 
     // Kehadiran
