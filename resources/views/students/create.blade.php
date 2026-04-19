@@ -35,7 +35,7 @@
                     <label class="block mb-1 text-sm font-semibold">Tanggal Lahir</label>
                     <input type="date" name="birth_date"
                            value="{{ old('birth_date') }}"
-                           max="{{ now()->subYears(3)->format('Y-m-d') }}"
+                           max="{{ now()->subYears(4)->format('Y-m-d') }}"
                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
                     @error('birth_date')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>

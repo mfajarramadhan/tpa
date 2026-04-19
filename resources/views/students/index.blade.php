@@ -41,6 +41,11 @@
                                         Rekap Absensi
                                     </a>
 
+                                    <a href="{{ route('students.show', $student->id) }}"
+                                        class="px-3 py-1 text-white bg-gray-600 rounded hover:bg-gray-700">
+                                            Lihat
+                                        </a>
+
                                     <a href="{{ route('students.edit', $student->id) }}"
                                        class="px-3 py-1 text-white bg-yellow-400 rounded">
                                         Edit

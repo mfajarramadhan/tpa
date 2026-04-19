@@ -86,23 +86,30 @@
             @endif
             @endrole
 
-            {{-- BUTTON BAYAR --}}
             @role('orang_tua')
             {{-- Cek ada tagihan atau tidak --}}
-            @php
-                $payments = $selectedStudent->payments->where('type', 'monthly');
+            @if($selectedStudent)
+                @php
+                    $payments = $selectedStudent->payments->where('type', 'monthly');
 
-                // tagihan normal (belum bayar)
-                $hasUnpaidNormal = $payments
-                    ->where('status', 'pending')
-                    ->whereNull('proof_file')
-                    ->count() > 0;
+                    // tagihan normal (belum bayar)
+                    $hasUnpaidNormal = $payments
+                        ->where('status', 'pending')
+                        ->whereNull('proof_file')
+                        ->count() > 0;
 
-                // ada yang ditolak
-                $hasRejected = $payments
-                    ->where('status', 'rejected')
-                    ->count() > 0;
-            @endphp
+                    // ada yang ditolak
+                    $hasRejected = $payments
+                        ->where('status', 'rejected')
+                        ->count() > 0;
+                @endphp
+            @else
+                <div class="p-4 text-sm text-gray-500 bg-gray-100 rounded">
+                    Belum ada data siswa.
+                </div>
+            @endif
+
+            {{-- BUTTON BAYAR --}}
             @if($selectedStudent)
                 <div class="mb-3">
                     @if($hasUnpaidNormal)
@@ -168,7 +175,7 @@
                             } elseif ($status == 'Menunggu Konfirmasi') {
                                 $class = 'bg-yellow-500';
                             } elseif ($status == 'Tidak ada tagihan') {
-                                $class = 'bg-gray-400';
+                                $class = 'bg-black';
                             } else {
                                 $class = 'bg-gray-500'; // Belum Bayar
                             }

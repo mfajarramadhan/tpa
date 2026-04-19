@@ -39,42 +39,49 @@
                         class="w-full p-2 border rounded">
                 </div>
 
+                <p class="text-xs text-gray-500">
+                    Perubahan biaya hanya berlaku untuk pendaftaran baru & bulan berikutnya
+                </p>
+
                 <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded">
                     Simpan Biaya
                 </button>
             </form>
-        </div>
 
-        {{-- ===================== --}}
-        {{-- 🔴 SECTION: ADJUSTMENT --}}
-        {{-- ===================== --}}
-        <div class="p-5 bg-white rounded shadow">
-            <h3 class="mb-4 font-semibold text-red-600">
-                Penyesuaian Tagihan (Mass Update)
-            </h3>
+            <div class="mt-6">
+                <h3 class="mb-2 font-semibold">Riwayat Perubahan Biaya</h3>
 
-            <form method="POST" action="{{ route('fees.adjustment.apply') }}">
-                @csrf
+                <table class="w-full text-sm border">
+                    <tr class="bg-gray-100">
+                        <th class="p-2">User</th>
+                        <th class="p-2">Pendaftaran</th>
+                        <th class="p-2">Iuran</th>
+                        <th class="p-2">Waktu</th>
+                    </tr>
 
-                <div class="mb-3">
-                    <label class="text-sm">Nominal Penyesuaian</label>
-                    <input type="number" name="amount"
-                        class="w-full p-2 border rounded"
-                        placeholder="contoh: -10000">
+                    @foreach($logs as $log)
+                        <tr class="border-t">
+                            <td class="p-2">{{ $log->user->name }}</td>
 
-                    <p class="mt-1 text-xs text-gray-500">
-                        Gunakan minus (-) untuk diskon
-                    </p>
+                            <td class="p-2">
+                                {{ number_format($log->old_registration_fee) }}
+                                →
+                                {{ number_format($log->new_registration_fee) }}
+                            </td>
 
-                    <p class="mt-1 text-xs text-red-500">
-                        ⚠ Akan mengubah semua tagihan yang belum dibayar
-                    </p>
-                </div>
+                            <td class="p-2">
+                                {{ number_format($log->old_monthly_fee) }}
+                                →
+                                {{ number_format($log->new_monthly_fee) }}
+                            </td>
 
-                <button class="px-4 py-2 text-white bg-red-600 rounded">
-                    Terapkan Penyesuaian
-                </button>
-            </form>
+                            <td class="p-2">
+                                {{ $log->created_at->format('d M Y H:i') }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
         </div>
 
     </div>

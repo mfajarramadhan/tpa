@@ -90,34 +90,46 @@ class PaymentController extends Controller
                         ->get();
 
                     $totalTagihan = $payments->sum(function ($p) {
-                        return $p->original_amount + $p->adjustment;
+                        return $p->original_amount;
                     });
                     $totalDibayar = $payments->where('status', 'paid')
                     ->sum(function ($p) {
-                        return $p->original_amount + $p->adjustment;
+                        return $p->original_amount;
                     });
 
                     $sisaTagihan = $totalTagihan - $totalDibayar;
 
                     $status = 'Belum Bayar';
 
-                    // 🔥 cek ada upload bukti (menunggu konfirmasi)
+                    // cek kondisi penting
                     $menungguKonfirmasi = $payments
                         ->where('status', '!=', 'paid')
                         ->whereNotNull('proof_file')
                         ->count() > 0;
 
-                    if ($totalDibayar == 0 && $totalTagihan == 0) {
-                        $status = 'Tidak ada tagihan';
+                    $belumBayar = $payments
+                        ->where('status', 'pending')
+                        ->whereNull('proof_file')
+                        ->count() > 0;
 
-                    } elseif ($menungguKonfirmasi) {
-                        $status = 'Menunggu Konfirmasi'; // 🔥 tambahan kamu
+                    // PRIORITAS SESUAI URUTAN
+                    if ($menungguKonfirmasi) {
+                        $status = 'Menunggu Konfirmasi';
 
                     } elseif ($totalDibayar > 0 && $totalDibayar < $totalTagihan) {
                         $status = 'Menunggak';
 
+                    } elseif ($belumBayar) {
+                        $status = 'Belum Bayar';
+
                     } elseif ($totalDibayar == $totalTagihan && $totalTagihan > 0) {
                         $status = 'Lunas';
+
+                    } elseif ($totalTagihan == 0) {
+                        $status = 'Tidak ada tagihan';
+
+                    } else {
+                        $status = 'Belum Bayar';
                     }
 
                     return [
@@ -126,17 +138,25 @@ class PaymentController extends Controller
                         'total_dibayar' => $totalDibayar,
                         'sisa_tagihan' => $sisaTagihan,
                         'status' => $status,
-                    ];
-                });
-        }
 
-        // TOTAL GLOBAL
-        // $totalUnpaid = $payments->where('status', 'pending')->sum('amount');
-        // $totalPaid   = $payments->where('status', 'paid')->sum('amount');
-        // $allPayments = Payment::where('type', 'monthly')->get();
-        // $totalTagihanAll = $allPayments->sum('original_amount');
-        // $totalDibayarAll = $allPayments->where('status', 'paid')->sum('original_amount');
-        // $sisaTagihanAll  = $allPayments->where('status', 'pending')->sum('original_amount');
+                        // URUTAN PRIORITAS
+                        // PAKAI PRIORITY KARENA $studentsSummary ADALAH COLLECTION, BUKAN QUERY DB
+                        'priority' => match ($status) {
+                            'Menunggu Konfirmasi' => 1,
+                            'Menunggak' => 2,
+                            'Belum Bayar' => 3,
+                            'Lunas' => 4,
+                            'Tidak ada tagihan' => 5,
+                            default => 99,
+                        }
+                    ];
+                })
+                ->sortBy([
+                    ['priority', 'asc'],
+                    ['sisa_tagihan', 'desc']
+                ])
+                ->values();
+        }
 
         $totalUnpaid = $payments
             ->where('status', 'pending')
@@ -260,11 +280,11 @@ class PaymentController extends Controller
         // $totalPaid = $payments->where('status', 'paid')->sum('original_amount');
         $totalUnpaid = $payments
             ->where('status', 'pending')
-            ->sum(fn($p) => $p->original_amount + $p->adjustment);
+            ->sum('original_amount');
 
         $totalPaid = $payments
             ->where('status', 'paid')
-            ->sum(fn($p) => $p->original_amount + $p->adjustment);
+            ->sum('original_amount');
 
         return view('payments.show', compact(
             'student',
@@ -287,19 +307,15 @@ class PaymentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'original_amount' => 'required|integer|min:0'
+        ]);
+
         $payment = Payment::findOrFail($id);
 
-        $payment->original_amount = $request->original_amount;
-
-        // hitung ulang total
-        $previousUnpaid = Payment::where('student_id', $payment->student_id)
-            ->where('status', 'pending')
-            ->where('id', '!=', $payment->id)
-            ->sum('amount');
-
-        $payment->amount = $request->original_amount + $previousUnpaid;
-
-        $payment->save();
+        $payment->update([
+            'original_amount' => $request->original_amount
+        ]);
 
         return redirect()->route('payments.index')
             ->with('success', 'Nominal berhasil diupdate');
@@ -352,7 +368,7 @@ class PaymentController extends Controller
             return back()->with('success', 'Siswa berhasil di-approve');
         }
 
-        // 🔥 APPROVE IURAN BULANAN
+        // APPROVE IURAN BULANAN
         if ($payment->type == 'monthly') {
 
             $payment->update([

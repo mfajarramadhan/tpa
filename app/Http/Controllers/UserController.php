@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -66,7 +67,7 @@ class UserController extends Controller
     // 🔷 DETAIL USER
     public function show($id)
     {
-        $user = User::with('roles')->findOrFail($id);
+        $user = User::with(['student.classroom'])->findOrFail($id);
 
         return view('users.show', compact('user'));
     }
@@ -74,14 +75,11 @@ class UserController extends Controller
     // 🔷 FORM EDIT USER
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        $roles = Role::all();
+        $user = User::with('student')->findOrFail($id);
 
-        if ($user->id == auth()->id()) {
-            abort(403);
-        }
+        $classrooms = Classroom::all();
 
-        return view('users.edit', compact('user', 'roles'));
+        return view('users.edit', compact('user', 'classrooms'));
     }
 
     // 🔷 UPDATE DATA USER
@@ -90,26 +88,42 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'status' => 'required',
-            'role' => 'required'
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'address' => 'nullable|string|max:255',
+            'password' => 'nullable|min:6',
         ]);
 
+        // PROTEKSI SUPERADMIN
         if ($user->hasRole('superadmin') && auth()->id() != $user->id) {
             return back()->with('error', 'Tidak bisa mengubah superadmin lain');
         }
 
-        $user->update([
+        $data = [
             'name' => $request->name,
             'email' => $request->email,
-            'status' => $request->status
-        ]);
+            'address' => $request->address,
+        ];
 
-        // update role
-        $user->syncRoles([$request->role]);
+        // PASSWORD OPTIONAL
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
 
-        return redirect()->route('users.index')->with('success', 'User berhasil diupdate');
+        $user->update($data);
+
+        if ($user->student) {
+            $user->student->update([
+                'classroom_id' => $request->classroom_id,
+                'nik' => $request->nik,
+                'birth_date' => $request->birth_date,
+                'gender' => $request->gender,
+                'school_origin' => $request->school_origin
+            ]);
+        }
+
+        return redirect()->route('users.index')
+            ->with('success', 'User berhasil diupdate');
     }
 
     // 🔷 UPDATE ROLE (CEPAT - DROPDOWN)

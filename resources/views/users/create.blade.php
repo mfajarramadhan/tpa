@@ -14,6 +14,17 @@
                 <input type="text" name="name" class="w-full p-2 border rounded" required>
             </div>
 
+            {{-- ALAMAT --}}
+           <div class="mb-3">
+                <label>Alamat</label>
+
+                <textarea name="address"
+                        rows="3"
+                        placeholder="Masukkan alamat lengkap..."
+                        class="w-full p-2 text-sm border rounded-lg resize-none focus:ring focus:ring-blue-200"
+                        required></textarea>
+            </div>
+
             {{-- EMAIL --}}
             <div class="mb-3">
                 <label>Email</label>

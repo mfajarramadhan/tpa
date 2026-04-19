@@ -127,9 +127,10 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Student $student)
+    public function show($id)
     {
-        $this->authorizeStudent($student);
+        $student = Student::with(['classroom', 'user'])
+            ->findOrFail($id);
 
         return view('students.show', compact('student'));
     }
@@ -147,18 +148,40 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(Request $request, $id)
     {
-        $this->authorizeStudent($student);
+        $student = Student::with('user')->findOrFail($id);
 
         $request->validate([
-            'name' => 'required',
-            'address' => 'required'
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $student->user_id,
+            'password' => 'nullable|min:6',
+            'classroom_id' => 'required|exists:classrooms,id',
+            'nik' => 'required',
+            'birth_date' => 'required|date',
+            'gender' => 'required|in:L,P',
+            'school_origin' => 'nullable|string'
         ]);
 
-        $student->update($request->only('name', 'address'));
+        // 🔥 UPDATE USER (login siswa)
+        $userData = [
+            'name' => $request->name,
+            'email' => $request->email,
+        ];
 
-        return redirect()->route('students.index')->with('success', 'Data berhasil diupdate');
+        $student->user->update($userData);
+
+        // 🔥 UPDATE DATA SISWA
+        $student->update([
+            'name' => $request->name,
+            'classroom_id' => $request->classroom_id,
+            'nik' => $request->nik,
+            'birth_date' => $request->birth_date,
+            'gender' => $request->gender,
+            'school_origin' => $request->school_origin
+        ]);
+
+        return back()->with('success', 'Data siswa berhasil diperbarui');
     }
 
     /**
