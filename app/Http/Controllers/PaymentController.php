@@ -89,13 +89,11 @@ class PaymentController extends Controller
                         ->where('type', 'monthly')
                         ->get();
 
-                    $totalTagihan = $payments->sum(function ($p) {
-                        return $p->original_amount;
-                    });
-                    $totalDibayar = $payments->where('status', 'paid')
-                    ->sum(function ($p) {
-                        return $p->original_amount;
-                    });
+                    $totalTagihan = $payments->sum('original_amount');
+
+                    $totalDibayar = $payments
+                        ->where('status', 'paid')
+                        ->sum('original_amount');
 
                     $sisaTagihan = $totalTagihan - $totalDibayar;
 
@@ -158,24 +156,20 @@ class PaymentController extends Controller
                 ->values();
         }
 
-        $totalUnpaid = $payments
-            ->where('status', 'pending')
-            ->sum(fn($p) => $p->original_amount + $p->adjustment);
+        $totalTagihan = $payments->sum('original_amount');
 
         $totalPaid = $payments
             ->where('status', 'paid')
-            ->sum(fn($p) => $p->original_amount + $p->adjustment);
-            $allPayments = Payment::where('type', 'monthly')->get();
+            ->sum('original_amount');
 
-        $totalTagihanAll = $allPayments->sum(fn($p) =>
-            $p->original_amount + $p->adjustment
-        );
+        $totalUnpaid = max(0, $totalTagihan - $totalPaid);
+            
+        $allPayments = Payment::where('type', 'monthly')->get();
 
+        $totalTagihanAll = $allPayments->sum('original_amount');
         $totalDibayarAll = $allPayments
             ->where('status', 'paid')
-            ->sum(fn($p) =>
-                $p->original_amount + $p->adjustment
-            );
+            ->sum('original_amount');
 
         $sisaTagihanAll = $totalTagihanAll - $totalDibayarAll;
 
@@ -272,19 +266,20 @@ class PaymentController extends Controller
 
         //  hanya monthly (untuk iuran)
         $payments = Payment::where('student_id', $id)
-            ->where('type', 'monthly')
-            ->orderBy('month', 'asc')
-            ->get();
+        ->where('type', 'monthly')
+        ->orderBy('month', 'asc')
+        ->get();
 
-        // $totalUnpaid = $payments->where('status', 'pending')->sum('original_amount');
-        // $totalPaid = $payments->where('status', 'paid')->sum('original_amount');
-        $totalUnpaid = $payments
-            ->where('status', 'pending')
-            ->sum('original_amount');
+        // TOTAL TAGIHAN (SEMUA)
+        $totalTagihan = $payments->sum('original_amount');
 
+        // TOTAL DIBAYAR
         $totalPaid = $payments
             ->where('status', 'paid')
             ->sum('original_amount');
+
+        // SISA TAGIHAN
+        $totalUnpaid = $totalTagihan - $totalPaid;
 
         return view('payments.show', compact(
             'student',

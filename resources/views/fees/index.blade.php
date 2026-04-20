@@ -3,86 +3,122 @@
         <h2 class="text-xl font-semibold">Pengaturan Biaya</h2>
     </x-slot>
 
-    <div class="max-w-3xl py-6 mx-auto space-y-6">
-        {{-- ALERT --}}
-            @if(session('success'))
-                <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">
-                    {{ session('success') }}
-                </div>
-            @endif
+    <div class="flex flex-col overflow-hidden shadow-sm card-panel">
 
-        {{-- ===================== --}}
-        {{-- 🟢 SECTION: FEE --}}
-        {{-- ===================== --}}
-        <div class="p-5 bg-white rounded shadow">
-            <h3 class="mb-4 font-semibold">Biaya Default</h3>
+    <!-- Header -->
+    <div class="p-5 border-b border-[var(--border-light)] bg-[var(--bg)]">
+        <h3 class="font-semibold text-[var(--text-main)]">Biaya Default</h3>
+    </div>
 
-            <form method="POST" action="{{ route('fees.update') }}">
-                @csrf
+    <!-- Form -->
+    <div class="p-5 space-y-4">
 
-                <div class="mb-3">
-                    <label class="text-sm">Biaya Pendaftaran</label>
-                    <input type="number" name="registration_fee"
-                        value="{{ $fee->registration_fee }}"
-                        class="w-full p-2 border rounded">
-                        @if ($errors->any())
-                            <div class="text-red-500">
-                                {{ $errors->first() }}
-                            </div>
-                        @endif
-                </div>
+        <form method="POST" action="{{ route('fees.update') }}">
+            @csrf
 
-                <div class="mb-3">
-                    <label class="text-sm">Iuran Bulanan</label>
-                    <input type="number" name="monthly_fee"
-                        value="{{ $fee->monthly_fee }}"
-                        class="w-full p-2 border rounded">
-                </div>
+            <!-- Biaya Pendaftaran -->
+            <div>
+                <label class="font-semibold text-[var(--text-main)] mb-1 block">
+                    Biaya Pendaftaran
+                </label>
+                <input type="number" name="registration_fee"
+                    value="{{ $fee->registration_fee }}"
+                    class="input-solid w-full rounded-xl py-2.5 border-[var(--border)] bg-[var(--surface)]">
 
-                <p class="text-xs text-gray-500">
-                    Perubahan biaya hanya berlaku untuk pendaftaran baru & bulan berikutnya
-                </p>
-
-                <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded">
-                    Simpan Biaya
-                </button>
-            </form>
-
-            <div class="mt-6">
-                <h3 class="mb-2 font-semibold">Riwayat Perubahan Biaya</h3>
-
-                <table class="w-full text-sm border">
-                    <tr class="bg-gray-100">
-                        <th class="p-2">User</th>
-                        <th class="p-2">Pendaftaran</th>
-                        <th class="p-2">Iuran</th>
-                        <th class="p-2">Waktu</th>
-                    </tr>
-
-                    @foreach($logs as $log)
-                        <tr class="border-t">
-                            <td class="p-2">{{ $log->user->name }}</td>
-
-                            <td class="p-2">
-                                {{ number_format($log->old_registration_fee) }}
-                                →
-                                {{ number_format($log->new_registration_fee) }}
-                            </td>
-
-                            <td class="p-2">
-                                {{ number_format($log->old_monthly_fee) }}
-                                →
-                                {{ number_format($log->new_monthly_fee) }}
-                            </td>
-
-                            <td class="p-2">
-                                {{ $log->created_at->format('d M Y H:i') }}
-                            </td>
-                        </tr>
-                    @endforeach
-                </table>
+                @if ($errors->any())
+                    <div class="text-[var(--danger)] text-xs mt-1">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
             </div>
-        </div>
+
+            <!-- Iuran Bulanan -->
+            <div>
+                <label class="font-semibold text-[var(--text-main)] mb-1 mt-2 block">
+                    Iuran Bulanan
+                </label>
+                <input type="number" name="monthly_fee"
+                    value="{{ $fee->monthly_fee }}"
+                    class="input-solid w-full rounded-xl py-2.5 border-[var(--border)] bg-[var(--surface)]">
+            </div>
+
+            <!-- Info -->
+            <p class="text-xs text-[var(--text-tertiary)] italic mb-1 mt-1">
+                <span class="font-bold">Catatan:</span> Perubahan biaya hanya berlaku untuk pendaftaran baru & bulan berikutnya
+            </p>
+
+            <!-- Button -->
+            <button type="submit"
+                class="flex items-center gap-2 mt-2 shadow-sm btn-primary">
+                <iconify-icon icon="solar:diskette-bold-duotone" width="20"></iconify-icon>
+                Simpan Biaya
+            </button>
+
+        </form>
 
     </div>
+
+    <!-- Riwayat -->
+    <div class="p-5 border-t border-[var(--border-light)]">
+        <h3 class="mb-4 font-semibold text-[var(--text-main)]">
+            Riwayat Perubahan Biaya
+        </h3>
+
+        <div class="overflow-x-auto card-panel">
+            <table class="w-full text-sm table-custom">
+
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Pendaftaran</th>
+                        <th>Iuran</th>
+                        <th>Waktu</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach($logs as $log)
+                        <tr>
+
+                            <td class="font-semibold text-[var(--text-main)]">
+                                {{ $log->user->name }}
+                            </td>
+
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[var(--danger)] font-mono text-xs">
+                                        {{ number_format($log->old_registration_fee) }}
+                                    </span>
+                                    <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-[var(--text-tertiary)]"></iconify-icon>
+                                    <span class="text-[var(--success)] font-mono text-xs">
+                                        {{ number_format($log->new_registration_fee) }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[var(--danger)] font-mono text-xs">
+                                        {{ number_format($log->old_monthly_fee) }}
+                                    </span>
+                                    <iconify-icon icon="solar:arrow-right-bold-duotone" class="text-[var(--text-tertiary)]"></iconify-icon>
+                                    <span class="text-[var(--success)] font-mono text-xs">
+                                        {{ number_format($log->new_monthly_fee) }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="font-mono text-xs text-[var(--text-tertiary)]">
+                                {{ $log->created_at->format('d M Y H:i') }}
+                            </td>
+
+                        </tr>
+                    @endforeach
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
 </x-app-layout>

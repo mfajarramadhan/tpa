@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">Iuran Bulanan</h2>
+        <h2 class="text-xl font-semibold">Approval Pendaftaran</h2>
     </x-slot>
 
     <div class="py-6">

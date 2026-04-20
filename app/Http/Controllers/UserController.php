@@ -13,21 +13,34 @@ class UserController extends Controller
     // 🔷 LIST USER + FILTER
     public function index(Request $request)
     {
-        $query = User::where('id', '!=', auth()->id());
+        $status = $request->has('status') ? $request->status : 'active';
+
+        $query = User::withTrashed()
+            ->where('id', '!=', auth()->id());
 
         // 🔍 filter nama
         if ($request->name) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
+        // 🔍 filter role
         if ($request->role) {
-        $query->whereHas('roles', function ($q) use ($request) {
-            $q->where('name', $request->role);
-        });
-    }
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+
+        // 🔥 filter status
+        if ($status === 'deleted') {
+            $query->onlyTrashed();
+        } elseif ($status === 'active') {
+            $query->whereNull('deleted_at');
+        }
+        // kalau "" → semua
+
         $users = $query->with('roles')->latest()->get();
 
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'status'));
     }
 
     // 🔷 BUAT USER
@@ -173,5 +186,23 @@ class UserController extends Controller
         $user->delete();
 
         return back()->with('success', 'User berhasil dihapus');
+    }
+
+    public function forceDelete($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+
+        $user->forceDelete();
+
+        return back()->with('success', 'User dihapus permanen');
+    }
+
+    public function restore($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+
+        $user->restore();
+
+        return back()->with('success', 'User berhasil dikembalikan');
     }
 }

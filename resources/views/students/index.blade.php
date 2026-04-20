@@ -13,58 +13,104 @@
                 </a>
             </div>
 
-            <div class="overflow-hidden bg-white rounded-lg shadow">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-100">
-                        <tr class="transition hover:bg-gray-50">
-                            <th class="p-3 text-left">Nama</th>
-                            <th class="p-3 text-left">Kelas</th>
-                            <th class="p-3 text-left">Status</th>
-                            <th class="p-3 text-left">Aksi</th>
+            <div class="overflow-x-auto card-panel">
+                <table class="w-full text-sm table-custom">
+
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Asal Sekolah</th>
+                            <th>Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($students as $student)
-                            <tr class="border-t">
-                                <td class="p-3">{{ $student->name }}</td>
-                                <td class="p-3">{{ $student->classroom->name ?? '-' }}</td>
-                                <td class="p-3">
-                                    <span class="px-2 py-1 rounded text-white
-                                        {{ $student->status == 'aktif' ? 'bg-green-500' : 'bg-gray-500' }}">
+                            <tr>
+
+                                @php
+                                    $initial = strtoupper(substr($student->name, 0, 2));
+                                @endphp
+
+                                <td>
+                                    <div class="flex items-center gap-4">
+
+                                        {{-- Avatar Inisial --}}
+                                        <div class="w-10 h-10 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center font-bold text-sm border border-[var(--primary-light)]">
+                                            {{ $initial }}
+                                        </div>
+
+                                        {{-- Nama + Info kecil --}}
+                                        <div>
+                                            <div class="font-semibold text-[var(--text-main)]">
+                                                {{ $student->name }}
+                                            </div>
+                                            <div class="text-xs text-[var(--text-tertiary)] mt-0.5">
+                                                {{ $student->classroom->name ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+
+                                {{-- Asal Sekolah --}}
+                                <td class="text-small">
+                                    {{ $student->school_origin ?? '-' }}
+                                </td>
+
+                                {{-- Status --}}
+                                <td>
+                                    <span class="badge {{ $student->status == 'aktif' ? 'badge-success' : 'badge-info' }}">
+                                        <iconify-icon icon="{{ $student->status == 'aktif' ? 'solar:check-circle-bold-duotone' : 'solar:info-circle-bold-duotone' }}"></iconify-icon>
                                         {{ $student->status }}
                                     </span>
                                 </td>
-                                <td class="flex gap-2 p-3">
-                                    <a href="{{ route('attendance.student', $student->id) }}"
-                                        class="px-3 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
-                                        Rekap Absensi
-                                    </a>
 
-                                    <a href="{{ route('students.show', $student->id) }}"
-                                        class="px-3 py-1 text-white bg-gray-600 rounded hover:bg-gray-700">
-                                            Lihat
+                                {{-- Aksi --}}
+                                <td>
+                                    <div class="flex justify-center gap-2">
+
+                                        {{-- Rekap Absensi --}}
+                                        <a href="{{ route('attendance.student', $student->id) }}"
+                                        class="btn-icon bg-[var(--info-light)] text-[var(--info)] hover:bg-[var(--info)] hover:text-white"
+                                        title="Rekap Absensi">
+                                            <iconify-icon icon="solar:calendar-bold-duotone" width="18"></iconify-icon>
                                         </a>
 
-                                    <a href="{{ route('students.edit', $student->id) }}"
-                                       class="px-3 py-1 text-white bg-yellow-400 rounded">
-                                        Edit
-                                    </a>
+                                        {{-- Detail --}}
+                                        <a href="{{ route('students.show', $student->id) }}"
+                                        class="btn-icon border border-[var(--primary)] hover:border-[var(--primary)]"
+                                        title="Detail">
+                                            <iconify-icon icon="solar:eye-bold-duotone" width="18" class="text-[var(--primary)]"></iconify-icon>
+                                        </a>
 
-                                    <form action="{{ route('students.destroy', $student->id) }}"
-                                          method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="px-3 py-1 text-white bg-red-500 rounded">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                        {{-- Edit --}}
+                                        <a href="{{ route('students.edit', $student->id) }}"
+                                        class="btn-icon group bg-[var(--warning-light)] border border-[var(--warning-dark)] hover:bg-[var(--warning-dark)]"
+                                        title="Edit">
+                                            <iconify-icon icon="heroicons:pencil-square" width="18" class="text-[var(--warning-dark)] group-hover:text-white transition"></iconify-icon>                                        
+                                        </a>
 
+                                        {{-- Delete --}}
+                                        <form action="{{ route('students.destroy', $student->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button onclick="return confirm('Yakin hapus data ini?')"
+                                                class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
+                                                title="Hapus">
+                                                    <iconify-icon icon="heroicons:trash" width="18" class="text-[var(--danger)] group-hover:text-white transition"></iconify-icon>
+                                            </button>
+                                        </form>
+
+                                    </div>
                                 </td>
+
                             </tr>
                         @empty
-                            <tr class="transition hover:bg-gray-50">
-                                <td colspan="4" class="p-3 text-center text-gray-500">
+                            <tr>
+                                <td colspan="4" class="py-6 text-center text-small">
                                     Belum ada data
                                 </td>
                             </tr>

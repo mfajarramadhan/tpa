@@ -36,30 +36,48 @@
             @endrole
 
             @role('superadmin')
-            <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
 
-                <div class="p-4 bg-white rounded shadow">
-                    <p class="text-sm text-gray-500">Total Tagihan</p>
-                    <p class="text-lg font-bold">
-                        Rp {{ number_format($totalTagihanAll) }}
-                    </p>
+            {{-- Total Tagihan --}}
+            <div class="stat-card">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-caption">Total Tagihan</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                        <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
+                    </div>
                 </div>
-
-                <div class="p-4 bg-white rounded shadow">
-                    <p class="text-sm text-gray-500">Total Dibayar</p>
-                    <p class="text-lg font-bold text-green-600">
-                        Rp {{ number_format($totalDibayarAll) }}
-                    </p>
+                <div class="text-data">
+                    Rp {{ number_format($totalTagihanAll) }}
                 </div>
-
-                <div class="p-4 bg-white rounded shadow">
-                    <p class="text-sm text-gray-500">Sisa Tagihan</p>
-                    <p class="text-lg font-bold text-red-600">
-                        Rp {{ number_format($sisaTagihanAll) }}
-                    </p>
-                </div>
-
             </div>
+
+            {{-- Total Dibayar --}}
+            <div class="stat-card" style="border-left-color: var(--success);">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-caption">Total Dibayar</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
+                        <iconify-icon icon="solar:check-circle-bold-duotone" width="18"></iconify-icon>
+                    </div>
+                </div>
+                <div class="text-data text-[var(--success)]">
+                    Rp {{ number_format($totalDibayarAll) }}
+                </div>
+            </div>
+
+            {{-- Sisa Tagihan --}}
+            <div class="stat-card" style="border-left-color: var(--danger);">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-caption">Sisa Tagihan</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
+                        <iconify-icon icon="solar:danger-bold-duotone" width="18"></iconify-icon>
+                    </div>
+                </div>
+                <div class="text-data text-[var(--danger)]">
+                    Rp {{ number_format($sisaTagihanAll) }}
+                </div>
+            </div>
+
+        </div>
             @endrole
 
             {{-- LIST ANAK --}}
@@ -138,96 +156,144 @@
 
             <h3 class="mb-3 font-semibold">Data Iuran Siswa</h3>
 
-            <div class="overflow-hidden bg-white rounded shadow">
-            <table class="w-full text-sm">
+            <div class="overflow-hidden card-panel">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm table-custom">
+                        <thead>
+                            <tr>
+                                <th>Siswa</th>
+                                <th>Orang Tua</th>
+                                <th>Asal Sekolah</th>
+                                <th class="text-right">Tagihan</th>
+                                <th>Status</th>
+                                <th class="text-right">Aksi</th>
+                            </tr>
+                        </thead>
 
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-3">Nama</th>
-                        <th class="p-3">Orang Tua</th>
-                        <th class="p-3">Kelas</th>
-                        <th class="p-3 text-right">Sisa Tagihan</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3 text-center">Aksi</th>
-                    </tr>
-                </thead>
+                        <tbody>
+                            @foreach($studentsSummary as $data)
+                                @php
+                                    $student = $data['student'];
+                                    $tagihan = $data['total_tagihan'] - $data['total_dibayar'];
+                                    $status = $data['status'];
 
-                <tbody>
-                @foreach($studentsSummary as $data)
-                    <tr class="border-t">
+                                    // ambil inisial
+                                    $initial = strtoupper(substr($student->name, 0, 2));
 
-                        <td class="p-3">{{ $data['student']->name }}</td>
-                        <td class="p-3">{{ $data['student']->parent->name }}</td>
-                        <td class="p-3">{{ $data['student']->classroom->name ?? '-' }}</td>
+                                    // mapping badge
+                                    if ($status == 'Lunas') {
+                                        $badge = 'badge-success';
+                                        $icon = 'solar:check-circle-bold-duotone';
+                                    } elseif ($status == 'Menunggak') {
+                                        $badge = 'badge-danger';
+                                        $icon = 'solar:close-circle-bold-duotone';
+                                    } elseif ($status == 'Menunggu Konfirmasi') {
+                                        $badge = 'badge-warning';
+                                        $icon = 'solar:clock-circle-bold-duotone';
+                                    } elseif ($status == 'Tidak ada tagihan') {
+                                        $badge = 'badge-info';
+                                        $icon = 'solar:info-circle-bold-duotone';
+                                    } else {
+                                        $badge = 'badge-purple';
+                                        $icon = 'solar:question-circle-bold-duotone';
+                                    }
+                                @endphp
 
-                        <td class="p-3 font-semibold text-right text-red-600">
-                            Rp {{ number_format($data['total_tagihan'] - $data['total_dibayar']) }}
-                        </td>
+                                <tr>
+                                    <!-- Siswa -->
+                                    <td>
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center font-bold text-sm border border-[var(--primary-light)]">
+                                                {{ $initial }}
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-[var(--text-main)]">
+                                                    {{ $student->name }}
+                                                </div>
+                                                <div class="text-xs text-[var(--text-tertiary)] mt-0.5">
+                                                    {{ $student->classroom->name ?? '-' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
 
-                        <td class="p-3">
-                        @php
-                            $status = $data['status'];
+                                    <!-- Orang Tua -->
+                                    <td class="font-medium">
+                                        {{ $student->parent->name }}
+                                    </td>
 
-                            if ($status == 'Lunas') {
-                                $class = 'bg-green-500';
-                            } elseif ($status == 'Menunggak') {
-                                $class = 'bg-red-600';
-                            } elseif ($status == 'Menunggu Konfirmasi') {
-                                $class = 'bg-yellow-500';
-                            } elseif ($status == 'Tidak ada tagihan') {
-                                $class = 'bg-black';
-                            } else {
-                                $class = 'bg-gray-500'; // Belum Bayar
-                            }
-                        @endphp
+                                    <!-- Asal Sekolah -->
+                                    <td>
+                                        {{ $student->school_origin ?? '-' }}
+                                    </td>
 
-                        <span class="px-2 py-1 text-white rounded text-xs {{ $class }}">
-                            {{ $status }}
-                        </span>
-                    </td>
+                                    <!-- Tagihan -->
+                                    @php
+                                        $tagihanColor = $tagihan > 0 ? 'var(--danger)' : 'var(--success)';
+                                    @endphp
 
-                        <td class="p-3 text-center">
-                            <a href="{{ route('payments.student.show', $data['student']->id) }}"
-                            class="text-blue-600 underline">
-                                Detail
-                            </a>
-                        </td>
+                                    <td class="font-semibold text-right" style="color: {{ $tagihanColor }}">
+                                        Rp {{ number_format($tagihan) }}
+                                    </td>
 
-                    </tr>
-                @endforeach
-                </tbody>
+                                    <!-- Status -->
+                                    <td>
+                                        <span class="badge {{ $badge }}">
+                                            <iconify-icon icon="{{ $icon }}"></iconify-icon>
+                                            {{ $status }}
+                                        </span>
+                                    </td>
 
-            </table>
+                                    <!-- Aksi -->
+                                    <td class="text-right">
+                                        <a href="{{ route('payments.student.show', $student->id) }}"
+                                        class="btn-icon border border-[var(--primary)] hover:border-[var(--primary)]"
+                                        title="Detail">
+
+                                            <iconify-icon 
+                                                icon="solar:eye-bold-duotone" 
+                                                width="18"
+                                                class="text-[var(--primary)]">
+                                            </iconify-icon>
+
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             @endrole
 
             @role("orang_tua")
             {{-- TABLE --}}
-            <div class="overflow-hidden bg-white rounded shadow">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-100">
-                        <tr class="text-left">
-                            <th class="p-3">Bulan</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3 text-right">Nominal</th>
-                            <th class="p-3">Bukti</th>
-                            <th class="p-3">Tanggal Bayar</th>
-                            <th class="p-3 text-center">Aksi</th>
+            <div class="overflow-x-auto card-panel">
+                <table class="w-full text-sm table-custom">
+
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Status</th>
+                            <th class="text-right">Nominal</th>
+                            <th>Bukti</th>
+                            <th>Tanggal Bayar</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($payments as $payment)
-                        <tr class="border-t hover:bg-gray-50">
+                        <tr>
 
                             {{-- BULAN --}}
-                            <td class="p-3">
+                            <td class="font-semibold text-[var(--text-main)]">
                                 {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
                             </td>
 
                             {{-- STATUS --}}
-                            <td class="p-3">
+                            <td>
                                 @php
                                     $isLate = false;
 
@@ -237,52 +303,48 @@
                                     }
                                 @endphp
 
-                                <span class="px-2 py-1 rounded text-xs text-white
-                                    @if($payment->status == 'paid') bg-green-500
-                                    @elseif($payment->status == 'rejected') bg-red-600
-                                    @elseif($payment->proof_file) bg-yellow-500
-                                    @elseif($isLate) bg-red-600
-                                    @else bg-gray-500
+                                <span class="badge
+                                    @if($payment->status == 'paid') badge-success
+                                    @elseif($payment->status == 'rejected') badge-danger
+                                    @elseif($payment->proof_file) badge-warning
+                                    @elseif($isLate) badge-danger
+                                    @else badge-info
                                     @endif
                                 ">
 
                                     @if($payment->status == 'paid')
-                                        Lunas
-
+                                        ✔ Lunas
                                     @elseif($payment->status == 'rejected')
-                                        Ditolak
-
+                                        ✖ Ditolak
                                     @elseif($payment->proof_file)
-                                        Menunggu Konfirmasi
-
+                                        ⏳ Menunggu
                                     @elseif($isLate)
-                                        Telat
-
+                                        ⚠ Telat
                                     @else
-                                        Belum Bayar
+                                        ℹ Belum Bayar
                                     @endif
 
                                 </span>
                             </td>
 
                             {{-- NOMINAL --}}
-                            <td class="p-3 text-right">
-                                Rp {{ number_format($payment->final_amount) }}
+                            <td class="text-right font-mono text-[var(--text-main)]">
+                                Rp {{ number_format($payment->original_amount) }}                            
                             </td>
 
                             {{-- BUKTI --}}
-                            <td class="p-3">
+                            <td>
                                 @if($payment->proof_file)
                                     <img src="{{ asset('storage/' . $payment->proof_file) }}"
-                                        class="object-cover w-12 h-12 border rounded cursor-pointer"
+                                        class="object-cover w-12 h-12 border rounded-lg cursor-pointer hover:shadow"
                                         onclick="window.open(this.src)">
                                 @else
-                                    -
+                                    <span class="text-small">-</span>
                                 @endif
                             </td>
 
                             {{-- TANGGAL --}}
-                            <td class="p-3">
+                            <td class="text-small">
                                 @if($payment->paid_at)
                                     {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y') }}
                                 @else
@@ -290,35 +352,33 @@
                                 @endif
                             </td>
 
-                            <td class="p-3 text-center">
+                            {{-- AKSI --}}
+                            <td>
+                                <div class="flex justify-center gap-2">
 
-                                {{-- ✔ SUDAH LUNAS --}}
-                                @if($payment->status == 'paid')
-                                    <span class="text-gray-400">-</span>
+                                    @if($payment->status == 'paid')
+                                        <span class="text-small">-</span>
 
-                                {{-- ❌ DITOLAK --}}
-                                @elseif($payment->status == 'rejected')
+                                    @elseif($payment->status == 'rejected')
+                                        <a href="{{ route('payments.create', ['student_id' => $payment->student_id]) }}"
+                                        class="px-3 py-1 text-xs btn-primary">
+                                            Perbaiki & Bayar
+                                        </a>
 
-                                    <a href="{{ route('payments.create', ['student_id' => $payment->student_id]) }}"
-                                    class="px-2 py-1 text-xs text-white bg-blue-500 rounded hover:bg-blue-600">
-                                        Perbaiki & Bayar
-                                    </a>
+                                    @elseif($payment->proof_file)
+                                        <span class="text-small">-</span>
 
-                                {{-- ⏳ SUDAH UPLOAD (MENUNGGU) --}}
-                                @elseif($payment->proof_file)
-                                    <span class="text-gray-400">-</span>
+                                    @else
+                                        <span class="text-small">-</span>
+                                    @endif
 
-                                {{-- ❌ BELUM BAYAR --}}
-                                @else
-                                    <span class="text-gray-400">-</span> 
-                                @endif
-
+                                </div>
                             </td>
 
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="p-3 text-center text-gray-500">
+                            <td colspan="6" class="py-6 text-center text-small">
                                 Belum ada data iuran
                             </td>
                         </tr>
@@ -326,31 +386,31 @@
                     </tbody>
 
                     <tfoot>
-                        <tr class="font-semibold border-t bg-gray-50">
+                        <tr class="border-t border-[var(--border)] bg-[var(--bg)]"">
 
-                            {{-- LABEL --}}
-                            <td colspan="3" class="p-3 text-right text-gray-600">
+                            <td colspan="3" class="text-right text-small">
                                 Total
                             </td>
 
-                            {{-- TOTAL TAGIHAN --}}
-                            <td class="p-3 text-right">
-                                <div class="text-sm text-gray-500">Tagihan</div>
-                                <div class="font-bold">
+                            <td class="text-right">
+                                <div class="text-small">Tagihan</div>
+                                <div class="font-semibold text-[var(--text-main)]">
                                     Rp {{ number_format($payments->sum('original_amount')) }}
                                 </div>
                             </td>
 
-                            {{-- TOTAL DIBAYAR --}}
-                            <td class="p-3 text-left">
-                                <div class="text-sm text-green-600">Dibayar</div>
-                                <div class="font-bold text-green-600">
+                            <td>
+                                <div class="text-small text-[var(--success)]">Dibayar</div>
+                                <div class="font-semibold text-[var(--success)]">
                                     Rp {{ number_format($payments->where('status','paid')->sum('original_amount')) }}
                                 </div>
                             </td>
 
+                            <td></td>
+
                         </tr>
                     </tfoot>
+
                 </table>
                 @endrole("orang_tua")
             </div>

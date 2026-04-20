@@ -13,15 +13,12 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->foreignId('classroom_id')->constrained()->cascadeOnDelete();
-            $table->date('date');
-            $table->enum('status', ['hadir', 'sakit', 'izin', 'alpha']);
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->date('date'); // tanggal absensi
+            $table->foreignId('created_by')->constrained('users'); // guru/admin
             $table->timestamps();
 
-            // Tidak boleh double absensi per hari
-            $table->unique(['student_id', 'date']);
+            $table->unique(['classroom_id', 'date']); // 1 kelas 1 hari 1 absensi
         });
     }
 

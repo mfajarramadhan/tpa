@@ -1,127 +1,151 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="flex items-center shrink-0">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block w-auto text-gray-800 fill-current h-9" />
-                    </a>
+<aside id="sidebar"
+    class="w-[280px] bg-surface border-r border-custom flex flex-col h-full
+           fixed md:relative z-30 transform -translate-x-full md:translate-x-0 transition-all duration-300">
+
+    @php
+        $user = Auth::user();
+    @endphp
+
+    <!-- 🔷 LOGO -->
+    <div class="h-[80px] flex items-center px-6 border-b border-custom shrink-0">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 text-primary-custom">
+            <div class="w-10 h-10 rounded-xl bg-[var(--primary)] text-white flex items-center justify-center shadow-md">
+                <iconify-icon icon="solar:moon-stars-bold-duotone" width="24"></iconify-icon>
+            </div>
+            <div>
+                <h2 class="text-[1.1rem] font-bold leading-tight">TPA/DTA</h2>
+                <span class="text-[0.65rem] font-bold text-[var(--text-tertiary)] uppercase tracking-widest">
+                    Miftahul Jannah
+                </span>
+            </div>
+        </a>
+    </div>
+
+    <!-- 🔷 MENU -->
+    <div class="flex-1 px-4 py-6 overflow-y-auto">
+
+        <div class="px-4 mb-3 text-caption">Menu Utama</div>
+
+        <!-- Dashboard -->
+        <a href="{{ route('dashboard') }}"
+           class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <iconify-icon icon="solar:home-2-bold-duotone"></iconify-icon>
+            Dashboard
+        </a>
+
+        <!-- ================= SUPERADMIN ================= -->
+        @if($user->hasRole('superadmin'))
+
+            <a href="/approval/students"
+               class="nav-item {{ request()->is('approval/*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:user-check-bold-duotone"></iconify-icon>
+                Approval
+            </a>
+
+            <a href="/payments"
+               class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
+                Iuran
+            </a>
+
+            <a href="/users"
+               class="nav-item {{ request()->is('users*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:users-group-rounded-bold-duotone"></iconify-icon>
+                Kelola User
+            </a>
+
+            <a href="/students/rejected"
+               class="nav-item {{ request()->is('students/rejected') ? 'active' : '' }}">
+                <iconify-icon icon="solar:user-cross-bold-duotone"></iconify-icon>
+                Siswa Ditolak
+            </a>
+
+            <a href="/fees"
+               class="nav-item {{ request()->is('fees*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:settings-bold-duotone"></iconify-icon>
+                Pengaturan Biaya
+            </a>
+
+        @endif
+
+        <!-- ================= GURU ================= -->
+        @if($user->hasRole('guru'))
+
+            <a href="/attendances/create"
+               class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:checklist-bold-duotone"></iconify-icon>
+                Absensi
+            </a>
+
+            <a href="/assignments"
+               class="nav-item {{ request()->is('assignments*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
+                Tugas
+            </a>
+
+        @endif
+
+        <!-- ================= ORANG TUA ================= -->
+        @if($user->hasRole('orang_tua'))
+
+            <a href="/students"
+               class="nav-item {{ request()->is('students*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:file-check-bold-duotone"></iconify-icon>
+                Anak
+            </a>
+
+            <a href="/payments"
+               class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
+                Iuran
+            </a>
+
+        @endif
+
+        <!-- ================= SISWA ================= -->
+        @if($user->hasRole('siswa'))
+
+            <a href="/assignments"
+               class="nav-item {{ request()->is('assignments*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
+                Tugas
+            </a>
+
+        @endif
+
+    </div>
+
+    <!-- 🔷 USER PROFILE -->
+    <div class="p-5 border-t border-custom bg-[var(--bg)] m-4 rounded-xl">
+
+        <div class="flex items-center gap-3">
+
+            <!-- Avatar -->
+            <div class="flex items-center justify-center w-10 h-10 font-bold border-2 rounded-full text-primary-custom border-surface"
+                 style="background-color: var(--primary-light);">
+                {{ strtoupper(substr($user->name, 0, 2)) }}
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 overflow-hidden">
+                <div class="text-sm font-bold truncate text-[var(--text-main)]">
+                    {{ $user->name }}
                 </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @php
-                        $user = Auth::user();
-                    @endphp
-
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        Dashboard
-                    </x-nav-link>
-
-                    @if($user->hasRole('superadmin'))
-                        <x-nav-link href="/approval/students">Approval</x-nav-link>
-                        <x-nav-link href="/payments">Iuran</x-nav-link>
-                        <x-nav-link href="/users">Kelola User</x-nav-link>     
-                        <x-nav-link href="/students/rejected">Siswa Ditolak</x-nav-link>     
-                        <x-nav-link href="/fees">Pengaturan Biaya</x-nav-link>     
-                        
-                    @endif
-
-                    @if($user->hasRole('guru'))
-                        <x-nav-link href="/attendances/create">Absensi</x-nav-link>
-                        <x-nav-link href="/assignments">Tugas</x-nav-link>
-                    @endif
-
-                    @if($user->hasRole('orang_tua'))
-                        <x-nav-link href="/students">Anak</x-nav-link>
-                        <x-nav-link href="/payments">Iuran</x-nav-link>
-                    @endif
-
-                    @if($user->hasRole('siswa'))
-                        <x-nav-link href="/assignments">Tugas</x-nav-link>
-                    @endif
+                <div class="text-xs text-[var(--text-tertiary)]">
+                    {{ $user->getRoleNames()->first() }}
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md focus:outline-none">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="flex items-center -me-2 sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 text-gray-400 transition duration-150 ease-in-out rounded-md hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 ">
-                    <svg class="w-6 h-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+            <!-- Logout -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="w-8 h-8 btn-icon text-danger hover:bg-danger-light">
+                    <iconify-icon icon="solar:logout-bold-duotone" width="20"></iconify-icon>
                 </button>
-            </div>
+            </form>
+
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200 ">
-            <div class="px-4">
-                <div class="text-base font-medium text-gray-800 ">{{ Auth::user()->name }}</div>
-                <div class="text-sm font-medium text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>
+</aside>

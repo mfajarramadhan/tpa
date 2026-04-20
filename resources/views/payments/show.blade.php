@@ -15,181 +15,229 @@
             @endif
 
         {{-- TOTAL --}}
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="p-4 text-red-700 bg-red-100 rounded">
-                <strong>Total Tunggakan</strong><br>
+        <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+
+        {{-- Total Tunggakan --}}
+        <div class="stat-card" style="border-left-color: var(--danger);">
+            <div class="flex items-start justify-between mb-3">
+                <span class="text-caption">Total Tunggakan</span>
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
+                    <iconify-icon icon="solar:danger-bold-duotone" width="18" class="text-[var(--danger)]"></iconify-icon>
+                </div>
+            </div>
+            <div class="text-data text-[var(--danger)]">
                 Rp {{ number_format($totalUnpaid) }}
             </div>
+        </div>
 
-            <div class="p-4 text-green-700 bg-green-100 rounded">
-                <strong>Total Dibayar</strong><br>
+        {{-- Total Dibayar --}}
+        <div class="stat-card" style="border-left-color: var(--success);">
+            <div class="flex items-start justify-between mb-3">
+                <span class="text-caption">Total Dibayar</span>
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
+                    <iconify-icon icon="solar:check-circle-bold-duotone" width="18" class="text-[var(--success)]"></iconify-icon>
+                </div>
+            </div>
+            <div class="text-data text-[var(--success)]">
                 Rp {{ number_format($totalPaid) }}
             </div>
         </div>
 
+    </div>
+
         {{-- TABLE --}}
-        <div class="overflow-hidden bg-white rounded shadow">
-            <table class="w-full text-sm">
-                <thead class="bg-gray-100">
+        <div class="overflow-x-auto card-panel">
+            <table class="w-full text-sm table-custom">
+
+                <thead>
                     <tr>
-                        <th class="p-3">Bulan</th>
-                        <th class="p-3">Tanggal Pembayaran</th>                        <th class="p-3">Nominal</th>
-                        <th class="p-3">Status</th>
-                        <th class="p-3">Bukti</th>
-                        <th class="p-3 text-center">Aksi</th>
+                        <th>Bulan</th>
+                        <th>Tanggal Pembayaran</th>
+                        <th>Nominal</th>
+                        <th>Status</th>
+                        <th>Bukti</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach($payments as $payment)
+                @foreach($payments as $payment)
 
-                        @php
-                            $isLate = false;
+                    @php
+                        $isLate = false;
 
-                            if ($payment->month) {
-                                $deadline = \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->startOfMonth();
+                        if ($payment->month) {
+                            $deadline = \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->startOfMonth();
 
-                                $isLate = now()->gt($deadline)
-                                    && $payment->status != 'paid'
-                                    && !$payment->proof_file;
-                            }
-                        @endphp
+                            $isLate = now()->gt($deadline)
+                                && $payment->status != 'paid'
+                                && !$payment->proof_file;
+                        }
+                    @endphp
 
-                        <tr class="border-t hover:bg-gray-50">
+                    <tr>
 
-                            <td class="p-3">
-                                @if($payment->month)
-                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
+                        {{-- Bulan --}}
+                        <td>
+                            @if($payment->month)
+                                {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
+                            @else
+                                -
+                            @endif
+                        </td>
 
-                            <td class="p-3">
-                                @if($payment->paid_at)
-                                    {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
+                        {{-- Tanggal --}}
+                        <td>
+                            @if($payment->paid_at)
+                                {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y') }}
+                            @else
+                                -
+                            @endif
+                        </td>
 
-                            <td class="p-3">
-                                Rp {{ number_format($payment->amount) }}
-                            </td>
+                        {{-- Nominal --}}
+                        <td class="font-semibold text-[var(--danger)]">
+                            Rp {{ number_format($payment->amount) }}
+                        </td>
 
-                            <td class="p-3">
-                                <span class="px-2 py-1 rounded text-xs text-white
-                                    @if($payment->status == 'paid') bg-green-500
-                                    @elseif($payment->status == 'rejected') bg-red-600
-                                    @elseif($payment->proof_file) bg-yellow-500
-                                    @elseif($isLate) bg-red-600
-                                    @else bg-gray-500
-                                    @endif
-                                ">
-
-                                    @if($payment->status == 'paid')
-                                        Lunas
-
-                                    @elseif($payment->status == 'rejected')
-                                        Ditolak
-
-                                    @elseif($payment->proof_file)
-                                        Menunggu Konfirmasi
-
-                                    @elseif($isLate)
-                                        Telat
-
-                                    @else
-                                        Belum Bayar
-                                    @endif
-
+                        {{-- Status --}}
+                        <td>
+                            @if($payment->status == 'paid')
+                                <span class="badge badge-success">
+                                    <iconify-icon icon="solar:check-circle-bold-duotone"></iconify-icon>
+                                    Lunas
                                 </span>
-                            </td>
 
-                            <td class="p-3">
-                                @if($payment->proof_file)
-                                    <img src="{{ asset('storage/' . $payment->proof_file) }}"
-                                        class="object-cover w-16 h-16 border rounded cursor-pointer"
-                                        onclick="window.open(this.src)">
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            
-                            <td class="p-3 text-center">
-                                @if($payment->proof_file && $payment->status == 'pending')
+                            @elseif($payment->status == 'rejected')
+                                <span class="badge badge-danger">
+                                    <iconify-icon icon="solar:close-circle-bold-duotone"></iconify-icon>
+                                    Ditolak
+                                </span>
 
-                                    <div x-data="{ showReject: false }" class="flex flex-col items-center gap-2">
+                            @elseif($payment->proof_file)
+                                <span class="badge badge-warning">
+                                    <iconify-icon icon="solar:clock-circle-bold-duotone"></iconify-icon>
+                                    Menunggu
+                                </span>
 
-                                        <div x-data="{ open: false }">
+                            @elseif($isLate)
+                                <span class="badge badge-danger">
+                                    <iconify-icon icon="solar:danger-bold-duotone"></iconify-icon>
+                                    Telat
+                                </span>
 
-                                        <div class="flex justify-center gap-2">
+                            @else
+                                <span class="badge badge-info">
+                                    <iconify-icon icon="solar:info-circle-bold-duotone"></iconify-icon>
+                                    Belum Bayar
+                                </span>
+                            @endif
+                        </td>
 
-                                            {{-- APPROVE --}}
-                                            <form method="POST" action="{{ route('payments.approve', $payment->id) }}">
-                                                @csrf
-                                                <button class="px-3 py-1 text-xs text-white bg-green-600 rounded-lg hover:bg-green-700">
-                                                    ✔ Approve
-                                                </button>
-                                            </form>
+                        {{-- Bukti --}}
+                        <td>
+                            @if($payment->proof_file)
+                                <img src="{{ asset('storage/' . $payment->proof_file) }}"
+                                    class="w-16 h-16 object-cover rounded-lg border border-[var(--border)] cursor-pointer hover:scale-105 transition"
+                                    onclick="window.open(this.src)">
+                            @else
+                                <span class="text-small">-</span>
+                            @endif
+                        </td>
 
-                                            {{-- OPEN MODAL --}}
-                                            <button @click="open = true"
-                                                    class="px-3 py-1 text-xs text-white bg-red-600 rounded-lg hover:bg-red-700">
-                                                ✖ Tolak
+                        {{-- Aksi --}}
+                        <td class="text-center">
+                            @if($payment->proof_file && $payment->status == 'pending')
+
+                                <div x-data="{ open: false }">
+
+                                    <div class="flex justify-center gap-2">
+
+                                        {{-- APPROVE --}}
+                                        <form method="POST"
+                                            action="{{ route('payments.approve', $payment->id) }}"
+                                            onsubmit="return confirm('Yakin ingin menyetujui pembayaran ini?')">
+                                            @csrf
+
+                                            <button class="btn-icon group bg-[var(--success-light)] border border-[var(--success)] hover:bg-[var(--success)]"
+                                                    title="Approve">
+
+                                                <iconify-icon icon="lets-icons:check-fill"
+                                                            width="18"
+                                                            class="text-[var(--success)] group-hover:text-white transition">
+                                                </iconify-icon>
+
                                             </button>
-                                        </div>
+                                        </form>
 
-                                        {{-- MODAL --}}
-                                        <div x-show="open"
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                                        {{-- REJECT --}}
+                                        <button @click="open = true"
+                                            class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
+                                            title="Tolak">
 
-                                            <div @click.outside="open = false"
-                                                class="w-full max-w-md p-4 bg-white rounded-xl">
+                                        <iconify-icon icon="heroicons:x-circle"
+                                                    width="18"
+                                                    class="text-[var(--danger)] group-hover:text-white transition">
+                                        </iconify-icon>
 
-                                                <h2 class="mb-2 text-sm font-semibold">Alasan Penolakan</h2>
-
-                                                <form method="POST" action="{{ route('payments.reject', $payment->id) }}">
-                                                    @csrf
-
-                                                    <textarea name="reject_reason"
-                                                            rows="3"
-                                                            class="w-full p-2 text-sm border rounded-lg focus:ring focus:ring-red-200"
-                                                            placeholder="Tulis alasan..."
-                                                            required></textarea>
-
-                                                    <div class="flex justify-end gap-2 mt-3">
-                                                        <button type="button"
-                                                                @click="open = false"
-                                                                class="px-3 py-1 text-sm bg-gray-200 rounded-lg">
-                                                            Batal
-                                                        </button>
-
-                                                        <button class="px-3 py-1 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
-                                                            Kirim
-                                                        </button>
-                                                    </div>
-                                                </form>
-
-                                            </div>
-                                        </div>
+                                    </button>
 
                                     </div>
-                                @elseif($payment->status == 'rejected')
 
-                                    <span class="text-xs text-red-500">
-                                        {{ $payment->reject_reason }}
-                                    </span>
+                                    {{-- MODAL (DIPISAH DARI FLEX) --}}
+                                    <div x-show="open"
+                                        x-cloak
+                                        x-transition
+                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 
-                                @else
-                                    -
-                                @endif
-                            </td>
+                                        <div @click.outside="open = false"
+                                            class="w-full max-w-md p-5 shadow-md bg-surface rounded-xl">
 
-                        </tr>
+                                            <h3 class="mb-3">Alasan Penolakan</h3>
 
-                    @endforeach
+                                            <form method="POST" action="{{ route('payments.reject', $payment->id) }}">
+                                                @csrf
+
+                                                <textarea name="reject_reason"
+                                                        rows="3"
+                                                        class="input-solid"
+                                                        placeholder="Tulis alasan..."
+                                                        required></textarea>
+
+                                                <div class="flex justify-end gap-2 mt-4">
+                                                    <button type="button"
+                                                            @click="open = false"
+                                                            class="btn-outline">
+                                                        Batal
+                                                    </button>
+
+                                                    <button class="btn-primary bg-[var(--danger)] hover:bg-red-700">
+                                                        Kirim
+                                                    </button>
+                                                </div>
+                                            </form>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            @elseif($payment->status == 'rejected')
+
+                                <span class="text-xs text-[var(--danger)]">
+                                    {{ $payment->reject_reason }}
+                                </span>
+
+                            @else
+                                <span class="text-small">-</span>
+                            @endif
+                        </td>
+
+                    </tr>
+
+                @endforeach
                 </tbody>
+
             </table>
         </div>
 

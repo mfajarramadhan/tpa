@@ -77,13 +77,13 @@
                                 @php
                                     $monthlyPayments = $student->payments->where('type', 'monthly');
 
-                                    $sisaTagihan = $monthlyPayments
-                                        ->where('status', '!=', 'paid') // status belum paid maka blm bayar
-                                        ->sum(fn($p) => $p->original_amount + $p->adjustment);
+                                    $totalTagihan = $monthlyPayments->sum('original_amount');
 
-                                    $sudahDibayar = $monthlyPayments
+                                    $totalDibayar = $monthlyPayments
                                         ->where('status', 'paid')
-                                        ->sum(fn($p) => $p->original_amount + $p->adjustment);
+                                        ->sum('original_amount');
+
+                                    $sisaTagihan = $totalTagihan - $totalDibayar;
                                 @endphp
 
                                 <div class="p-3 rounded bg-gray-50">

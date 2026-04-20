@@ -6,36 +6,92 @@
     <div class="py-6">
         <div class="mx-auto max-w-7xl">
 
-            {{-- ALERT --}}
-            @if(session('success'))
-                <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">
-                    {{ session('success') }}
-                </div>
-            @endif
+            <div class="relative">
 
-            @if(session('error'))
-                <div class="p-3 mb-4 text-red-700 bg-red-100 rounded">
-                    {{ session('error') }}
+                {{-- FLOATING ALERT WRAPPER --}}
+                <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
+
+                    {{-- SUCCESS --}}
+                    @if(session('success'))
+                    <div
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-init="setTimeout(() => show = false, 3000)"
+                        @click.outside="show = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 -translate-y-3"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0 -translate-y-2"
+                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                            bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
+                            bg-opacity-80 backdrop-blur-sm">
+
+                        <div class="text-sm font-semibold ms-2">
+                            {{ session('success') }}
+                        </div>
+
+                        <button @click="show = false"
+                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                            ✕
+                        </button>
+                    </div>
+                    @endif
+
+
+                    {{-- ERROR --}}
+                    @if(session('error'))
+                    <div
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-init="setTimeout(() => show = false, 3000)"
+                        @click.outside="show = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 -translate-y-3"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0 -translate-y-2"
+                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                            bg-gradient-to-t from-[var(--danger)] to-red-400 
+                            bg-opacity-80 backdrop-blur-sm">
+
+                        <div class="text-sm font-semibold ms-2">
+                            {{ session('error') }}
+                        </div>
+
+                        <button @click="show = false"
+                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                            ✕
+                        </button>
+                    </div>
+                    @endif
+
                 </div>
-            @endif
+
+            </div>
+
+        </div>
 
             <div class="mb-4">
                 <a href="{{ route('users.create') }}"
-                class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    + Tambah User
+                class="flex items-center gap-2 shadow-sm btn-primary">
+                    <iconify-icon icon="solar:user-plus-bold-duotone" width="20"></iconify-icon>
+                    Tambah User
                 </a>
             </div>
 
             {{-- 🔍 FILTER --}}
-            <form method="GET" class="flex gap-2 mb-4">
+            <form method="GET" class="flex flex-wrap items-center gap-2 mb-4">
 
                 <input type="text"
                     name="name"
                     value="{{ request('name') }}"
                     placeholder="Cari nama..."
-                    class="p-2 border rounded">
+                    class="input-solid inline-block flex-none w-fit max-w-40 bg-[var(--surface)] rounded-xl py-2.5 px-3">
 
-                <select name="role" class="p-2 border rounded">
+                <select name="role" class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5">
                     <option value="">Semua Role</option>
                     <option value="superadmin">Super Admin</option>
                     <option value="guru">Guru</option>
@@ -43,84 +99,142 @@
                     <option value="siswa">Siswa</option>
                 </select>
 
-                <button class="px-4 py-2 text-white bg-blue-600 rounded">
+                <select name="status" class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5">
+                    <option value="" {{ $status === '' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="deleted" {{ $status === 'deleted' ? 'selected' : '' }}>Dihapus</option>
+                </select>
+
+                <button class="btn-outline flex items-center gap-2 rounded-xl py-2.5 border-[var(--border)] hover:bg-[var(--primary-light)] hover:border-[var(--primary)] hover:text-[var(--primary)]">
+                    <iconify-icon icon="solar:filter-bold-duotone" width="20"></iconify-icon>
                     Filter
                 </button>
+
+                <!-- Button Clear -->
+                <a href="{{ route('users.index') }}"
+                    class="btn-outline flex items-center justify-center rounded-xl py-2.5 border-[var(--border)] hover:bg-[var(--primary-light)] hover:border-[var(--primary)] hover:text-[var(--primary)]">
+                    <iconify-icon icon="solar:close-circle-bold-duotone" width="22"></iconify-icon>
+                </a>
 
             </form>
 
             {{-- TABLE --}}
-            <div class="overflow-hidden bg-white rounded shadow">
-                <table class="w-full text-sm">
+            <div class="overflow-x-auto card-panel">
+                <table class="w-full text-sm table-custom">
 
-                    <thead class="bg-gray-100">
+                    <thead>
                         <tr>
-                            <th class="p-3 text-left">Nama</th>
-                            <th class="p-3 text-left">Email</th>
-                            <th class="p-3 text-left">Role</th>
-                            <th class="p-3 text-left">Status</th>
-                            <th class="p-3 text-left">Aksi</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($users as $user)
-                            <tr class="border-t hover:bg-gray-50">
-
+                            <tr class="{{ $user->trashed() ? 'opacity-50' : '' }}">
                                 {{-- NAMA --}}
-                                <td class="p-3">{{ $user->name }}</td>
+                                <td class="font-semibold text-[var(--text-main)]">
+                                    {{ $user->name }}
+                                </td>
 
                                 {{-- EMAIL --}}
-                                <td class="p-3">{{ $user->email }}</td>
+                                <td class="text-small">
+                                    {{ $user->email }}
+                                </td>
 
-                                {{-- ROLE DROPDOWN --}}
-                                <td class="p-3">
-                                    <span class="px-2 py-1 text-xs text-white bg-blue-500 rounded">
+                                {{-- ROLE --}}
+                                <td>
+                                    <span class="badge badge-info">
+                                        <iconify-icon icon="solar:user-id-bold-duotone"></iconify-icon>
                                         {{ $user->roles->first()->name ?? '-' }}
                                     </span>
                                 </td>
 
                                 {{-- STATUS --}}
-                                <td class="p-3">
-                                    <form method="POST" action="{{ route('users.toggleStatus', $user->id) }}">
-                                        @csrf
-
-                                        <button class="px-2 py-1 text-xs text-white rounded
-                                            {{ $user->status == 'aktif' ? 'bg-green-500' : 'bg-red-500' }}">
-                                            {{ $user->status }}
-                                        </button>
-                                    </form>
+                                <td>
+                                    @if($user->trashed())
+                                        <span class="badge badge-danger">
+                                            <iconify-icon icon="solar:trash-bin-trash-bold-duotone"></iconify-icon>
+                                            Deleted
+                                        </span>
+                                    @else
+                                        <form method="POST" action="{{ route('users.toggleStatus', $user->id) }}">
+                                            @csrf
+                                            <button class="badge {{ $user->status == 'aktif' ? 'badge-success' : 'badge-danger' }}">
+                                                <iconify-icon icon="{{ $user->status == 'aktif' ? 'solar:check-circle-bold-duotone' : 'solar:close-circle-bold-duotone' }}"></iconify-icon>
+                                                {{ $user->status }}
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
 
                                 {{-- AKSI --}}
-                                <td class="flex gap-2 p-3">
+                                <td>
+                                    <div class="flex justify-center gap-2">
 
-                                    <a href="{{ route('users.show', $user->id) }}"
-                                       class="px-2 py-1 text-xs text-white bg-blue-500 rounded">
-                                        Detail
-                                    </a>
+                                        {{-- DETAIL --}}
+                                        <a href="{{ route('users.show', $user->id) }}"
+                                           class="btn-icon border border-[var(--primary)]" title="Detail">
+                                            <iconify-icon icon="solar:eye-bold-duotone"
+                                                          class="text-[var(--primary)]"></iconify-icon>
+                                        </a>
 
-                                    <a href="{{ route('users.edit', $user->id) }}"
-                                       class="px-2 py-1 text-xs text-white bg-yellow-500 rounded">
-                                        Edit
-                                    </a>
+                                        @if(!$user->trashed())
 
-                                    <form method="POST" action="{{ route('users.destroy', $user->id) }}">
-                                        @csrf
-                                        @method('DELETE')
+                                            {{-- EDIT --}}
+                                            <a href="{{ route('users.edit', $user->id) }}"
+                                               title="Edit" class="btn-icon group bg-[var(--warning-light)] border border-[var(--warning-dark)] hover:bg-[var(--warning-dark)]">
+                                                <iconify-icon icon="heroicons:pencil-square"
+                                                              class="text-[var(--warning-dark)] group-hover:text-white"></iconify-icon>
+                                            </a>
 
-                                        <button onclick="return confirm('Yakin hapus user ini?')"
-                                                class="px-2 py-1 text-xs text-white bg-red-600 rounded">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                            {{-- DELETE --}}
+                                            <form method="POST" action="{{ route('users.destroy', $user->id) }}">
+                                                @csrf
+                                                @method('DELETE')
 
+                                                <button onclick="return confirm('Yakin hapus user?')"
+                                                        title="Hapus" class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]">
+                                                    <iconify-icon icon="heroicons:trash"
+                                                                  class="text-[var(--danger)] group-hover:text-white"></iconify-icon>
+                                                </button>
+                                            </form>
+
+                                        @else
+
+                                            {{-- RESTORE --}}
+                                            <form method="POST" action="{{ route('users.restore', $user->id) }}">
+                                                @csrf
+
+                                                <button class="btn-icon bg-[var(--info-light)] border border-[var(--info)] hover:bg-[var(--info)]">
+                                                    <iconify-icon icon="solar:restart-bold-duotone"
+                                                                  class="text-[var(--info)] group-hover:text-white"></iconify-icon>
+                                                </button>
+                                            </form>
+
+                                            {{-- FORCE DELETE --}}
+                                            <form method="POST" action="{{ route('users.forceDelete', $user->id) }}">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button onclick="return confirm('Hapus permanen?')"
+                                                        class="btn-icon bg-[var(--danger)] text-white">
+                                                    <iconify-icon icon="solar:trash-bin-trash-bold-duotone"></iconify-icon>
+                                                </button>
+                                            </form>
+
+                                        @endif
+
+                                    </div>
                                 </td>
 
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="p-4 text-center text-gray-500">
+                                <td colspan="5" class="py-6 text-center text-small">
                                     Tidak ada data user
                                 </td>
                             </tr>
