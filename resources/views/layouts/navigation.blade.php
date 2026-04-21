@@ -71,7 +71,7 @@
         <!-- ================= GURU ================= -->
         @if($user->hasRole('guru'))
 
-            <a href="/attendances/create"
+            <a href="/attendances"
                class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:checklist-bold-duotone"></iconify-icon>
                 Absensi

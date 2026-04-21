@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('classroom_id')->constrained()->cascadeOnDelete();
             $table->date('date'); // tanggal absensi
+            $table->enum('session', ['pagi', 'sore']);
             $table->foreignId('created_by')->constrained('users'); // guru/admin
             $table->timestamps();
 
-            $table->unique(['classroom_id', 'date']); // 1 kelas 1 hari 1 absensi
+            $table->unique(['classroom_id', 'date', 'session']); // 1 kelas 1 hari 1 absensi
         });
     }
 

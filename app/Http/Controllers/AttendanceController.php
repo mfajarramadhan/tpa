@@ -3,31 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
-use App\Models\Student;
+use App\Models\AttendanceDetail;
 use App\Models\Classroom;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-        public function index(Request $request)
+    public function index()
     {
-        $query = Attendance::with('student', 'classroom');
+        // ambil semua kelas + jumlah siswa
+        $classrooms = Classroom::withCount('students')->get();
 
-        if ($request->classroom_id) {
-            $query->where('classroom_id', $request->classroom_id);
-        }
-
-        if ($request->month) {
-            $query->whereMonth('date', $request->month);
-        }
-
-        $attendances = $query->get();
-
-        return view('attendances.index', compact('attendances'));
+        return view('attendances.index', compact('classrooms'));
     }
 
     /**
@@ -35,17 +28,34 @@ class AttendanceController extends Controller
      */
     public function create(Request $request)
     {
-        $classrooms = Classroom::all();
+        $classroomId = $request->classroom_id;
+        $session = $request->session ?? 'pagi';
 
-        $students = [];
+        $classroom = Classroom::with('students')->findOrFail($classroomId);
 
-        if ($request->classroom_id) {
-            $students = Student::where('classroom_id', $request->classroom_id)
-                ->where('status', 'aktif')
-                ->get();
+        //  absensi + detailnya
+        $attendance = Attendance::with('details')
+            ->where([
+                'classroom_id' => $classroomId,
+                'date' => now()->toDateString(),
+                'session' => $session
+            ])
+            ->first();
+
+        $details = [];
+
+        if ($attendance) {
+            foreach ($attendance->details as $d) {
+                $details[$d->student_id] = $d;
+            }
         }
 
-        return view('attendances.create', compact('classrooms', 'students'));
+        return view('attendances.create', compact(
+            'classroom',
+            'attendance',
+            'session',
+            'details'
+        ));
     }
 
     /**
@@ -53,43 +63,67 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'classroom_id' => 'required|exists:classrooms,id',
+            'session' => 'required|in:pagi,sore',
             'date' => 'required|date',
             'students' => 'required|array'
         ]);
 
-        foreach ($request->students as $studentId => $data) {
-
-            // 🔥 Cegah double absensi
-            $exists = Attendance::where('student_id', $studentId)
-                ->where('date', $request->date)
-                ->exists();
-
-            if ($exists) {
-                continue;
-            }
-
-            $status = isset($data['hadir']) ? 'hadir' : $data['status'];
-
-            Attendance::create([
-                'student_id' => $studentId,
+        // 🔹 BUAT / AMBIL HEADER ABSENSI
+        $attendance = Attendance::firstOrCreate(
+            [
                 'classroom_id' => $request->classroom_id,
                 'date' => $request->date,
-                'status' => $status,
-                'created_by' => Auth::user()->id
-            ]);
-        }
+                'session' => $request->session,
+            ],
+            [
+                'created_by' => auth()->id()
+            ]
+        );
 
-        return redirect()->back()->with('success', 'Absensi berhasil disimpan');
+        // HAPUS DETAIL LAMA (BIAR BISA EDIT ULANG)
+        $attendance->details()->delete();
+
+        // LOOP SEMUA SISWA
+        foreach ($request->students as $studentId => $data) {
+            // ✔ LOGIC UTAMA
+            // jika checkbox hadir dicentang → hadir
+            // jika tidak → ambil dari dropdown/alpha
+
+                if (isset($data['hadir'])) {
+                    $status = 'hadir';
+                    $note = null;
+                } else {
+                    $status = $data['status'] ?? 'alpha';
+                    $note = $data['note'] ?? null;
+                }
+
+                AttendanceDetail::create([
+                    'attendance_id' => $attendance->id,
+                    'student_id' => $studentId,
+                    'status' => $status,
+                    'note' => $note,
+                ]);
+            }
+
+        return redirect()->route('attendances.create', ['classroom_id' => $request->classroom_id, 'session' => $request->session])->with('success', 'Absensi berhasil disimpan');    
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Attendance $attendance)
+    public function show(Classroom $classroom)
     {
-        //
+        $students = $classroom->students;
+
+        // cek apakah sudah ada absensi hari ini
+        $attendance = Attendance::where('classroom_id', $classroom->id)
+            ->whereDate('date', today())
+            ->first();
+
+        return view('attendances.show', compact('classroom', 'students', 'attendance'));
     }
 
     /**
@@ -133,5 +167,16 @@ class AttendanceController extends Controller
             'alpha',
             'attendances'
         ));
+    }
+
+    public function student($studentId)
+    {
+        $student = Student::with('classroom')->findOrFail($studentId);
+
+        $attendances = Attendance::where('student_id', $studentId)
+            ->latest()
+            ->get();
+
+        return view('attendances.student', compact('student', 'attendances'));
     }
 }

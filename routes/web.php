@@ -66,9 +66,17 @@ Route::middleware('auth')->group(function () {
     });
 
     // Kehadiran
-    Route::resource('attendances', AttendanceController::class);
-    Route::get('/attendance/student/{id}', [AttendanceController::class, 'studentRecap'])
-    ->name('attendance.student');
+    // Route::resource('attendances', AttendanceController::class);
+    // Route::get('/attendance/student/{id}', [AttendanceController::class, 'studentRecap'])
+    // ->name('attendance.student');
+    Route::get('/attendance/student/{student}', [AttendanceController::class, 'student'])
+        ->name('attendance.student');
+    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('/attendances/create', [AttendanceController::class, 'create'])->name('attendances.create');
+    Route::get('/attendances/{classroom}', [AttendanceController::class, 'show'])->name('attendances.show');
+    Route::post('/attendances', [AttendanceController::class, 'store'])->name('attendances.store');
+
+
 
     // Detail Pembayaran
     Route::resource('payments', PaymentController::class);

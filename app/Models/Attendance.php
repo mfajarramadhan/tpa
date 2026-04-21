@@ -11,8 +11,9 @@ class Attendance extends Model
     use HasFactory;
     protected $fillable = [
         'student_id',
-        'class_id',
+        'classroom_id',
         'date',
+        'session',
         'status',
         'created_by'
     ];
@@ -22,9 +23,14 @@ class Attendance extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function class()
+    public function classroom()
     {
         return $this->belongsTo(Classroom::class);
+    }
+
+    public function details()
+    {
+        return $this->hasMany(AttendanceDetail::class);
     }
 
     public function creator()
