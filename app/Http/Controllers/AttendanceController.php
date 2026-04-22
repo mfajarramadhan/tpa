@@ -75,7 +75,7 @@ class AttendanceController extends Controller
         $attendance = Attendance::firstOrCreate(
             [
                 'classroom_id' => $request->classroom_id,
-                'date' => $request->date,
+                'date' => now()->toDateString(),
                 'session' => $request->session,
             ],
             [

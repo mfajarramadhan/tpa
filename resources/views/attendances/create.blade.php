@@ -75,33 +75,38 @@
             {{-- 🔹 FILTER KELAS & SESI --}}
             <form method="GET" action="{{ route('attendances.create') }}" class="mb-6">
 
-                {{-- WAJIB: kirim classroom_id --}}
                 <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
 
-                <div class="flex flex-wrap items-end gap-4">
+                <div class="grid items-center w-full grid-cols-2 gap-6 md:grid-cols-3">
+                    
+                    {{-- TANGGAL --}}
+                    <div>
+                        <label class="text-small">Tanggal</label>
+                        <div class="text-lg font-semibold text-[var(--text-main)]">
+                            {{ now()->format('d M Y') }}
+                        </div>
+                    </div>
 
                     {{-- INFO KELAS --}}
-                    <div>
-                        <div class="text-small">Kelas</div>
-                        <div class="text-lg font-bold text-[var(--text-main)]">
+                    <div class="text-right md:text-left">
+                        <label class="text-small">Kelas</label>
+                        <div class="text-lg font-semibold text-[var(--text-main)]">
                             {{ $classroom->name }}
                         </div>
                     </div>
 
                     {{-- PILIH SESI --}}
-                    <div>
-                        <label class="text-small">Sesi</label>
-
+                    <div class="col-span-2 md:col-span-1">
                         <select name="session"
-                                class="input-solid"
+                                class="input-solid w-full bg-[var(--primary)] text-center rounded-xl py-2.5 text-sm"
                                 onchange="this.form.submit()">
 
                             <option value="pagi" {{ $session == 'pagi' ? 'selected' : '' }}>
-                                Pagi (08:00 - 10:15)
+                                PAGI (08:00 WIB - 10:15 WIB)
                             </option>
 
                             <option value="sore" {{ $session == 'sore' ? 'selected' : '' }}>
-                                Sore (14:00 - 17:00)
+                                SORE (14:00 WIB - 17:00 WIB)
                             </option>
 
                         </select>
@@ -111,108 +116,97 @@
 
             </form>
 
-            {{-- 🔥 FORM ABSENSI --}}
+            {{-- FORM ABSENSI --}}
             @if($classroom->students->count() > 0)
-                <form method="POST" action="{{ route('attendances.store') }}">
-                    @csrf
+            <form method="POST" action="{{ route('attendances.store') }}">
+                @csrf
 
-                    <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
-                    <input type="hidden" name="session" value="{{ $session }}">
+                <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
+                <input type="hidden" name="session" value="{{ $session }}">
+                <input type="hidden" name="date" value="{{ now()->toDateString() }}">
 
-                    {{-- TANGGAL --}}
-                    <div class="mb-4">
-                        <label class="text-small">Tanggal</label>
-                        <input type="date" name="date"
-                               class="input-solid"
-                               value="{{ date('Y-m-d') }}">
-                    </div>
+                {{-- TABLE --}}
+                <div class="mt-4 overflow-x-auto card-panel">
 
-                    {{-- BUTTON HADIR SEMUA --}}
-                    <div class="mt-4 overflow-x-auto card-panel">
+                    <div class="flex items-center justify-between m-5">
+                        <h3 class="font-semibold">Daftar Siswa</h3>
 
-                        <!-- ACTION -->
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold">Daftar Siswa</h3>
-
-                            <button type="button"
-                                    onclick="selectAllHadir()"
-                                    class="text-sm btn-outline">
-                                ✔ Semua Hadir
-                            </button>
-                        </div>
-
-                        <table class="w-full text-sm table-custom">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Siswa</th>
-                                    <th class="text-center">Hadir</th>
-                                    <th>Keterangan</th>
-                                    <th>Alasan</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @foreach($classroom->students as $i => $student)
-                                <tr>
-
-                                    <!-- NO -->
-                                    <td>{{ $i + 1 }}</td>
-
-                                    <!-- NAMA -->
-                                    <td class="font-semibold text-[var(--text-main)]">
-                                        {{ $student->name }}
-                                    </td>
-
-                                    <!-- CHECKBOX HADIR -->
-                                    <td class="text-center">
-                                        <input type="checkbox"
-                                            name="students[{{ $student->id }}][hadir]"
-                                            class="w-4 h-4 hadir-checkbox"
-                                            onchange="toggleStatus({{ $student->id }})"
-                                            {{ isset($details[$student->id]) && $details[$student->id]->status == 'hadir' ? 'checked' : '' }}>
-                                    </td>
-
-                                    <!-- DROPDOWN -->
-                                    <td>
-                                        <select name="students[{{ $student->id }}][status]"
-                                                id="status-{{ $student->id }}"
-                                                class="text-sm input-solid">
-
-                                            @php
-                                                $status = $details[$student->id]->status ?? 'alpha';
-                                            @endphp
-
-                                            <option value="">--</option>
-                                            <option value="izin" {{ $status == 'izin' ? 'selected' : '' }}>Izin</option>
-                                            <option value="sakit" {{ $status == 'sakit' ? 'selected' : '' }}>Sakit</option>
-                                            <option value="alpha" {{ $status == 'alpha' ? 'selected' : '' }}>Alpha</option>
-                                        </select>
-                                    </td>
-
-                                    <!-- ALASAN -->
-                                    <td>
-                                        <input type="text"
-                                            name="students[{{ $student->id }}][note]"
-                                            id="note-{{ $student->id }}"
-                                            class="text-sm input-solid"
-                                            placeholder="Opsional..."
-                                            value="{{ $details[$student->id]->note ?? '' }}">
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{-- SUBMIT --}}
-                    <div class="mt-4">
-                        <button class="btn-primary" type="submit">
-                            Simpan Absensi
+                        <button type="button"
+                                id="btn-toggle-hadir"
+                                onclick="toggleAllHadir()"
+                                class="text-sm btn-outline">
+                            ✔ Semua Hadir
                         </button>
                     </div>
 
-                </form>
+                    <table class="w-full text-sm table-custom whitespace-nowrap min-w-[1000px]">
+                        <thead>
+                            <tr>
+                                <th class="w-12 pl-6 text-center">No</th>
+                                <th>Nama Siswa</th>
+                                <th class="text-center">Hadir</th>
+                                <th>Keterangan</th>
+                                <th class="pr-6">Alasan</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach($classroom->students as $i => $student)
+                            <tr>
+
+                                <td class="pl-6 text-center">{{ $i + 1 }}</td>
+
+                                <td class="font-semibold text-[var(--text-main)]">
+                                    {{ $student->name }}
+                                </td>
+
+                                <td class="text-center">
+                                    <input type="checkbox"
+                                        name="students[{{ $student->id }}][hadir]"
+                                        class="hadir-checkbox accent-[var(--primary)] w-4 h-4 rounded cursor-pointer"
+                                        onchange="toggleStatus({{ $student->id }})"
+                                        {{ isset($details[$student->id]) && $details[$student->id]->status == 'hadir' ? 'checked' : '' }}>
+                                </td>
+
+                                <td>
+                                    @php
+                                        $status = $details[$student->id]->status ?? 'alpha';
+                                    @endphp
+
+                                    <select name="students[{{ $student->id }}][status]"
+                                            id="status-{{ $student->id }}"
+                                            class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5 text-sm">
+
+                                        <option value="">--</option>
+                                        <option value="izin" {{ $status == 'izin' ? 'selected' : '' }}>Izin</option>
+                                        <option value="sakit" {{ $status == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                                        <option value="alpha" {{ $status == 'alpha' ? 'selected' : '' }}>Alpha</option>
+                                    </select>
+                                </td>
+
+                                <td class="pr-6">
+                                    <input type="text"
+                                        name="students[{{ $student->id }}][note]"
+                                        id="note-{{ $student->id }}"
+                                        class="text-sm input-solid"
+                                        placeholder="Opsional..."
+                                        value="{{ $details[$student->id]->note ?? '' }}">
+                                </td>
+
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- SUBMIT --}}
+                <div class="mt-4">
+                    <button class="btn-primary" type="submit">
+                        Simpan Absensi
+                    </button>
+                </div>
+
+            </form>
             @endif
 
         </div>
@@ -220,42 +214,85 @@
 
     {{-- JS --}}
     <script>
+        let allHadirActive = false;
+
+        // INIT SAAT LOAD (SYNC UI DENGAN DATA)
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.hadir-checkbox').forEach(cb => {
+                const id = cb.name.match(/\d+/)[0];
+                toggleStatus(id);
+            });
+
+            checkAllState(); // set tombol awal
+        });
+
+        // TOGGLE PER SISWA
         function toggleStatus(id) {
             const checkbox = document.querySelector(`input[name="students[${id}][hadir]"]`);
             const status = document.getElementById(`status-${id}`);
             const note = document.getElementById(`note-${id}`);
 
             if (checkbox.checked) {
-                // HADIR
+                // ✔ HADIR
+                status.value = ''; 
                 note.value = '';
 
-                status.value = ''; // 🔥 kosongkan dropdown
                 status.disabled = true;
-
                 note.disabled = true;
             } else {
-                // TIDAK HADIR
+                // ❌ TIDAK HADIR
                 status.disabled = false;
                 note.disabled = false;
             }
+
+            checkAllState(); // update tombol
         }
 
-        function selectAllHadir() {
-            document.querySelectorAll('.hadir-checkbox').forEach(cb => {
-                cb.checked = true;
+        // TOGGLE SEMUA HADIR (BUTTON)
+        function toggleAllHadir() {
+            const btn = document.getElementById('btn-toggle-hadir');
 
-                const id = cb.name.match(/\d+/)[0];
+            if (!allHadirActive) {
+                // ✔ SET SEMUA HADIR
+                document.querySelectorAll('.hadir-checkbox').forEach(cb => {
+                    cb.checked = true;
 
-                const status = document.getElementById(`status-${id}`);
-                const note = document.getElementById(`note-${id}`);
+                    const id = cb.name.match(/\d+/)[0];
+                    toggleStatus(id);
+                });
 
-                note.value = '';
+                btn.innerText = '✖ Batalkan';
+                allHadirActive = true;
 
-                status.value = ''; // 🔥 ini kunci
-                status.disabled = true;
+            } else {
+                // ❌ RESET SEMUA
+                document.querySelectorAll('.hadir-checkbox').forEach(cb => {
+                    cb.checked = false;
 
-                note.disabled = true;
-            });
+                    const id = cb.name.match(/\d+/)[0];
+                    toggleStatus(id);
+                });
+
+                btn.innerText = '✔ Semua Hadir';
+                allHadirActive = false;
+            }
+        }
+
+        // AUTO DETECT (JIKA SEMUA SUDAH DICENTANG MANUAL)
+        function checkAllState() {
+            const all = document.querySelectorAll('.hadir-checkbox');
+            const checked = document.querySelectorAll('.hadir-checkbox:checked');
+            const btn = document.getElementById('btn-toggle-hadir');
+
+            if (!btn) return;
+
+            if (all.length > 0 && all.length === checked.length) {
+                allHadirActive = true;
+                btn.innerText = '✖ Batalkan';
+            } else {
+                allHadirActive = false;
+                btn.innerText = '✔ Semua Hadir';
+            }
         }
         </script>
 
