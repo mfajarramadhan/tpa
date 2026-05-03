@@ -20,6 +20,11 @@ class AssignmentSubmission extends Model
         return $this->belongsTo(Assignment::class);
     }
 
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
+    }
+
     public function student()
     {
         return $this->belongsTo(Student::class);

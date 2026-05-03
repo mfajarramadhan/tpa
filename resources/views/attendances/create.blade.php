@@ -164,8 +164,10 @@
                                     <input type="checkbox"
                                         name="students[{{ $student->id }}][hadir]"
                                         class="hadir-checkbox accent-[var(--primary)] w-4 h-4 rounded cursor-pointer"
+                                        data-locked="{{ isset($lockedStudents[$student->id]) ? '1' : '0' }}"
                                         onchange="toggleStatus({{ $student->id }})"
-                                        {{ isset($details[$student->id]) && $details[$student->id]->status == 'hadir' ? 'checked' : '' }}>
+                                        {{ isset($details[$student->id]) && $details[$student->id]->status == 'hadir' ? 'checked' : '' }}
+                                        {{ isset($lockedStudents[$student->id]) ? 'disabled' : '' }}>
                                 </td>
 
                                 <td>
@@ -174,13 +176,26 @@
                                     @endphp
 
                                     <select name="students[{{ $student->id }}][status]"
-                                            id="status-{{ $student->id }}"
-                                            class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5 text-sm">
+                                        id="status-{{ $student->id }}"
+                                        class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5 text-sm"
+                                        {{ isset($lockedStudents[$student->id]) ? 'disabled' : '' }}>
 
                                         <option value="">--</option>
-                                        <option value="izin" {{ $status == 'izin' ? 'selected' : '' }}>Izin</option>
-                                        <option value="sakit" {{ $status == 'sakit' ? 'selected' : '' }}>Sakit</option>
-                                        <option value="alpha" {{ $status == 'alpha' ? 'selected' : '' }}>Alpha</option>
+
+                                        <option value="izin"
+                                            {{ isset($details[$student->id]) && $details[$student->id]->status == 'izin' ? 'selected' : '' }}>
+                                            Izin
+                                        </option>
+
+                                        <option value="sakit"
+                                            {{ isset($details[$student->id]) && $details[$student->id]->status == 'sakit' ? 'selected' : '' }}>
+                                            Sakit
+                                        </option>
+
+                                        <option value="alpha"
+                                            {{ isset($details[$student->id]) && $details[$student->id]->status == 'alpha' ? 'selected' : '' }}>
+                                            Alpha
+                                        </option>
                                     </select>
                                 </td>
 
@@ -189,8 +204,8 @@
                                         name="students[{{ $student->id }}][note]"
                                         id="note-{{ $student->id }}"
                                         class="text-sm input-solid"
-                                        placeholder="Opsional..."
-                                        value="{{ $details[$student->id]->note ?? '' }}">
+                                        value="{{ $details[$student->id]->note ?? '' }}"
+                                        {{ isset($lockedStudents[$student->id]) ? 'disabled' : '' }}>
                                 </td>
 
                             </tr>
@@ -216,25 +231,34 @@
     <script>
         let allHadirActive = false;
 
-        // INIT SAAT LOAD (SYNC UI DENGAN DATA)
+        // 🔥 INIT SAAT LOAD
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.hadir-checkbox').forEach(cb => {
                 const id = cb.name.match(/\d+/)[0];
-                toggleStatus(id);
+                applyStatusUI(id);
             });
 
-            checkAllState(); // set tombol awal
+            checkAllState();
         });
 
-        // TOGGLE PER SISWA
-        function toggleStatus(id) {
+        // 🔥 CORE FUNCTION (HANDLE UI)
+        function applyStatusUI(id) {
             const checkbox = document.querySelector(`input[name="students[${id}][hadir]"]`);
             const status = document.getElementById(`status-${id}`);
             const note = document.getElementById(`note-${id}`);
 
+            const isLocked = checkbox.dataset.locked === '1';
+
+            // 🔒 JIKA LOCK → JANGAN SENTUH
+            if (isLocked) {
+                status.disabled = true;
+                note.disabled = true;
+                return;
+            }
+
             if (checkbox.checked) {
                 // ✔ HADIR
-                status.value = ''; 
+                status.value = '';
                 note.value = '';
 
                 status.disabled = true;
@@ -244,55 +268,56 @@
                 status.disabled = false;
                 note.disabled = false;
             }
-
-            checkAllState(); // update tombol
         }
 
-        // TOGGLE SEMUA HADIR (BUTTON)
+        // 🔥 TOGGLE PER SISWA
+        function toggleStatus(id) {
+            applyStatusUI(id);
+            checkAllState();
+        }
+
+        // 🔥 TOGGLE SEMUA HADIR
         function toggleAllHadir() {
             const btn = document.getElementById('btn-toggle-hadir');
 
-            if (!allHadirActive) {
-                // ✔ SET SEMUA HADIR
-                document.querySelectorAll('.hadir-checkbox').forEach(cb => {
-                    cb.checked = true;
+            allHadirActive = !allHadirActive;
 
-                    const id = cb.name.match(/\d+/)[0];
-                    toggleStatus(id);
-                });
+            document.querySelectorAll('.hadir-checkbox').forEach(cb => {
+                const isLocked = cb.dataset.locked === '1';
 
-                btn.innerText = '✖ Batalkan';
-                allHadirActive = true;
+                if (isLocked) return; // 🔒 skip siswa yang sudah diabsen pagi
 
-            } else {
-                // ❌ RESET SEMUA
-                document.querySelectorAll('.hadir-checkbox').forEach(cb => {
-                    cb.checked = false;
+                cb.checked = allHadirActive;
 
-                    const id = cb.name.match(/\d+/)[0];
-                    toggleStatus(id);
-                });
+                const id = cb.name.match(/\d+/)[0];
+                applyStatusUI(id);
+            });
 
-                btn.innerText = '✔ Semua Hadir';
-                allHadirActive = false;
-            }
+            updateButtonText(btn);
         }
 
-        // AUTO DETECT (JIKA SEMUA SUDAH DICENTANG MANUAL)
+        // 🔥 UPDATE TEXT BUTTON
+        function updateButtonText(btn) {
+            btn.innerText = allHadirActive
+                ? '✖ Batal Semua Hadir'
+                : '✔ Semua Hadir';
+        }
+
+        // 🔥 AUTO DETECT STATE
         function checkAllState() {
-            const all = document.querySelectorAll('.hadir-checkbox');
-            const checked = document.querySelectorAll('.hadir-checkbox:checked');
+            const all = document.querySelectorAll('.hadir-checkbox:not([data-locked="1"])');
+            const checked = document.querySelectorAll('.hadir-checkbox:not([data-locked="1"]):checked');
             const btn = document.getElementById('btn-toggle-hadir');
 
             if (!btn) return;
 
             if (all.length > 0 && all.length === checked.length) {
                 allHadirActive = true;
-                btn.innerText = '✖ Batalkan';
             } else {
                 allHadirActive = false;
-                btn.innerText = '✔ Semua Hadir';
             }
+
+            updateButtonText(btn);
         }
         </script>
 

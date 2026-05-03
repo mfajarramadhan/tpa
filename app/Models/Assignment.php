@@ -27,6 +27,11 @@ class Assignment extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
     public function submissions()
     {
         return $this->hasMany(AssignmentSubmission::class);

@@ -7,14 +7,16 @@ use App\Http\Controllers\AssignmentSubmissionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeeController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Route::get('/dashboard', function () {
@@ -38,9 +40,36 @@ Route::middleware('auth')->group(function () {
     // Approval
     Route::get('/students/{id}/reapply', [StudentController::class, 'reapply'])->name('students.reapply');
     Route::post('/students/{id}/reapply', [StudentController::class, 'submitReapply'])->name('students.reapply.submit');
+
+    // Route Mapel
+    Route::get('/learning', [SubjectController::class, 'index'])->name('learning.index');
+    Route::get('/learning/subject/{subject}', [SubjectController::class, 'show'])->name('learning.subject');
+    Route::get('/learning/{classroom}', [SubjectController::class, 'classroom'])->name('learning.classroom');
+    // form create
+    Route::get('/learning/{classroom}/create', [SubjectController::class, 'create'])->name('learning.subject.create');
+    // store
+    Route::post('/learning/{classroom}', [SubjectController::class, 'store'])->name('learning.subject.store');
+    // form edit 
+    Route::get('/learning/subject/{subject}/edit', [SubjectController::class, 'edit'])->name('learning.subject.edit');
+    // update
+    Route::put('/learning/subject/{subject}', [SubjectController::class, 'update'])->name('learning.subject.update');
+    // delete
+    Route::delete('/learning/subject/{subject}', [SubjectController::class, 'destroy'])->name('learning.subject.destroy');
+
+
+    // Route Kelola Materi
+    Route::get('/materials/create/{subject}', [MaterialController::class, 'create'])->name('materials.create');
+    Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
+
+
+    // Route Pengumpulan Tugas
+    Route::get('/submissions/{assignment}', [AssignmentSubmissionController::class, 'create'])
+    ->name('submissions.create');
+    Route::post('/submissions', [AssignmentSubmissionController::class, 'store'])
+        ->name('submissions.store');
     
     // Khusus Superadmin
-    Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::middleware('role:superadmin')->group(function () {
         // Approval Siswa Baru
         Route::get('/approval/students', [ApprovalController::class, 'students'])->name('approval.students');
         Route::post('/approval/students/{id}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');

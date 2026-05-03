@@ -15,7 +15,7 @@
             <div>
                 <h2 class="text-[1.1rem] font-bold leading-tight">TPA/DTA</h2>
                 <span class="text-[0.65rem] font-bold text-[var(--text-tertiary)] uppercase tracking-widest">
-                    Miftahul Jannah
+                    Al-Barokah
                 </span>
             </div>
         </a>
@@ -36,28 +36,40 @@
         <!-- ================= SUPERADMIN ================= -->
         @if($user->hasRole('superadmin'))
 
-            <a href="/approval/students"
-               class="nav-item {{ request()->is('approval/*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:user-check-bold-duotone"></iconify-icon>
-                Approval
-            </a>
-
-            <a href="/payments"
-               class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
-                Iuran
-            </a>
-
             <a href="/users"
                class="nav-item {{ request()->is('users*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:users-group-rounded-bold-duotone"></iconify-icon>
                 Kelola User
             </a>
 
+             <a href="/payments"
+               class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
+                Iuran
+            </a>
+
+            <a href="/approval/students"
+               class="nav-item {{ request()->is('approval/*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:user-check-bold-duotone"></iconify-icon>
+                Approval
+            </a>
+
             <a href="/students/rejected"
                class="nav-item {{ request()->is('students/rejected') ? 'active' : '' }}">
                 <iconify-icon icon="solar:user-cross-bold-duotone"></iconify-icon>
                 Siswa Ditolak
+            </a>
+
+            <a href="/attendances"
+                class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:checklist-bold-duotone"></iconify-icon>
+                Absensi
+            </a>
+
+            <a href="/learning"
+                class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
+                Pembelajaran
             </a>
 
             <a href="/fees"
@@ -72,15 +84,15 @@
         @if($user->hasRole('guru'))
 
             <a href="/attendances"
-               class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
+                class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:checklist-bold-duotone"></iconify-icon>
                 Absensi
             </a>
 
-            <a href="/assignments"
-               class="nav-item {{ request()->is('assignments*') ? 'active' : '' }}">
+            <a href="/learning"
+                class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
-                Tugas
+                Pembelajaran
             </a>
 
         @endif
@@ -100,15 +112,21 @@
                 Iuran
             </a>
 
+            <a href="/learning"
+                class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
+                Pembelajaran
+            </a>
+
         @endif
 
         <!-- ================= SISWA ================= -->
         @if($user->hasRole('siswa'))
 
-            <a href="/assignments"
-               class="nav-item {{ request()->is('assignments*') ? 'active' : '' }}">
+            <a href="/learning"
+                class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
-                Tugas
+                Pembelajaran
             </a>
 
         @endif

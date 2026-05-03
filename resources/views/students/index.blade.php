@@ -6,10 +6,77 @@
     <div class="py-6">
         <div class="mx-auto max-w-7xl">
 
+            <div class="relative">
+
+                {{-- FLOATING ALERT WRAPPER --}}
+                <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
+
+                    {{-- SUCCESS --}}
+                    @if(session('success'))
+                    <div
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-init="setTimeout(() => show = false, 3000)"
+                        @click.outside="show = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 -translate-y-3"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0 -translate-y-2"
+                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                            bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
+                            bg-opacity-80 backdrop-blur-sm">
+
+                        <div class="text-sm font-semibold ms-2">
+                            {{ session('success') }}
+                        </div>
+
+                        <button @click="show = false"
+                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                            ✕
+                        </button>
+                    </div>
+                    @endif
+
+
+                    {{-- ERROR --}}
+                    @if(session('error'))
+                    <div
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-init="setTimeout(() => show = false, 3000)"
+                        @click.outside="show = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 -translate-y-3"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0 -translate-y-2"
+                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                            bg-gradient-to-t from-[var(--danger)] to-red-400 
+                            bg-opacity-80 backdrop-blur-sm">
+
+                        <div class="text-sm font-semibold ms-2">
+                            {{ session('error') }}
+                        </div>
+
+                        <button @click="show = false"
+                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                            ✕
+                        </button>
+                    </div>
+                    @endif
+
+                </div>
+
+            </div>
+
             <div class="mb-4">
                 <a href="{{ route('students.create') }}"
-                   class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    + Tambah Anak
+                class="flex items-center gap-2 shadow-sm btn-primary">
+                    <iconify-icon icon="solar:user-plus-bold-duotone" width="20"></iconify-icon>
+                    Tambah Anak
                 </a>
             </div>
 
@@ -19,7 +86,7 @@
                     <thead>
                         <tr>
                             <th>Nama</th>
-                            <th>Asal Sekolah</th>
+                            <th>Email</th>
                             <th>Status</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -56,7 +123,7 @@
 
                                 {{-- Asal Sekolah --}}
                                 <td class="text-small">
-                                    {{ $student->school_origin ?? '-' }}
+                                    {{ $student->user->email ?? '-' }}
                                 </td>
 
                                 {{-- Status --}}
@@ -93,7 +160,7 @@
                                         </a>
 
                                         {{-- Delete --}}
-                                        <form action="{{ route('students.destroy', $student->id) }}" method="POST">
+                                        {{-- <form action="{{ route('students.destroy', $student->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
 
@@ -102,7 +169,7 @@
                                                 title="Hapus">
                                                     <iconify-icon icon="heroicons:trash" width="18" class="text-[var(--danger)] group-hover:text-white transition"></iconify-icon>
                                             </button>
-                                        </form>
+                                        </form> --}}
 
                                     </div>
                                 </td>

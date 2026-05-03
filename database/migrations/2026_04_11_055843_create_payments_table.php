@@ -14,16 +14,25 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', ['registration', 'monthly']);
-            $table->string('month')->nullable();
-            $table->integer('original_amount');
-            $table->integer('adjustment')->default(0);
-            $table->integer('amount');
-            $table->string('proof_file')->nullable();
+
+            $table->enum('type', ['registration', 'monthly']); // jenis pembayaran
+
+            $table->string('month', 7)->nullable(); // format: YYYY-MM
+
+            $table->integer('original_amount'); // nominal awal
+            $table->integer('adjustment')->default(0); // penyesuaian (+/-)
+            $table->integer('amount'); // total akhir
+
+            // $table->string('proof_file', 255)->nullable(); // path bukti
+            $table->string('proof_file', 255); // path bukti
+
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
+
             $table->timestamp('paid_at')->nullable();
+
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('approved_at')->nullable();
+
             $table->text('reject_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -35,9 +44,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-            Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn('original_amount');
-            $table->dropColumn('status');
-        });
+        Schema::dropIfExists('payments');
     }
 };

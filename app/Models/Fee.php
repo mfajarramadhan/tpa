@@ -10,4 +10,11 @@ class Fee extends Model
         'registration_fee',
         'monthly_fee',
     ];
+
+    public function logs()
+    {   
+        return $this->hasMany(FeeLog::class);
+    }
 }
+
+

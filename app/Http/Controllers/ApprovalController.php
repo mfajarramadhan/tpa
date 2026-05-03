@@ -57,7 +57,7 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Siswa berhasil di-approve & dimasukkan ke kelas');
+        return back()->with('success', 'Pendaftaran siswa berhasil dan terdaftar kedalam kelas!');
     }
 
     public function rejectStudent(Request $request, $id)
@@ -79,7 +79,7 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Siswa ditolak');
+        return back()->with('success', 'Pendaftaran siswa ditolak. Silakan periksa kembali dokumen pendaftaran!');
     }
 
     public function rejected()

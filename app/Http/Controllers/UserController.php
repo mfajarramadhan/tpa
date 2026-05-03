@@ -31,12 +31,22 @@ class UserController extends Controller
         }
 
         // 🔥 filter status
+        // if ($status === 'deleted') {
+        //     $query->onlyTrashed();
+        // } elseif ($status === 'active') {
+        //     $query->whereNull('deleted_at');
+        // }
+        // kalau kosong "" → semua
+
+        $status = request('status', 'aktif'); // 🔥 DEFAULT AKTIF
+
         if ($status === 'deleted') {
             $query->onlyTrashed();
-        } elseif ($status === 'active') {
-            $query->whereNull('deleted_at');
+        } elseif ($status === 'aktif') {
+            $query->where('status', 'aktif')->whereNull('deleted_at');
+        } elseif ($status === 'nonaktif') {
+            $query->where('status', 'nonaktif')->whereNull('deleted_at');
         }
-        // kalau "" → semua
 
         $users = $query->with('roles')->latest()->get();
 
@@ -52,8 +62,10 @@ class UserController extends Controller
     // 🔷 SIMPAN USER
     public function store(Request $request)
     {
+        // dd($request);
         $request->validate([
             'name' => 'required',
+            'address' => 'nullable|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role' => 'required'
@@ -66,10 +78,12 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $request->name,
+            'address' => $request->address,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'status' => 'aktif',
-            'approval_status' => 'approved'
+            'approval_status' => 'approved',
+            'role' => $request->role
         ]);
 
         $user->assignRole($request->role);

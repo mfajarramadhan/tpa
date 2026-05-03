@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-3xl p-6 mx-auto bg-white shadow-sm rounded-2xl">
+        <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST" action="{{ route('students.store') }}" enctype="multipart/form-data">
                 @csrf
@@ -19,13 +19,16 @@
                     @enderror
                 </div>
 
-                {{-- NIK --}}
+                {{-- NISN --}}
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm font-semibold">NIK</label>
-                    <input type="text" name="nik" value="{{ old('nik') }}"
-                           maxlength="16" inputmode="numeric"
+                    <label class="block mb-1 text-sm font-semibold">NISN (Nomor Induk Siswa Nasional)</label>
+                    <input type="text" name="nisn" value="{{ old('nisn') }}"
+                           maxlength="10" 
+                           inputmode="numeric"
+                           pattern="[0-9]*"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
-                    @error('nik')
+                    @error('nisn')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
                 </div>

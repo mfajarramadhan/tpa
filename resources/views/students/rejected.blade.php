@@ -74,7 +74,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="py-6 text-center text-small">
+                        <td colspan="6" class="py-6 text-center">
                             Tidak ada data siswa ditolak
                         </td>
                     </tr>

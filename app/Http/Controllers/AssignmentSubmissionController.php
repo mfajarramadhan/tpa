@@ -2,45 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AssignmentSubmissionController extends Controller
 {
-    public function store(Request $request, $id)
+    public function create(Assignment $assignment)
     {
-        $request->validate([
-            'file' => 'required|mimes:pdf,doc,docx,jpg,png|max:2048'
-        ]);
-
-        $student = Auth::user()->student;
-
-        $filePath = $request->file('file')->store('submissions', 'public');
-
-        AssignmentSubmission::updateOrCreate(
-            [
-                'assignment_id' => $id,
-                'student_id' => $student->id
-            ],
-            [
-                'file_path' => $filePath
-            ]
-        );
-
-        return back()->with('success', 'Tugas berhasil dikumpulkan');
+        return view('submissions.create', compact('assignment'));
     }
 
-    public function destroy($id)
+    public function store(Request $request)
     {
-        $submission = AssignmentSubmission::findOrFail($id);
+        $request->validate([
+            'assignment_id' => 'required',
+            'file' => 'required|file|max:2048'
+        ]);
 
-        if ($submission->student_id !== Auth::user()->student->id) {
-            abort(403);
-        }
+        $path = $request->file('file')->store('submissions', 'public');
 
-        $submission->delete();
+        AssignmentSubmission::create([
+            'assignment_id' => $request->assignment_id,
+            'student_id' => auth()->user()->student->id,
+            'file_path' => $path,
+        ]);
 
-        return back()->with('success', 'Tugas berhasil dihapus');
+        return redirect()->route('learning.subject', $request->assignment_id)
+            ->with('success', 'Tugas berhasil diupload');
     }
 }

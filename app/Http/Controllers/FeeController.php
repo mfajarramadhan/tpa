@@ -29,6 +29,7 @@ class FeeController extends Controller
         // 🔥 SIMPAN LOG SEBELUM UPDATE
         FeeLog::create([
             'user_id' => Auth::id(),
+            'fee_id' => $fee->id,
             'old_registration_fee' => $fee->registration_fee,
             'new_registration_fee' => $request->registration_fee,
             'old_monthly_fee' => $fee->monthly_fee,

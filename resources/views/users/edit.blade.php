@@ -66,11 +66,15 @@
                     </select>
                 </div>
 
-                {{-- NIK --}}
+                {{-- NISN --}}
                 <div class="mb-3">
-                    <label>NIK</label>
-                    <input type="text" name="nik"
-                        value="{{ old('nik', $user->student->nik) }}"
+                    <label>NISN (Nomor Induk Siswa Nasional)</label>
+                    <input type="text" name="nisn" 
+                        maxlength="10" 
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        value="{{ old('nisn', $user->student->nisn) }}"
                         class="w-full p-2 border rounded">
                 </div>
 

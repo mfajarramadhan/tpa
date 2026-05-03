@@ -38,8 +38,8 @@
                         {{ $user->student->classroom->name ?? '-' }}
                     </p>
 
-                    <p><strong>NIK:</strong>
-                        {{ $user->student->nik ?? '-' }}
+                    <p><strong>NISN:</strong>
+                        {{ $user->student->nisn ?? '-' }}
                     </p>
 
                     <p><strong>Tanggal Lahir:</strong>

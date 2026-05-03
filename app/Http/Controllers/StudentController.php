@@ -43,13 +43,13 @@ class StudentController extends Controller
         // dd($request);
         $request->validate([
             'name' => 'required|string',
-            'nik' => 'required|digits:16|unique:students,nik',
+            'nisn' => 'required|digits:10|unique:students,nisn',
             'birth_date' => [
                 'required',
                 'date',
                 function ($attribute, $value, $fail) {
-                    if (Carbon::parse($value)->age < 2) {
-                        $fail('Usia anak minimal 2 tahun');
+                    if (Carbon::parse($value)->age < 4) {
+                        $fail('Usia anak minimal 4 tahun');
                     }
                 }
             ],
@@ -65,31 +65,16 @@ class StudentController extends Controller
         $aktaPath = $request->file('birth_certificate_file')->store('akta', 'public');
         $proofPath = $request->file('proof_file')->store('payments', 'public');
 
-        // Generate email unik siswa
-        // ambil nama (tanpa spasi)
-        $name = strtolower(str_replace(' ', '', $request->name));
-
         // format tanggal lahir (ddmmyyyy)
-        $birth = Carbon::parse($request->birth_date)->format('dmY');
-
-        // gabungkan nama + tanggal lahir
-        $email = $name . $birth . '@gmail.com';
-
-        // CEK DUPLIKAT (WAJIB)
-        if (User::where('email', $email)->exists()) {
-            $email = $name . $birth . rand(10,99) . '@gmail.com';
-        }
-
-        // Generate password dari tanggal lahir
-        $password = Hash::make($request->birth_date);
+        $birthDate = Carbon::parse($request->birth_date)->format('dmY');
 
         // Buat akun siswa
         $user = User::create([
             'name' => $request->name,
-            'email' => $email,
-            'password' => $password,
+            'email' => strtolower(str_replace(' ', '', $request->name)) . $birthDate . '@mail.com', // gabungkan nama + tanggal lahir
+            'password' => Hash::make($birthDate), // Generate password dari tanggal lahir
             'status' => 'nonaktif',
-            'approval_status' => 'approved'
+            'approval_status' => 'approved',
         ]);
 
         $user->assignRole('siswa');
@@ -99,7 +84,7 @@ class StudentController extends Controller
             'parent_id' => Auth::user()->id,
             'user_id' => $user->id,
             'classroom_id' => null,
-            'nik' => $request->nik,
+            'nisn' => $request->nisn,
             'name' => $request->name,
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
@@ -121,7 +106,7 @@ class StudentController extends Controller
         ]);
 
         return redirect()->route('students.index')
-            ->with('success', 'Data anak berhasil ditambahkan, menunggu approval.');
+            ->with('success', 'Anak berhasil didaftarkan! Menunggu persetujuan.');
     }
 
     /**
@@ -150,38 +135,75 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request);
         $student = Student::with('user')->findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $student->user_id,
-            'password' => 'nullable|min:6',
-            'classroom_id' => 'required|exists:classrooms,id',
-            'nik' => 'required',
-            'birth_date' => 'required|date',
-            'gender' => 'required|in:L,P',
-            'school_origin' => 'nullable|string'
-        ]);
+        $isAdmin = auth()->user()->hasRole('superadmin');
 
-        // 🔥 UPDATE USER (login siswa)
+        // VALIDASI
+        $rules = [
+            'name' => 'required|string|max:255',
+            'birth_date' => 'required|date',
+            'school_origin' => 'nullable|string|max:255',
+            'kk_file' => 'nullable|image|max:2048',
+            'birth_certificate_file' => 'nullable|image|max:2048',
+        ];
+
+        // hanya admin wajib isi
+        if ($isAdmin) {
+            $rules['gender'] = 'required|in:L,P';
+            $rules['email'] = 'required|email|unique:users,email,' . $student->user_id;
+            $rules['classroom_id'] = 'required|exists:classrooms,id';
+            $rules['nisn'] = 'required|string|max:10';
+        }
+
+        $request->validate($rules);
+
+        // FORMAT PASSWORD (dmY)
+        $birthDateFormatted = Carbon::parse($request->birth_date)->format('dmY');
+
+        // UPDATE USER (LOGIN SISWA)
         $userData = [
             'name' => $request->name,
-            'email' => $request->email,
         ];
+
+        if ($isAdmin) {
+            $userData['email'] = $request->email;
+        } else {
+            // AUTO EMAIL SISWA (dmY)
+            $userData['email'] = strtolower(str_replace(' ', '', $request->name)) . $birthDateFormatted . '@mail.com';
+        }
+
+        // OPTIONAL: kalau mau reset password otomatis saat edit
+        $userData['password'] = Hash::make($birthDateFormatted);
 
         $student->user->update($userData);
 
-        // 🔥 UPDATE DATA SISWA
-        $student->update([
-            'name' => $request->name,
-            'classroom_id' => $request->classroom_id,
-            'nik' => $request->nik,
-            'birth_date' => $request->birth_date,
-            'gender' => $request->gender,
-            'school_origin' => $request->school_origin
-        ]);
+        // HANDLE FILE UPLOAD
+        if ($request->hasFile('kk_file')) {
+            $student->kk_file = $request->file('kk_file')->store('kk', 'public');
+        }
 
-        return back()->with('success', 'Data siswa berhasil diperbarui');
+        if ($request->hasFile('birth_certificate_file')) {
+            $student->birth_certificate_file = $request->file('birth_certificate_file')->store('akta', 'public');
+        }
+
+        // UPDATE DATA SISWA
+        $studentData = [
+            'name' => $request->name,
+            'birth_date' => $request->birth_date,
+            'school_origin' => $request->school_origin,
+        ];
+
+        if ($isAdmin) {
+            $studentData['classroom_id'] = $request->classroom_id;
+            $studentData['nisn'] = $request->nisn;
+            $studentData['gender'] = $request->gender;
+        }
+
+        $student->update($studentData);
+
+        return redirect()->route('students.index')->with('success', 'Data berhasil diperbarui');
     }
 
     /**
@@ -223,20 +245,20 @@ class StudentController extends Controller
             abort(403);
         }
 
-        // 🔥 VALIDASI (TAMBAH INI)
+        // VALIDASI (TAMBAH INI)
         $request->validate([
             'name' => 'required|string',
-            'nik' => [
+            'nisn' => [
                 'required',
-                'digits:16',
-                Rule::unique('students', 'nik')->ignore($student->id)
+                'digits:10',
+                Rule::unique('students', 'nisn')->ignore($student->id)
             ],
             'birth_date' => 'required|date',
             'gender' => 'required|in:L,P',
             'school_origin' => 'required'
         ]);
 
-        // 🔥 HANDLE FILE KK
+        // HANDLE FILE KK
         if ($request->hasFile('kk_file')) {
 
             if ($student->kk_file) {
@@ -246,7 +268,7 @@ class StudentController extends Controller
             $student->kk_file = $request->file('kk_file')->store('kk', 'public');
         }
 
-        // 🔥 HANDLE FILE AKTA
+        // HANDLE FILE AKTA
         if ($request->hasFile('birth_certificate_file')) {
 
             if ($student->birth_certificate_file) {
@@ -256,10 +278,10 @@ class StudentController extends Controller
             $student->birth_certificate_file = $request->file('birth_certificate_file')->store('akta', 'public');
         }
 
-        // 🔥 UPDATE DATA SISWA
+        // UPDATE DATA SISWA
         $student->update([
             'name' => $request->name,
-            'nik' => $request->nik,
+            'nisn' => $request->nisn,
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
             'school_origin' => $request->school_origin,
@@ -267,7 +289,7 @@ class StudentController extends Controller
             'reject_reason' => null
         ]);
 
-        // 🔥 HANDLE PAYMENT REGISTRATION
+        // HANDLE PAYMENT REGISTRATION
         $payment = Payment::where('student_id', $student->id)
             ->where('type', 'registration')
             ->first();
@@ -292,7 +314,7 @@ class StudentController extends Controller
 
             } else {
 
-                // 🔥 TIDAK upload baru → tetap pakai lama
+                // TIDAK upload baru → tetap pakai lama
                 $payment->update([
                     'status' => 'pending'
                     // proof_file tetap
@@ -302,7 +324,7 @@ class StudentController extends Controller
 
         } else {
 
-            // 🔥 kalau belum ada (edge case)
+            // kalau belum ada (edge case)
             if ($request->hasFile('payment_proof')) {
 
                 $newProof = $request->file('payment_proof')->store('payments', 'public');

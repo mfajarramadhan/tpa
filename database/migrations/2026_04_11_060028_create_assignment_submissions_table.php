@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('assignment_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('assignment_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('material_id')->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->string('file_path');
+            $table->enum('status', ['submitted', 'revision', 'done'])->default('submitted');
+            $table->text('note')->nullable();
             $table->timestamps();
             // 1 siswa hanya 1 submission per tugas
-            $table->unique(['assignment_id', 'student_id']);
+            $table->unique(['material_id', 'student_id']);
         });
     }
 

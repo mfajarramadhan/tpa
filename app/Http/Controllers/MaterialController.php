@@ -3,63 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class MaterialController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function create(Subject $subject)
     {
-        //
+        return view('materials.create', compact('subject'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-    }
+        // dd($request);
+        $request->validate([
+            'subject_id' => 'required',
+            'title' => 'required',
+            'description' => 'nullable',
+            'file' => 'nullable|file|max:2048',
+            'youtube_link' => 'nullable|string'
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Material $material)
-    {
-        //
-    }
+        $filePath = null;
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Material $material)
-    {
-        //
-    }
+        if ($request->file('file')) {
+            $filePath = $request->file('file')->store('materials', 'public');
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Material $material)
-    {
-        //
-    }
+        Material::create([
+            'subject_id' => $request->subject_id,
+            'user_id' => auth()->id(),
+            'title' => $request->title,
+            'description' => $request->description,
+            'file_path' => $filePath,
+            'youtube_link' => $request->youtube_link,
+            'is_task' => $request->has('is_task'),
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Material $material)
-    {
-        //
+        return redirect()->route('learning.subject', $request->subject_id)
+            ->with('success', 'Materi berhasil ditambahkan');
     }
 }

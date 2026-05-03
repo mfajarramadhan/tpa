@@ -2,12 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Classroom;
+use App\Models\Payment;
+use App\Models\Student;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Student;
-use App\Models\Payment;
-use App\Models\Classroom;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -41,18 +42,18 @@ class StudentSeeder extends Seeder
         $studentsData = [
             [
                 'name' => 'Rama',
-                'email' => 'rama@gmail.com',
-                'nik' => '3275061210040001',
+                'email' => 'rama02022022@gmail.com',
+                'nisn' => '3275061210',
             ],
             [
                 'name' => 'Vito',
-                'email' => 'vito@gmail.com',
-                'nik' => '3275061210040002',
+                'email' => 'vito02022022@gmail.com',
+                'nisn' => '3275061211',
             ],
             [
                 'name' => 'Yasin',
-                'email' => 'yasin@gmail.com',
-                'nik' => '3275061210040003',
+                'email' => 'yasin02022022@gmail.com',
+                'nisn' => '3275061212',
             ],
         ];
 
@@ -60,15 +61,17 @@ class StudentSeeder extends Seeder
 
             // 🔹 USER SISWA
             $studentUser = User::where('email', $data['email'])->first();
+            $birthDate = Carbon::parse('2022-02-02')->format('dmY');
 
             if (!$studentUser) {
                 $studentUser = User::create([
                     'name' => $data['name'],
                     'email' => $data['email'],
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make($birthDate),
                     'status' => 'aktif',
                     'approval_status' => 'approved',
-                    'address' => 'Karawang'
+                    'address' => 'Karawang',
+                    'role' => 'siswa'
                 ]);
             }
 
@@ -82,8 +85,8 @@ class StudentSeeder extends Seeder
                     'user_id' => $studentUser->id,
                     'parent_id' => $parent->id,
                     'name' => $data['name'],
-                    'nik' => $data['nik'],
-                    'birth_date' => '2022-04-19',
+                    'nisn' => $data['nisn'],
+                    'birth_date' => '2022-02-02',
                     'gender' => 'L',
                     'school_origin' => 'SDN KALIBARU 1',
                     'classroom_id' => $classroom?->id,

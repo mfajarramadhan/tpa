@@ -100,8 +100,9 @@
                 </select>
 
                 <select name="status" class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5">
-                    <option value="" {{ $status === '' ? 'selected' : '' }}>Semua Status</option>
-                    <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Aktif</option>
+                    {{-- <option value="" {{ $status === '' ? 'selected' : '' }}>Semua Status</option> --}}
+                    <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="nonaktif" {{ $status === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                     <option value="deleted" {{ $status === 'deleted' ? 'selected' : '' }}>Dihapus</option>
                 </select>
 

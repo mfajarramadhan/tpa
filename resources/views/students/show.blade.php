@@ -24,7 +24,7 @@
                 </span>
             </p>
 
-            <p><strong>NIK:</strong> {{ $student->nik ?? '-' }}</p>
+            <p><strong>NISN:</strong> {{ $student->nisn ?? '-' }}</p>
 
             <p><strong>Tanggal Lahir:</strong>
                 {{ $student->birth_date

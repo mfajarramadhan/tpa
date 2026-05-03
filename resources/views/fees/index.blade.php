@@ -44,7 +44,7 @@
 
             <!-- Info -->
             <p class="text-xs text-[var(--text-tertiary)] italic mb-1 mt-1">
-                <span class="font-bold">Catatan:</span> Perubahan biaya hanya berlaku untuk pendaftaran baru & bulan berikutnya
+                <span class="font-bold">Catatan:</span> Perubahan biaya iuran bulanan mulai berlaku di bulan berikutnya
             </p>
 
             <!-- Button -->
