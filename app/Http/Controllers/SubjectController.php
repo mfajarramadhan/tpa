@@ -63,7 +63,7 @@ class SubjectController extends Controller
     {
         $subject->load([
             'materials.user',
-            'assignments.submissions.student.user'
+            'materials.submissions.student'
         ]);
 
         return view('learning.show', compact('subject'));

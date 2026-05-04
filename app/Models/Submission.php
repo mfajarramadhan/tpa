@@ -5,20 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AssignmentSubmission extends Model
+class Submission extends Model
 {
     /** @use HasFactory<\Database\Factories\AssignmentSubmissionFactory> */
     use HasFactory;
     protected $fillable = [
+        'material_id',
         'student_id',
-        'assignment_id',
-        'file_path'
+        'file_path',
+        'link'
     ];
-
-    public function assignment()
-    {
-        return $this->belongsTo(Assignment::class);
-    }
 
     public function material()
     {

@@ -14,6 +14,7 @@
     {{-- Iconify & Chart --}}
     <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 
 <body class="flex h-screen overflow-x-hidden text-body">

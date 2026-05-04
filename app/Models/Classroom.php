@@ -27,11 +27,6 @@ class Classroom extends Model
         return $this->hasMany(Subject::class);
     }
 
-    public function assignments()
-    {
-        return $this->hasMany(Assignment::class);
-    }
-
     public function attendances()
     {
         return $this->hasMany(Attendance::class);

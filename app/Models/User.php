@@ -72,11 +72,6 @@ class User extends Authenticatable
         return $this->hasMany(Material::class, 'created_by');
     }
 
-    public function assignments()
-    {
-        return $this->hasMany(Assignment::class, 'created_by');
-    }
-
     public function approvedPayments()
     {
         return $this->hasMany(Payment::class, 'approved_by');

@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="grid grid-cols-1 gap-6 mx-auto max-w-7xl md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 mx-auto max-w-7xl md:grid-cols-4">
 
             <div class="p-6 bg-white rounded-lg shadow">
                 <p>Total Siswa</p>
@@ -17,8 +17,13 @@
             </div>
 
             <div class="p-6 bg-blue-100 rounded-lg shadow">
+                <p>Total Materi</p>
+                <h2 class="text-2xl font-bold">{{ $materials }}</h2>
+            </div>
+
+            <div class="p-6 bg-blue-100 rounded-lg shadow">
                 <p>Total Tugas</p>
-                <h2 class="text-2xl font-bold">{{ $assignments }}</h2>
+                <h2 class="text-2xl font-bold">{{ $tasks }}</h2>
             </div>
 
         </div>

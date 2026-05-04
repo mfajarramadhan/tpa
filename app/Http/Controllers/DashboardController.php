@@ -7,6 +7,8 @@ use App\Models\Student;
 use App\Models\Attendance;
 use App\Models\Payment;
 use App\Models\Assignment;
+use App\Models\Material;
+use App\Models\Submission;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -41,12 +43,14 @@ class DashboardController extends Controller
 
             $totalStudents = Student::where('status', 'aktif')->count();
             $todayAttendance = Attendance::where('date', $today)->count();
-            $assignments = Assignment::where('created_by', $user->id)->count();
+            $materials = Material::where('is_task', false)->count();
+            $tasks = Material::where('is_task', true)->count();
 
             return view('dashboard.guru', compact(
                 'totalStudents',
                 'todayAttendance',
-                'assignments'
+                'materials',
+                'tasks'
             ));
         }
 
@@ -69,15 +73,32 @@ class DashboardController extends Controller
 
         // 🔷 SISWA
         if ($user->hasRole('siswa')) {
+        $student = $user->student;
 
-            $student = $user->student;
+        // ambil tugas berdasarkan classroom lewat subject
+        $tasks = Material::whereHas('subject', function ($q) use ($student) {
+            $q->where('classroom_id', $student->classroom_id);
+        })
+        ->where('is_task', 1)
+        ->with('subject')
+        ->latest()
+        ->get();
 
-            $assignments = Assignment::where('classroom_id', $student->classroom_id)
-                ->orderBy('deadline', 'asc')
-                ->get();
+        // ambil materi berdasarkan classroom lewat subject
+        $materials = Material::whereHas('subject', function ($q) use ($student) {
+            $q->where('classroom_id', $student->classroom_id);
+        })
+        ->where('is_task', 0)
+        ->with('subject')
+        ->latest()
+        ->get();
 
-            return view('dashboard.siswa', compact('assignments'));
-        }
+        // total tugas
+        $totalTasks = $tasks->count();
+        $totalMaterials = $materials->count();
+
+        return view('dashboard.siswa', compact('tasks', 'totalTasks', 'totalMaterials'));
+    }
 
         abort(403);
     }

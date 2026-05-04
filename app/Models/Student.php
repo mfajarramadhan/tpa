@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\AssignmentSubmission;
+use App\Models\Submission;
 use App\Models\Attendance;
 use App\Models\Classroom;
 use App\Models\Payment;
@@ -65,7 +65,7 @@ class Student extends Model
     // 🔹 Submission tugas
     public function submissions()
     {
-        return $this->hasMany(AssignmentSubmission::class);
+        return $this->hasMany(Submission::class);
     }
 
     // 🔹 Parse tanggal lahir untuk umur

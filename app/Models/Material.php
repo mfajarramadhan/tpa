@@ -37,7 +37,13 @@ class Material extends Model
 
     public function submissions()
     {
-        return $this->hasMany(AssignmentSubmission::class);
+        return $this->hasMany(Submission::class);
+    }
+
+    public function mySubmission()
+    {
+        return $this->hasOne(Submission::class)
+            ->where('student_id', auth()->user()->student->id ?? 0);
     }
 
     public function subject()

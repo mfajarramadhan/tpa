@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('assignment_submissions', function (Blueprint $table) {
+        Schema::create('submissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('material_id')->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->string('file_path');
-            $table->enum('status', ['submitted', 'revision', 'done'])->default('submitted');
+            $table->enum('status', ['terkirim', 'perbaiki', 'selesai'])->default('terkirim');
+            $table->text('link')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
             // 1 siswa hanya 1 submission per tugas
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('assignment_submissions');
+        Schema::dropIfExists('submissions');
     }
 };
