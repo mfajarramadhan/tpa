@@ -62,7 +62,7 @@ class SubmissionController extends Controller
     public function store(Request $request, Material $material)
     {
         $request->validate([
-            'material_id' => 'required',
+            // 'material_id' => 'required', // ❌ tidak perlu, sudah pakai route model binding
             'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'link' => 'nullable|url'
         ]);
@@ -82,24 +82,47 @@ class SubmissionController extends Controller
         }
 
         $path = null;
+        $link = null;
+
+        // ambil submission lama (jika ada)
+        $oldSubmission = Submission::where('material_id', $material->id)
+            ->where('student_id', auth()->user()->student->id)
+            ->first();
 
         // FILE → file_path
         if ($request->hasFile('file')) {
+
+            // hapus file lama jika ada
+            if ($oldSubmission && $oldSubmission->file_path) {
+                Storage::disk('public')->delete($oldSubmission->file_path);
+            }
+
             $path = $request->file('file')->store('submissions', 'public');
         }
 
         // LINK → link
+        if ($request->filled('link')) {
+
+            // hapus file lama jika sebelumnya file
+            if ($oldSubmission && $oldSubmission->file_path) {
+                Storage::disk('public')->delete($oldSubmission->file_path);
+            }
+
+            $link = $request->link;
+        }
+
+        // update atau create
         Submission::updateOrCreate(
-        [
-            'material_id' => $material->id,
-            'student_id' => auth()->user()->student->id,
-        ],
-        [
-            'file_path' => $path,
-            'link' => $request->link,
-            'status' => 'terkirim'
-        ]
-    );
+            [
+                'material_id' => $material->id,
+                'student_id' => auth()->user()->student->id,
+            ],
+            [
+                'file_path' => $path,
+                'link' => $link,
+                'status' => 'terkirim'
+            ]
+        );
 
         return redirect()->route('learning.subject', $material->subject_id)
             ->with('success', 'Tugas berhasil diupload');

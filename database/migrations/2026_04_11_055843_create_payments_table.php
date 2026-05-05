@@ -23,9 +23,7 @@ return new class extends Migration
             $table->integer('adjustment')->default(0); // penyesuaian (+/-)
             $table->integer('amount'); // total akhir
 
-            // $table->string('proof_file', 255)->nullable(); // path bukti
-            $table->string('proof_file', 255); // path bukti
-
+            $table->string('proof_file', 255)->nullable(); // path bukti
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
 
             $table->timestamp('paid_at')->nullable();

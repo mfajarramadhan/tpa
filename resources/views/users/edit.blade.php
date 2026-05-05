@@ -22,6 +22,21 @@
 
                 @if(!$user->student)
                 <div class="mb-3">
+                    <label>Nomor Telepon</label>
+                    <input type="text" name="phone"
+                        value="{{ old('phone', $user->phone) }}"
+                        placeholder="08xxxxxxxxxx"
+                        maxlength="13"
+                        inputmode="numeric"
+                        pattern="[0-9]{10,13}"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        class="w-full p-2 border rounded"
+                        required>
+                    
+                    <x-input-error :messages="$errors->get('phone')" class="mt-1"/>
+                </div>
+                
+                <div class="mb-3">
                     <label>Alamat</label>
                     <input type="text" name="address"
                         value="{{ old('address', $user->address) }}"

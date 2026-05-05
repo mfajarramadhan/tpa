@@ -65,6 +65,7 @@ class UserController extends Controller
         // dd($request);
         $request->validate([
             'name' => 'required',
+            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/'],
             'address' => 'nullable|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
@@ -78,6 +79,7 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $request->name,
+            'phone' => $request->phone,
             'address' => $request->address,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -116,6 +118,7 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/'],
             'email' => 'required|email|unique:users,email,' . $user->id,
             'address' => 'nullable|string|max:255',
             'password' => 'nullable|min:6',
@@ -128,6 +131,7 @@ class UserController extends Controller
 
         $data = [
             'name' => $request->name,
+            'phone' => $request->phone,
             'email' => $request->email,
             'address' => $request->address,
         ];
