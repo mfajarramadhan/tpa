@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('material_id')->constrained()->cascadeOnDelete();
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
-            $table->string('file_path');
             $table->enum('status', ['terkirim', 'perbaiki', 'selesai'])->default('terkirim');
+            $table->string('file_path')->nullable();
             $table->text('link')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();

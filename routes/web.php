@@ -48,15 +48,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/learning', [SubjectController::class, 'index'])->name('learning.index');
     Route::get('/learning/subject/{subject}', [SubjectController::class, 'show'])->name('learning.subject');
     Route::get('/learning/{classroom}', [SubjectController::class, 'classroom'])->name('learning.classroom');
-    // form create
     Route::get('/learning/{classroom}/create', [SubjectController::class, 'create'])->name('learning.subject.create');
-    // store
     Route::post('/learning/{classroom}', [SubjectController::class, 'store'])->name('learning.subject.store');
-    // form edit 
     Route::get('/learning/subject/{subject}/edit', [SubjectController::class, 'edit'])->name('learning.subject.edit');
-    // update
     Route::put('/learning/subject/{subject}', [SubjectController::class, 'update'])->name('learning.subject.update');
-    // delete
     Route::delete('/learning/subject/{subject}', [SubjectController::class, 'destroy'])->name('learning.subject.destroy');
 
 
@@ -74,6 +69,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/submissions/{material}', [SubmissionController::class, 'store'])->name('submissions.store');
     Route::delete('/submissions/{submission}', [SubmissionController::class, 'destroy'])->name('submissions.destroy');
     Route::post('/submissions/{submission}/complete', [SubmissionController::class, 'complete'])->name('submissions.complete');
+    Route::post('/submissions/{submission}/revise', [SubmissionController::class, 'revise'])->name('submissions.revise');
+    Route::post('/submissions/{id}/complete', [SubmissionController::class, 'complete'])->name('submissions.complete');
+    Route::post('/submissions/{id}/revise', [SubmissionController::class, 'revise'])->name('submissions.revise');
 
 
     // Kehadiran
@@ -87,7 +85,7 @@ Route::middleware('auth')->group(function () {
 
     // Detail Pembayaran
     Route::resource('payments', PaymentController::class);
-    // Detail per siswa
+    // Detail pembayaran per siswa
     Route::get('/students/{student}/payments', [PaymentController::class, 'show'])->name('payments.student.show');
     Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
     Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');

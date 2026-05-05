@@ -3,12 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use App\Models\Student;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class SubmissionController extends Controller
 {
+    public function index(Request $request, Material $material)
+    {
+        // ambil semua siswa di kelas materi ini
+        $classroom = $material->subject->classroom;
+
+        $students = Student::where('classroom_id', $classroom->id)->get();
+
+        // ambil semua submission untuk materi ini
+        $submissions = $material->submissions()
+        ->with('student')
+        ->latest()
+        ->get()
+        ->keyBy('student_id');
+
+        // SEARCH
+        if ($request->filled('search')) {
+            $students = $students->filter(function ($student) use ($request) {
+                return str_contains(
+                    strtolower($student->name),
+                    strtolower($request->search)
+                );
+            });
+        }
+
+        // FILTER STATUS
+        if ($request->filled('status')) {
+
+            $students = $students->filter(function ($student) use ($request, $submissions) {
+
+                $submission = $submissions[$student->id] ?? null;
+
+                if ($request->status === 'belum') {
+                    return !$submission;
+                }
+
+                if (!$submission) return false;
+
+                return $submission->status === $request->status;
+            });
+        }
+
+        return view('submissions.index', compact('material', 'students', 'submissions'));
+    }
+
     public function create(Material $material)
     {
         return view('submissions.create', compact('material'));
@@ -22,10 +67,17 @@ class SubmissionController extends Controller
             'link' => 'nullable|url'
         ]);
 
-        // VALIDASI MINIMAL SALAH SATU
+        // minimal salah satu
         if (!$request->hasFile('file') && !$request->filled('link')) {
             return back()->withErrors([
-                'file' => 'Upload file atau isi link. Tidak boleh keduanya!'
+                'file' => 'Upload file atau isi link'
+            ]);
+        }
+
+        // tidak boleh dua-duanya
+        if ($request->hasFile('file') && $request->filled('link')) {
+            return back()->withErrors([
+                'file' => 'Pilih salah satu: file atau link'
             ]);
         }
 
@@ -45,6 +97,7 @@ class SubmissionController extends Controller
         [
             'file_path' => $path,
             'link' => $request->link,
+            'status' => 'terkirim'
         ]
     );
 
@@ -62,12 +115,26 @@ class SubmissionController extends Controller
         return back()->with('success', 'Tugas dihapus');
     }
 
-    public function complete(Submission $submission)
+    public function complete($id)
     {
+        $submission = Submission::findOrFail($id);
+
         $submission->update([
             'status' => 'selesai'
         ]);
 
         return back()->with('success', 'Tugas ditandai selesai');
+    }
+
+
+    public function revise($id)
+    {
+        $submission = Submission::findOrFail($id);
+
+        $submission->update([
+            'status' => 'perbaiki'
+        ]);
+
+        return back()->with('success', 'Tugas diminta perbaikan');
     }
 }

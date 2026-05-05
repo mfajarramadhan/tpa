@@ -13,7 +13,7 @@
                   enctype="multipart/form-data">
                 @csrf
 
-                <input type="hidden" name="material_id" value="{{ $material->id }}">
+                {{-- <input type="hidden" name="material_id" value="{{ $material->id }}"> --}}
 
                 {{-- PILIH TIPE --}}
                 <div class="mb-4">
