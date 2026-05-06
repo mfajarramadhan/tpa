@@ -41,21 +41,19 @@ class SubjectController extends Controller
     /**
      * 🔹 STEP 2: LIST MAPEL PER KELAS
      */
-    public function classroom($id)
+    public function classroom(Classroom $classroom)
     {
-        $classroom = Classroom::with([
+        $classroom->load([
             'subjects' => function ($q) {
-                $q->withCount('materials'); 
+                $q->withCount('materials');
             }
-        ])->findOrFail($id);
+        ]);
 
         return view('learning.classroom', compact('classroom'));
     }
 
-    public function create($classroomId)
+    public function create(Classroom $classroom)
     {
-        $classroom = Classroom::findOrFail($classroomId);
-
         return view('learning.create', compact('classroom'));
     }
 
@@ -69,7 +67,7 @@ class SubjectController extends Controller
         return view('learning.show', compact('subject'));
     }
 
-    public function store(Request $request, $classroomId)
+    public function store(Request $request, Classroom $classroom)
     {
         $request->validate([
             'name' => 'required|string|max:50',
@@ -77,13 +75,13 @@ class SubjectController extends Controller
         ]);
 
         Subject::create([
-            'classroom_id' => $classroomId,
+            'classroom_id' => $classroom->id,
             'name' => $request->name,
             'description' => $request->description
         ]);
 
         return redirect()
-            ->route('learning.classroom', $classroomId)
+            ->route('learning.classroom', $classroom->id)
             ->with('success', 'Mapel berhasil ditambahkan');
     }
 

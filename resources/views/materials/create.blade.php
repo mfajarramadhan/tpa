@@ -24,7 +24,7 @@
                 {{-- DESKRIPSI --}}
                 <div class="mb-4">
                     <label class="block mb-1 text-sm font-semibold">Deskripsi</label>
-                    <textarea name="description"
+                    <textarea name="description" rows="5"
                               class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">{{ old('description') }}</textarea>
                 </div>
 

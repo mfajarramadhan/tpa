@@ -62,7 +62,7 @@ class SubmissionController extends Controller
     public function store(Request $request, Material $material)
     {
         $request->validate([
-            // 'material_id' => 'required', // ❌ tidak perlu, sudah pakai route model binding
+            // 'material_id' => 'required' tidak perlu, sudah pakai route model binding
             'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'link' => 'nullable|url'
         ]);
@@ -138,26 +138,27 @@ class SubmissionController extends Controller
         return back()->with('success', 'Tugas dihapus');
     }
 
-    public function complete($id)
+    public function complete(Submission $submission)
     {
-        $submission = Submission::findOrFail($id);
-
         $submission->update([
             'status' => 'selesai'
         ]);
 
-        return back()->with('success', 'Tugas ditandai selesai');
+        return back()->with('success', 'Tugas selesai');
     }
 
 
-    public function revise($id)
+    public function revise(Request $request, Submission $submission)
     {
-        $submission = Submission::findOrFail($id);
-
-        $submission->update([
-            'status' => 'perbaiki'
+        $request->validate([
+            'note' => 'required|string|max:1000'
         ]);
 
-        return back()->with('success', 'Tugas diminta perbaikan');
+        $submission->update([
+            'status' => 'perbaiki',
+            'note' => $request->note
+        ]);
+
+        return back()->with('success', 'Tugas dikembalikan untuk diperbaiki!');
     }
 }

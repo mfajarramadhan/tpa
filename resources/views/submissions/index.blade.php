@@ -105,6 +105,7 @@
                             <th class="p-3">Status</th>
                             <th class="p-3 text-center">File</th>
                             <th class="p-3 text-center">Aksi</th>
+                            <th class="p-3 text-center">Note</th>
                         </tr>
                     </thead>
 
@@ -140,7 +141,7 @@
                                     @else
 
                                         <span class="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded">
-                                            Belum Submit
+                                            Belum Kirim
                                         </span>
 
                                     @endif
@@ -199,34 +200,116 @@
 
                                     @if($submission)
 
-                                        <div class="flex justify-center gap-2">
+                                        <div x-data="{ open: false }">
 
-                                            {{-- SELESAI --}}
-                                            @if($submission->status !== 'selesai')
-                                            <form method="POST"
-                                                action="{{ route('submissions.complete', $submission->id) }}">
-                                                @csrf
-                                                <button class="px-3 py-1 text-xs text-white bg-green-600 rounded hover:bg-green-700">
-                                                    Selesai
-                                                </button>
-                                            </form>
-                                            @endif
+                                            <div class="flex justify-center gap-2">
 
-                                            {{-- PERBAIKI --}}
-                                            @if($submission->status !== 'perbaiki')
-                                            <form method="POST"
-                                                action="{{ route('submissions.revise', $submission->id) }}">
-                                                @csrf
-                                                <button class="px-3 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600">
-                                                    Perbaiki
+                                                {{-- SELESAI --}}
+                                                @if($submission->status !== 'selesai')
+                                                <form method="POST"
+                                                    action="{{ route('submissions.complete', $submission->id) }}"
+                                                    onsubmit="return confirm('Tandai tugas selesai?')">
+
+                                                    @csrf
+
+                                                    <button class="btn-icon group bg-[var(--success-light)] border border-[var(--success)] hover:bg-[var(--success)]"
+                                                            title="Selesai">
+
+                                                        <iconify-icon icon="lets-icons:check-fill"
+                                                                    width="18"
+                                                                    class="text-[var(--success)] group-hover:text-white transition">
+                                                        </iconify-icon>
+
+                                                    </button>
+
+                                                </form>
+                                                @endif
+
+                                                {{-- PERBAIKI --}}
+                                                @if($submission->status !== 'perbaiki')
+
+                                                <button @click="open = true"
+                                                    class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
+                                                    title="Perbaiki">
+
+                                                    <iconify-icon icon="heroicons:x-circle"
+                                                                width="18"
+                                                                class="text-[var(--danger)] group-hover:text-white transition">
+                                                    </iconify-icon>
+
                                                 </button>
-                                            </form>
-                                            @endif
+
+                                                @endif
+
+                                            </div>
+
+                                            {{-- MODAL --}}
+                                            <div x-show="open"
+                                                x-cloak
+                                                x-transition
+                                                class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+
+                                                <div @click.outside="open = false"
+                                                    class="w-full max-w-md p-5 shadow-md bg-surface rounded-xl">
+
+                                                    <h3 class="mb-3 font-semibold">
+                                                        Catatan Perbaikan
+                                                    </h3>
+
+                                                    <form method="POST"
+                                                        action="{{ route('submissions.revise', $submission->id) }}">
+
+                                                        @csrf
+
+                                                        <textarea name="note"
+                                                                rows="3"
+                                                                class="input-solid"
+                                                                placeholder="Tulis alasan perbaikan..."
+                                                                required></textarea>
+
+                                                        <div class="flex justify-end gap-2 mt-4">
+
+                                                            <button type="button"
+                                                                    @click="open = false"
+                                                                    class="btn-outline">
+
+                                                                Batal
+
+                                                            </button>
+
+                                                            <button class="btn-primary bg-[var(--danger)] hover:bg-red-700">
+
+                                                                Kirim
+
+                                                            </button>
+
+                                                        </div>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
 
                                         </div>
 
                                     @else
                                         <span class="text-xs text-gray-400">-</span>
+                                    @endif
+
+                                </td>
+
+                                {{-- NOTE --}}
+                                <td class="p-3 text-sm text-center">
+
+                                    @if($submission && $submission->note)
+
+                                        <div class="max-w-[220px] mx-auto text-xs text-gray-600">
+                                            {{ $submission->note }}
+                                        </div>
+
+                                    @else
+                                        <span class="text-gray-400">-</span>
                                     @endif
 
                                 </td>

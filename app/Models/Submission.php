@@ -14,7 +14,8 @@ class Submission extends Model
         'student_id',
         'file_path',
         'link',
-        'status'
+        'status',
+        'note'
     ];
 
     public function material()

@@ -8,71 +8,7 @@
     <div class="py-6">
         <div class="mx-auto space-y-6 max-w-7xl">
 
-            <div class="relative">
-
-                {{-- FLOATING ALERT WRAPPER --}}
-                <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
-
-                    {{-- SUCCESS --}}
-                    @if(session('success'))
-                    <div
-                        x-data="{ show: true }"
-                        x-show="show"
-                        x-init="setTimeout(() => show = false, 3000)"
-                        @click.outside="show = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 -translate-y-3"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
-                            bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
-                            bg-opacity-80 backdrop-blur-sm">
-
-                        <div class="text-sm font-semibold ms-2">
-                            {{ session('success') }}
-                        </div>
-
-                        <button @click="show = false"
-                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
-                            ✕
-                        </button>
-                    </div>
-                    @endif
-
-
-                    {{-- ERROR --}}
-                    @if(session('error'))
-                    <div
-                        x-data="{ show: true }"
-                        x-show="show"
-                        x-init="setTimeout(() => show = false, 3000)"
-                        @click.outside="show = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 -translate-y-3"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
-                            bg-gradient-to-t from-[var(--danger)] to-red-400 
-                            bg-opacity-80 backdrop-blur-sm">
-
-                        <div class="text-sm font-semibold ms-2">
-                            {{ session('error') }}
-                        </div>
-
-                        <button @click="show = false"
-                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
-                            ✕
-                        </button>
-                    </div>
-                    @endif
-
-                </div>
-
-            </div>
+            
 
             {{-- ================= TAMBAH MATERI ================= --}}
             @role('guru|superadmin')
@@ -136,14 +72,10 @@
                     class="p-6 cursor-pointer rounded-xl hover:bg-slate-50">
                     
                     {{-- TITLE --}}
-                    <h3 class="text-lg font-bold">
+                    <h3 class="pr-10 text-lg font-bold break-words">
                         {{ $material->title }}
                     </h3>
 
-                    {{-- DESC --}}
-                    <p class="mt-2 text-sm text-gray-600">
-                        {{ $material->description }}
-                    </p>
                 </div>
 
                 {{-- CONTENT (HIDDEN BY DEFAULT) --}}
@@ -151,6 +83,15 @@
                     class="overflow-hidden transition-all duration-500 max-h-0">
 
                     <div class="px-6 pb-6 border-t">
+                        
+                        {{-- DESCRIPTION --}}
+                        @if($material->description)
+                            <div class="mt-4">
+                                <p class="text-sm leading-relaxed text-gray-600 whitespace-pre-line">
+                                    {{ $material->description }}
+                                </p>
+                            </div>
+                        @endif
 
                         {{-- ================= PREVIEW ================= --}}
                         <div class="mt-4">
@@ -222,75 +163,130 @@
 
                             <div class="mt-4 space-y-3">
 
-                                {{-- ================= SISWA VIEW ================= --}}
+                                {{-- ================= SUBMISSION SISWA ================= --}}
                                 @if(auth()->user()->hasRole('siswa'))
 
                                     @php
                                         $mySubmission = $material->submissions
                                             ->where('student_id', auth()->user()->student->id)
                                             ->first();
+
+                                        $statusMap = [
+                                            'terkirim' => [
+                                                'label' => 'Terkirim',
+                                                'color' => 'bg-yellow-100 text-yellow-700'
+                                            ],
+                                            'perbaiki' => [
+                                                'label' => 'Perbaiki',
+                                                'color' => 'bg-red-100 text-red-700'
+                                            ],
+                                            'selesai' => [
+                                                'label' => 'Selesai',
+                                                'color' => 'bg-green-100 text-green-700'
+                                            ]
+                                        ];
                                     @endphp
 
+                                    {{-- SUDAH SUBMIT --}}
                                     @if($mySubmission)
 
                                         @php
-                                            $fileUrl = asset('storage/' . $mySubmission->file_path);
-                                            $ext = strtolower(pathinfo($mySubmission->file_path, PATHINFO_EXTENSION));
+                                            $fileUrl = $mySubmission->file_path
+                                                ? asset('storage/' . $mySubmission->file_path)
+                                                : $mySubmission->link;
 
-                                            // 🔥 mapping status
-                                            $statusMap = [
-                                                'terkirim' => ['label' => 'Menunggu', 'color' => 'bg-yellow-100 text-yellow-700'],
-                                                'perbaiki' => ['label' => 'Perbaiki', 'color' => 'bg-red-100 text-red-700'],
-                                                'selesai'  => ['label' => 'Selesai', 'color' => 'bg-green-100 text-green-700'],
-                                            ];
+                                            $ext = $mySubmission->file_path
+                                                ? strtolower(pathinfo($mySubmission->file_path, PATHINFO_EXTENSION))
+                                                : null;
                                         @endphp
 
-                                        {{-- CARD --}}
-                                        <div class="flex items-center justify-between p-3 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
-                                            onclick="window.open('{{ $fileUrl }}')">
+                                        <div class="mt-4">
 
-                                            <div class="flex items-center gap-3">
+                                            {{-- CLICKABLE CARD --}}
+                                            <div
+                                                onclick="window.open('{{ $fileUrl }}')"
+                                                class="flex items-center justify-between p-3 transition bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
 
-                                                {{-- PREVIEW --}}
-                                                @if(in_array($ext, ['jpg','jpeg','png']))
-                                                    <img src="{{ $fileUrl }}" class="object-cover w-12 h-12 rounded">
-                                                @elseif($ext == 'pdf')
-                                                    <div class="flex items-center justify-center w-12 h-12 text-xs bg-red-100 rounded">
-                                                        PDF
+                                                <div class="flex items-center gap-3">
+
+                                                    {{-- PREVIEW --}}
+                                                    @if($mySubmission->file_path)
+
+                                                        @if(in_array($ext, ['jpg','jpeg','png']))
+                                                            <img src="{{ $fileUrl }}"
+                                                                class="object-cover w-12 h-12 rounded">
+                                                        @elseif($ext == 'pdf')
+                                                            <div class="flex items-center justify-center w-12 h-12 text-xs font-bold text-red-500 bg-white rounded">
+                                                                PDF
+                                                            </div>
+                                                        @else
+                                                            <div class="flex items-center justify-center w-12 h-12 text-xs bg-white rounded">
+                                                                FILE
+                                                            </div>
+                                                        @endif
+
+                                                    @elseif($mySubmission->link)
+
+                                                        <div class="flex items-center justify-center w-12 h-12 text-xl bg-blue-100 rounded">
+                                                            🔗
+                                                        </div>
+
+                                                    @endif
+
+                                                    {{-- INFO --}}
+                                                    <div>
+
+                                                        {{-- STATUS --}}
+                                                        <span class="px-2 py-1 text-xs rounded {{ $statusMap[$mySubmission->status]['color'] }}">
+                                                            {{ $statusMap[$mySubmission->status]['label'] }}
+                                                        </span>
+
+                                                        {{-- NOTE --}}
+                                                        @if($mySubmission->note)
+                                                            <div class="mt-1 text-xs text-gray-500">
+                                                                Catatan:
+                                                                {{ $mySubmission->note }}
+                                                            </div>
+                                                        @endif
+
                                                     </div>
-                                                @endif
 
-                                                {{-- STATUS --}}
-                                                <div>
-                                                    <span class="px-2 py-1 text-xs rounded {{ $statusMap[$mySubmission->status]['color'] }}">
-                                                        {{ $statusMap[$mySubmission->status]['label'] ?? 'Menunggu' }}
-                                                    </span>
                                                 </div>
 
                                             </div>
 
-                                            {{-- DELETE (HANYA SISWA) --}}
-                                            <form method="POST"
-                                                action="{{ route('submissions.destroy', $mySubmission->id) }}"
-                                                onclick="event.stopPropagation()">
+                                            {{-- BUTTON ACTION --}}
+                                            @if($mySubmission->status != 'selesai')
 
-                                                @csrf
-                                                @method('DELETE')
+                                                <a href="{{ route('submissions.create', $material->id) }}"
+                                                class="block w-full py-2 mt-3 text-center text-white rounded-lg
+                                                {{ $mySubmission->status == 'perbaiki'
+                                                    ? 'bg-red-500 hover:bg-red-600'
+                                                    : 'bg-yellow-500 hover:bg-yellow-600' }}">
 
-                                                <button class="px-2 text-red-500 hover:text-red-700">
-                                                    ✕
-                                                </button>
-                                            </form>
+                                                    {{ $mySubmission->status == 'perbaiki'
+                                                        ? 'Upload Revisi'
+                                                        : 'Upload Ulang' }}
+
+                                                </a>
+
+                                            @endif
 
                                         </div>
 
+                                    {{-- BELUM SUBMIT --}}
                                     @else
 
-                                        {{-- BUTTON UPLOAD --}}
-                                        <a href="{{ route('submissions.create', $material->id) }}"
-                                        class="block w-full py-2 text-center text-white bg-blue-600 rounded hover:bg-blue-700">
-                                            Upload Tugas
-                                        </a>
+                                        <div class="mt-4">
+
+                                            <a href="{{ route('submissions.create', $material->id) }}"
+                                            class="block w-full py-2 text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+
+                                                Upload Tugas
+
+                                            </a>
+
+                                        </div>
 
                                     @endif
 
