@@ -23,11 +23,42 @@
                         required>
                 </div>
 
-                {{-- DESKRIPSI --}}
+                {{-- HARI --}}
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm font-semibold">Deskripsi</label>
-                    <textarea name="description"
-                        class="w-full p-2 border rounded">{{ $subject->description }}</textarea>
+                    <label class="block mb-1 text-sm font-semibold">
+                        Hari
+                    </label>
+
+                    <select name="day"
+                            class="w-full p-2 border rounded-lg">
+
+                        <option value="1" {{ $subject->day == 1 ? 'selected' : '' }}>
+                            Senin
+                        </option>
+
+                        <option value="2" {{ $subject->day == 2 ? 'selected' : '' }}>
+                            Selasa
+                        </option>
+
+                        <option value="3" {{ $subject->day == 3 ? 'selected' : '' }}>
+                            Rabu
+                        </option>
+
+                        <option value="4" {{ $subject->day == 4 ? 'selected' : '' }}>
+                            Kamis
+                        </option>
+
+                        <option value="5" {{ $subject->day == 5 ? 'selected' : '' }}>
+                            Jumat
+                        </option>
+
+                    </select>
+
+                    @error('day')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
                 </div>
 
                 <button class="px-4 py-2 text-white bg-blue-600 rounded">

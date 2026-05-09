@@ -77,7 +77,7 @@
                     $payment = $student->payments->where('type', 'registration')->first();
                 @endphp
 
-                <div class="p-6 bg-white shadow-sm rounded-2xl">
+                <div class="p-6 mb-4 bg-white shadow-sm rounded-2xl">
 
                     {{-- IDENTITAS --}}
                     <div class="pb-4 mb-4 border-b">

@@ -19,7 +19,8 @@ return new class extends Migration
             $table->enum('status', ['hadir', 'izin', 'sakit', 'alpha']);
             $table->text('note')->nullable(); // alasan jika tidak hadir
 
-            $table->timestamps();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('updated_at')->nullable();
 
             $table->unique(['attendance_id', 'student_id']);
         });

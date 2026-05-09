@@ -1,59 +1,185 @@
 <x-app-layout>
 
-    <div class="max-w-2xl p-6 mx-auto mt-6 bg-white rounded shadow">
+    <div class="py-6 md:py-0">
 
-        <h2 class="mb-4 text-lg font-semibold">Detail Siswa</h2>
+        {{-- BUTTON --}}
+        <div class="mb-6">
 
-        {{-- DATA SISWA --}}
-        <div class="space-y-2 text-sm">
+            <a href="{{ route('students.index') }}"
+                class="flex items-center gap-2 shadow-sm btn-primary">
 
-            <p><strong>Nama:</strong> {{ $student->name }}</p>
+                <iconify-icon
+                    icon="heroicons:arrow-left-20-solid"
+                    width="20">
+                </iconify-icon>
 
-            <p><strong>Email:</strong>
-                {{ $student->user->email ?? '-' }}
-            </p>
+                Kembali
 
-            <p><strong>Kelas:</strong>
-                {{ $student->classroom->name ?? '-' }}
-            </p>
-
-            <p><strong>Status:</strong>
-                <span class="px-2 py-1 text-white rounded
-                    {{ $student->status == 'aktif' ? 'bg-green-500' : 'bg-gray-500' }}">
-                    {{ $student->status }}
-                </span>
-            </p>
-
-            <p><strong>NISN:</strong> {{ $student->nisn ?? '-' }}</p>
-
-            <p><strong>Tanggal Lahir:</strong>
-                {{ $student->birth_date
-                    ? \Carbon\Carbon::parse($student->birth_date)->format('d M Y')
-                    : '-' }}
-            </p>
-
-            <p><strong>Gender:</strong>
-                @if($student->gender == 'L')
-                    Laki-laki
-                @elseif($student->gender == 'P')
-                    Perempuan
-                @else
-                    -
-                @endif
-            </p>
-
-            <p><strong>Asal Sekolah:</strong>
-                {{ $student->school_origin ?? '-' }}
-            </p>
+            </a>
 
         </div>
 
-        {{-- BUTTON --}}
-        <div class="mt-4">
-            <a href="{{ route('students.index') }}"
-               class="px-4 py-2 text-gray-700 bg-gray-200 rounded">
-                Kembali
-            </a>
+        {{-- CARD --}}
+        <div class="p-6 mx-auto max-w-7xl card-panel">
+
+            {{-- HEADER --}}
+            <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
+
+                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+                    <iconify-icon 
+                        icon="heroicons:academic-cap-solid"
+                        class="text-xl text-[var(--primary)]">
+                    </iconify-icon>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">
+                        Informasi Siswa
+                    </h2>
+
+                    <p class="text-sm text-slate-500">
+                        Detail data lengkap siswa
+                    </p>
+                </div>
+
+            </div>
+
+            {{-- CONTENT --}}
+            <div class="divide-y divide-gray-100">
+
+                {{-- NAMA --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Nama Lengkap
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+                        {{ $student->name }}
+                    </p>
+
+                </div>
+
+                {{-- EMAIL --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Email
+                    </p>
+
+                    <p class="text-sm font-bold text-right break-words text-slate-800">
+                        {{ $student->user->email ?? '-' }}
+                    </p>
+
+                </div>
+
+                {{-- KELAS --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Kelas
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+                        {{ $student->classroom->name ?? '-' }}
+                    </p>
+
+                </div>
+
+                {{-- STATUS --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Status
+                    </p>
+
+                    <div class="flex justify-end">
+
+                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold
+                            {{ $student->status == 'aktif'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-gray-100 text-gray-600' }}">
+
+                            <span class="w-2 h-2 rounded-full
+                                {{ $student->status == 'aktif'
+                                    ? 'bg-green-500'
+                                    : 'bg-gray-400' }}">
+                            </span>
+
+                            {{ ucfirst($student->status) }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                {{-- NISN --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        NISN
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+                        {{ $student->nisn ?? '-' }}
+                    </p>
+
+                </div>
+
+                {{-- TANGGAL LAHIR --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Tanggal Lahir
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+
+                        {{ $student->birth_date
+                            ? \Carbon\Carbon::parse($student->birth_date)->format('d M Y')
+                            : '-' }}
+
+                    </p>
+
+                </div>
+
+                {{-- GENDER --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Gender
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+
+                        @if($student->gender == 'L')
+                            Laki-laki
+                        @elseif($student->gender == 'P')
+                            Perempuan
+                        @else
+                            -
+                        @endif
+
+                    </p>
+
+                </div>
+
+                {{-- ASAL SEKOLAH --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-6 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Asal Sekolah
+                    </p>
+
+                    <p class="text-sm font-bold text-right break-words text-slate-800">
+                        {{ $student->school_origin ?? '-' }}
+                    </p>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>

@@ -14,6 +14,18 @@
                 <input type="text" name="name" class="w-full p-2 border rounded" required>
             </div>
 
+            {{-- PHONE --}}
+            <div class="mb-3">
+                <label>Nomor Telepon</label>
+                <input type="text" name="phone" 
+                placeholder="08xxxxxxxxxx"
+                maxlength="13"
+                inputmode="numeric"
+                pattern="[0-9]{10,13}"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                class="w-full p-2 border rounded" required>
+            </div>
+
             {{-- ALAMAT --}}
            <div class="mb-3">
                 <label>Alamat</label>

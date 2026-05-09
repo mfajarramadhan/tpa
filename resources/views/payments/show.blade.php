@@ -136,13 +136,42 @@
 
                         {{-- Bukti --}}
                         <td>
+
                             @if($payment->proof_file)
-                                <img src="{{ asset('storage/' . $payment->proof_file) }}"
-                                    class="w-16 h-16 object-cover rounded-lg border border-[var(--border)] cursor-pointer hover:scale-105 transition"
-                                    onclick="window.open(this.src)">
+
+                                @php
+                                    $proofUrl = asset('storage/' . $payment->proof_file);
+                                    $ext = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
+                                @endphp
+
+                                {{-- IMAGE --}}
+                                @if(in_array($ext, ['jpg','jpeg','png']))
+
+                                    <img src="{{ $proofUrl }}"
+                                        class="object-cover w-16 h-16 transition border rounded-lg cursor-pointer border-[var(--border)] hover:scale-105"
+                                        onclick="openPaymentPreview('image', '{{ $proofUrl }}')">
+
+                                {{-- PDF --}}
+                                @elseif($ext === 'pdf')
+
+                                    <div
+                                        onclick="openPaymentPreview('pdf', '{{ $proofUrl }}')"
+                                        class="flex items-center justify-center w-16 h-16 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 border-[var(--border)]">
+
+                                        <span class="text-xs font-bold text-red-600">
+                                            PDF
+                                        </span>
+
+                                    </div>
+
+                                @endif
+
                             @else
+
                                 <span class="text-small">-</span>
+
                             @endif
+
                         </td>
 
                         {{-- Aksi --}}
@@ -242,4 +271,85 @@
         </div>
 
     </div>
+
+    {{-- ================= PAYMENT PREVIEW MODAL ================= --}}
+    <div id="paymentPreviewModal"
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm">
+
+        {{-- CLOSE --}}
+        <button onclick="closePaymentPreview()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
+
+        <div class="w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="paymentPreviewImage"
+                class="hidden object-contain w-full max-h-[90vh] rounded-lg shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="paymentPreviewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+        </div>
+
+    </div>
+    
 </x-app-layout>
+
+<script>
+
+    function openPaymentPreview(type, src) {
+
+        const modal = document.getElementById('paymentPreviewModal');
+
+        const image = document.getElementById('paymentPreviewImage');
+        const pdf = document.getElementById('paymentPreviewPdf');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+
+            image.src = src;
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        if (type === 'pdf') {
+
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closePaymentPreview() {
+
+        const modal = document.getElementById('paymentPreviewModal');
+
+        document.getElementById('paymentPreviewImage').src = '';
+        document.getElementById('paymentPreviewPdf').src = '';
+
+        modal.style.display = 'none';
+    }
+
+    // klik backdrop
+    document.getElementById('paymentPreviewModal')
+        .addEventListener('click', function(e) {
+
+            if (e.target.id === 'paymentPreviewModal') {
+                closePaymentPreview();
+            }
+
+        });
+
+</script>

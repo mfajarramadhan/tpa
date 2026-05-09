@@ -66,6 +66,12 @@
                 Absensi
             </a>
 
+            <a href="{{ route('attendance.recap') }}"
+                class="nav-item {{ request()->is('attendance-recaps*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:clipboard-list-bold-duotone"></iconify-icon>
+                Rekap Absensi
+            </a>
+
             <a href="/learning"
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
@@ -87,6 +93,12 @@
                 class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:checklist-bold-duotone"></iconify-icon>
                 Absensi
+            </a>
+
+            <a href="{{ route('attendance.recap') }}"
+                class="nav-item {{ request()->is('attendance-recaps*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:clipboard-list-bold-duotone"></iconify-icon>
+                Rekap Absensi
             </a>
 
             <a href="/learning"
@@ -112,6 +124,12 @@
                 Iuran
             </a>
 
+            <a href="{{ route('attendance.recap') }}"
+                class="nav-item {{ request()->is('attendance-recaps*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:clipboard-list-bold-duotone"></iconify-icon>
+                Rekap Absensi
+            </a>
+
             <a href="/learning"
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
@@ -122,6 +140,12 @@
 
         <!-- ================= SISWA ================= -->
         @if($user->hasRole('siswa'))
+
+            <a href="{{ route('attendance.recap') }}"
+                class="nav-item {{ request()->is('attendance-recaps*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:clipboard-list-bold-duotone"></iconify-icon>
+                Rekap Absensi
+            </a>
 
             <a href="/learning"
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">

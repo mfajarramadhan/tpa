@@ -5,6 +5,37 @@
         </h2>
     </x-slot>
 
+    {{-- ================= SUBMISSION PREVIEW MODAL ================= --}}
+    <div id="submissionPreviewModal"
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center hidden bg-black/80 backdrop-blur-sm">
+
+        {{-- CLOSE --}}
+        <button onclick="closeSubmissionPreview()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
+
+        <div class="w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="submissionPreviewImage"
+                class="hidden object-contain w-full max-h-[90vh] rounded-lg shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="submissionPreviewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+            {{-- LINK --}}
+            <iframe id="submissionPreviewLink"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+        </div>
+
+    </div>
+
     <div class="py-6">
         <div class="max-w-5xl mx-auto">
 
@@ -162,24 +193,52 @@
                                                     $ext = strtolower(pathinfo($submission->file_path, PATHINFO_EXTENSION));
                                                 @endphp
 
-                                                <div class="flex items-center justify-center w-12 h-12 transition bg-gray-100 rounded cursor-pointer hover:scale-105"
-                                                    onclick="window.open('{{ $fileUrl }}')">
+                                                {{-- IMAGE --}}
+                                                @if(in_array($ext, ['jpg','jpeg','png']))
 
-                                                    @if(in_array($ext, ['jpg','jpeg','png']))
-                                                        <img src="{{ $fileUrl }}" class="object-cover w-full h-full rounded">
-                                                    @elseif($ext == 'pdf')
-                                                        <span class="text-xs font-bold text-red-500">PDF</span>
-                                                    @else
-                                                        <span class="text-xs">FILE</span>
-                                                    @endif
+                                                    <div
+                                                        onclick="openSubmissionPreview('image', '{{ $fileUrl }}')"
+                                                        class="overflow-hidden transition bg-gray-100 rounded cursor-pointer w-14 h-14 hover:scale-105">
 
-                                                </div>
+                                                        <img src="{{ $fileUrl }}"
+                                                            class="object-cover w-full h-full">
+
+                                                    </div>
+
+                                                {{-- PDF --}}
+                                                @elseif($ext == 'pdf')
+
+                                                    <div
+                                                        onclick="openSubmissionPreview('pdf', '{{ $fileUrl }}')"
+                                                        class="flex items-center justify-center transition bg-gray-100 rounded cursor-pointer w-14 h-14 hover:scale-105">
+
+                                                        <span class="text-xs font-bold text-red-500">
+                                                            PDF
+                                                        </span>
+
+                                                    </div>
+
+                                                {{-- OTHER --}}
+                                                @else
+
+                                                    <a href="{{ $fileUrl }}"
+                                                        target="_blank"
+                                                        class="flex items-center justify-center transition bg-gray-100 rounded w-14 h-14 hover:scale-105">
+
+                                                        <span class="text-xs">
+                                                            FILE
+                                                        </span>
+
+                                                    </a>
+
+                                                @endif
 
                                             {{-- LINK --}}
                                             @elseif($submission->link)
 
-                                                <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded cursor-pointer hover:scale-105"
-                                                    onclick="window.open('{{ $submission->link }}')">
+                                                <div
+                                                    onclick="openSubmissionPreview('link', '{{ $submission->link }}')"
+                                                    class="flex items-center justify-center transition bg-blue-100 rounded cursor-pointer w-14 h-14 hover:scale-105">
 
                                                     🔗
 
@@ -226,18 +285,24 @@
                                                 @endif
 
                                                 {{-- PERBAIKI --}}
-                                                @if($submission->status !== 'perbaiki')
+                                                @if(!in_array($submission->status, ['perbaiki', 'selesai']))
 
-                                                <button @click="open = true"
-                                                    class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
-                                                    title="Perbaiki">
+                                                    <button @click="open = true"
+                                                        class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
+                                                        title="Perbaiki">
 
-                                                    <iconify-icon icon="heroicons:x-circle"
-                                                                width="18"
-                                                                class="text-[var(--danger)] group-hover:text-white transition">
-                                                    </iconify-icon>
+                                                        <iconify-icon icon="heroicons:x-circle"
+                                                                    width="18"
+                                                                    class="text-[var(--danger)] group-hover:text-white transition">
+                                                        </iconify-icon>
 
-                                                </button>
+                                                    </button>
+                                                
+                                                @elseif($submission->status == 'selesai')
+
+                                                    <div
+                                                        class="h-3 bg-gray-200 border border-gray-300 rounded-lg w-9">
+                                                    </div>
 
                                                 @endif
 
@@ -326,3 +391,62 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+
+    function openSubmissionPreview(type, src) {
+
+        const modal = document.getElementById('submissionPreviewModal');
+
+        const image = document.getElementById('submissionPreviewImage');
+        const pdf = document.getElementById('submissionPreviewPdf');
+        const link = document.getElementById('submissionPreviewLink');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+        link.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+            image.src = src;
+            image.classList.remove('hidden');
+        }
+
+        // PDF
+        if (type === 'pdf') {
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+        }
+
+        // LINK
+        if (type === 'link') {
+            link.src = src;
+            link.classList.remove('hidden');
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeSubmissionPreview() {
+
+        const modal = document.getElementById('submissionPreviewModal');
+
+        document.getElementById('submissionPreviewPdf').src = '';
+        document.getElementById('submissionPreviewLink').src = '';
+        document.getElementById('submissionPreviewImage').src = '';
+
+        modal.style.display = 'none';
+    }
+
+    // klik backdrop
+    document.getElementById('submissionPreviewModal')
+        .addEventListener('click', function(e) {
+
+            if (e.target.id === 'submissionPreviewModal') {
+                closeSubmissionPreview();
+            }
+
+        });
+
+</script>

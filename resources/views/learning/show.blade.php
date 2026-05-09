@@ -68,13 +68,56 @@
                 @endrole
 
                 {{-- HEADER (CLICKABLE) --}}
+                {{-- HEADER (CLICKABLE) --}}
                 <div onclick="toggleMaterial({{ $material->id }})"
                     class="p-6 cursor-pointer rounded-xl hover:bg-slate-50">
-                    
-                    {{-- TITLE --}}
-                    <h3 class="pr-10 text-lg font-bold break-words">
-                        {{ $material->title }}
-                    </h3>
+
+                    <div class="flex items-start gap-4">
+
+                        {{-- ICON --}}
+                        <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-xl
+                            {{ $material->is_task 
+                                ? 'bg-orange-100 text-orange-600' 
+                                : 'bg-blue-100 text-blue-600' }}">
+
+                            @if($material->is_task)
+
+                                {{-- TUGAS --}}
+                                <iconify-icon icon="heroicons:clipboard-document-list"
+                                    width="28">
+                                </iconify-icon>
+
+                            @else
+
+                                {{-- MATERI --}}
+                                <iconify-icon icon="heroicons:book-open"
+                                    width="28">
+                                </iconify-icon>
+
+                            @endif
+
+                        </div>
+
+                        {{-- TITLE --}}
+                        <div class="flex-1 min-w-0">
+
+                            <h3 class="pr-10 text-lg font-bold break-words">
+                                {{ $material->title }}
+                            </h3>
+
+                            {{-- LABEL --}}
+                            <p class="mt-1 text-xs font-medium
+                                {{ $material->is_task 
+                                    ? 'text-orange-500' 
+                                    : 'text-blue-500' }}">
+
+                                {{ $material->is_task ? 'Tugas' : 'Materi' }}
+
+                            </p>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -98,58 +141,106 @@
 
                             @if($material->file_path)
 
-                                {{-- ================= FILE ================= --}}
                                 @php
                                     $fileUrl = asset('storage/' . $material->file_path);
                                     $extension = strtolower(pathinfo($material->file_path, PATHINFO_EXTENSION));
+                                    $fileName = basename($material->file_path);
                                 @endphp
 
-                                {{-- IMAGE --}}
+                                {{-- ================= IMAGE ================= --}}
                                 @if(in_array($extension, ['jpg','jpeg','png']))
-                                    <img src="{{ $fileUrl }}" 
-                                        class="w-full rounded-lg shadow cursor-pointer"
-                                        onclick="openLightbox('{{ $fileUrl }}')">
 
-                                {{-- PDF --}}
+                                    <div onclick="openPreviewModal('image', '{{ $fileUrl }}')"
+                                        class="overflow-hidden transition bg-gray-100 border cursor-pointer rounded-xl hover:bg-gray-200">
+
+                                        <img src="{{ $fileUrl }}"
+                                            class="object-cover w-full h-48">
+
+                                    </div>
+
+                                {{-- ================= PDF ================= --}}
                                 @elseif($extension === 'pdf')
-                                    <div class="space-y-2">
 
-                                        <iframe 
-                                            src="{{ $fileUrl }}#toolbar=1&navpanes=0&scrollbar=1"
-                                            class="w-full h-[600px] rounded-lg border">
-                                        </iframe>
+                                    <div onclick="openPreviewModal('pdf', '{{ $fileUrl }}')"
+                                        class="flex items-center justify-between gap-4 p-4 transition bg-gray-100 border cursor-pointer rounded-xl hover:bg-gray-200">
 
-                                        <div class="flex gap-2">
-                                            <a href="{{ $fileUrl }}" target="_blank"
-                                            class="px-3 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700">
-                                                Buka Tab Baru
-                                            </a>
+                                        <div class="flex items-center min-w-0 gap-4">
+
+                                            {{-- MINI PREVIEW --}}
+                                            <iframe
+                                                src="{{ $fileUrl }}#toolbar=0"
+                                                class="flex-shrink-0 hidden w-32 bg-white border rounded h-18 md:block">
+                                            </iframe>
+
+                                            {{-- THUMB --}}
+                                            <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 text-sm font-bold text-red-500 bg-white border rounded-lg">
+                                                PDF
+                                            </div>
+
+                                            {{-- INFO --}}
+                                            <div class="min-w-0">
+                                                <p class="font-semibold text-blue-700 truncate">
+                                                    {{ $material->title }}
+                                                </p>
+
+                                                <p class="text-sm text-gray-500">
+                                                    PDF
+                                                </p>
+                                            </div>
+
                                         </div>
 
                                     </div>
 
-                                {{-- FALLBACK --}}
+                                {{-- ================= OTHER FILE ================= --}}
                                 @else
-                                    <a href="{{ $fileUrl }}" target="_blank"
-                                    class="inline-block px-3 py-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-700">
-                                        Download File
+
+                                    <a href="{{ $fileUrl }}"
+                                        target="_blank"
+                                        class="flex items-center gap-3 p-4 transition bg-gray-100 border rounded-xl hover:bg-gray-200">
+
+                                        <div class="flex items-center justify-center text-sm bg-white border rounded w-14 h-14">
+                                            FILE
+                                        </div>
+
+                                        <div>
+                                            <p class="font-semibold">
+                                                {{ $material->title }}
+                                            </p>
+
+                                            <p class="text-sm text-gray-500">
+                                                Download File
+                                            </p>
+                                        </div>
+
                                     </a>
+
                                 @endif
 
+                            {{-- ================= YOUTUBE ================= --}}
                             @elseif($material->youtube_link)
 
-                                {{-- ================= YOUTUBE ================= --}}
-                                <div class="aspect-video">
-                                    <iframe 
-                                        src="https://www.youtube.com/embed/{{ $material->youtube_link }}"
-                                        class="w-full h-full rounded-lg shadow"
-                                        allowfullscreen>
-                                    </iframe>
+                                <div onclick="openPreviewModal('youtube', '{{ $material->youtube_link }}')"
+                                    class="relative overflow-hidden transition border cursor-pointer rounded-xl group">
+
+                                    {{-- THUMBNAIL --}}
+                                    <img src="https://img.youtube.com/vi/{{ $material->youtube_link }}/hqdefault.jpg"
+                                        class="object-cover w-full h-56 transition group-hover:scale-105">
+
+                                    {{-- OVERLAY --}}
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+
+                                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-white/90">
+                                            ▶
+                                        </div>
+
+                                    </div>
+
                                 </div>
 
+                            {{-- ================= EMPTY ================= --}}
                             @else
 
-                                {{-- ================= EMPTY ================= --}}
                                 <p class="text-sm italic text-gray-400">
                                     Materi belum memiliki file atau video
                                 </p>
@@ -307,7 +398,7 @@
                                             </div>
 
                                             @if(auth()->user()->hasAnyRole(['guru','superadmin']))
-                                            <a href="{{ route('materials.submissions', $material->id) }}"
+                                            <a href="{{ route('materials.submissions', $material->id) }}" onclick="event.stopPropagation()"
                                             class="px-3 py-1 text-xs text-white bg-indigo-600 rounded hover:bg-indigo-700">
                                                 Lihat Tugas
                                             </a>
@@ -327,28 +418,101 @@
 
         </div>
     </div>
-    <div id="lightbox" 
-     class="fixed inset-0 z-50 items-center justify-center hidden bg-black bg-opacity-80">
+    
+    {{-- ================= UNIVERSAL PREVIEW MODAL ================= --}}
+    <div id="previewModal"
+        class="fixed inset-0 z-50 items-center justify-center hidden bg-black/80 backdrop-blur-sm">
 
-    <img id="lightboxImg" class="max-w-4xl max-h-[90vh] rounded-lg shadow-lg">
+        {{-- CLOSE --}}
+        <button onclick="closePreviewModal()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
 
-</div>
+        {{-- CONTENT --}}
+        <div class="relative w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="previewImage"
+                class="hidden max-w-full mx-auto rounded-lg max-h-[90vh] shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="previewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+            {{-- YOUTUBE --}}
+            <div id="previewYoutubeWrapper"
+                class="hidden aspect-video">
+
+                <iframe id="previewYoutube"
+                    class="w-full h-full rounded-lg shadow-2xl"
+                    allowfullscreen>
+                </iframe>
+
+            </div>
+
+        </div>
+
+    </div>
 </x-app-layout>
 
 <script>
-    function openLightbox(src) {
-        const lightbox = document.getElementById('lightbox');
-        const img = document.getElementById('lightboxImg');
 
-        img.src = src;
-        lightbox.classList.remove('hidden');
-        lightbox.classList.add('flex');
+    function openPreviewModal(type, src) {
+
+        const modal = document.getElementById('previewModal');
+
+        const image = document.getElementById('previewImage');
+        const pdf = document.getElementById('previewPdf');
+        const yt = document.getElementById('previewYoutube');
+        const ytWrap = document.getElementById('previewYoutubeWrapper');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+        ytWrap.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+            image.src = src;
+            image.classList.remove('hidden');
+        }
+
+        // PDF
+        if (type === 'pdf') {
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+        }
+
+        // YOUTUBE
+        if (type === 'youtube') {
+            yt.src = `https://www.youtube.com/embed/${src}?autoplay=1`;
+            ytWrap.classList.remove('hidden');
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
-    document.getElementById('lightbox').addEventListener('click', function () {
-        this.classList.add('hidden');
+    function closePreviewModal() {
+
+        const modal = document.getElementById('previewModal');
+
+        document.getElementById('previewYoutube').src = '';
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // klik backdrop
+    document.getElementById('previewModal').addEventListener('click', function(e) {
+
+        if (e.target.id === 'previewModal') {
+            closePreviewModal();
+        }
+
     });
-    
 
     function toggleMaterial(id) {
 
@@ -357,7 +521,7 @@
 
         const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
 
-        // tutup semua dulu (accordion mode)
+        // tutup semua
         document.querySelectorAll('[id^="content-"]').forEach(el => {
             el.style.maxHeight = '0px';
         });
@@ -366,12 +530,16 @@
             el.classList.remove('border-[var(--primary)]', 'ring-2', 'ring-[var(--primary)]');
         });
 
-        // buka jika sebelumnya tertutup
         if (!isOpen) {
+
             content.style.maxHeight = content.scrollHeight + "px";
 
-            // highlight aktif
-            card.classList.add('border-[var(--primary)]', 'ring-2', 'ring-[var(--primary)]');
+            card.classList.add(
+                'border-[var(--primary)]',
+                'ring-2',
+                'ring-[var(--primary)]'
+            );
         }
     }
+
 </script>

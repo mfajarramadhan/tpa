@@ -3,7 +3,7 @@
         <h2 class="text-xl font-semibold">Iuran Bulanan</h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
             <div class="relative">
@@ -71,98 +71,6 @@
                 </div>
 
             </div>
-
-            {{-- TOTAL TUNGGAKAN --}}
-            @role('orang_tua')
-            <div class="grid grid-cols-3 gap-4 mb-4">
-
-                <div class="p-4 bg-white rounded shadow">
-                    <p class="text-sm text-gray-500">Total Tagihan</p>
-                    <p class="text-lg font-bold">Rp {{ number_format($totalUnpaid + $totalPaid) }}</p>
-                </div>
-
-                <div class="p-4 bg-white rounded shadow">
-                    <p class="text-sm text-gray-500">Total Dibayar</p>
-                    <p class="text-lg font-bold text-green-600">Rp {{ number_format($totalPaid) }}</p>
-                </div>
-
-                <div class="p-4 bg-white rounded shadow">
-                    <p class="text-sm text-gray-500">Sisa Tagihan</p>
-                    <p class="text-lg font-bold text-red-600">Rp {{ number_format($totalUnpaid) }}</p>
-                </div>
-
-            </div>
-            @endrole
-
-            @role('superadmin')
-            <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
-
-            {{-- Total Tagihan --}}
-            <div class="stat-card">
-                <div class="flex items-start justify-between mb-3">
-                    <span class="text-caption">Total Tagihan</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
-                        <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
-                    </div>
-                </div>
-                <div class="text-data">
-                    Rp {{ number_format($totalTagihanAll) }}
-                </div>
-            </div>
-
-            {{-- Total Dibayar --}}
-            <div class="stat-card" style="border-left-color: var(--success);">
-                <div class="flex items-start justify-between mb-3">
-                    <span class="text-caption">Total Dibayar</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
-                        <iconify-icon icon="solar:check-circle-bold-duotone" width="18"></iconify-icon>
-                    </div>
-                </div>
-                <div class="text-data text-[var(--success)]">
-                    Rp {{ number_format($totalDibayarAll) }}
-                </div>
-            </div>
-
-            {{-- Sisa Tagihan --}}
-            <div class="stat-card" style="border-left-color: var(--danger);">
-                <div class="flex items-start justify-between mb-3">
-                    <span class="text-caption">Sisa Tagihan</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
-                        <iconify-icon icon="solar:danger-bold-duotone" width="18"></iconify-icon>
-                    </div>
-                </div>
-                <div class="text-data text-[var(--danger)]">
-                    Rp {{ number_format($sisaTagihanAll) }}
-                </div>
-            </div>
-
-        </div>
-            @endrole
-
-            {{-- LIST ANAK --}}
-            @role('orang_tua')
-            <div class="flex gap-3 mb-4">
-
-                @foreach($students as $student)
-                    <a href="{{ route('payments.index', ['student_id' => $student->id]) }}"
-                    class="px-4 py-2 rounded border
-                    {{ $selectedStudent && $selectedStudent->id == $student->id ? 'bg-blue-600 text-white' : 'bg-white' }}">
-
-                        {{ $student->name }}
-                    </a>
-                @endforeach
-
-            </div>
-            @endrole
-
-            @role('orang_tua')
-            @if($selectedStudent)
-                <h3 class="mb-2 font-semibold">
-                    Rincian Iuran - {{ $selectedStudent->name }}
-                </h3>
-            @endif
-            @endrole
-
             @role('orang_tua')
             {{-- Cek ada tagihan atau tidak --}}
             @if($selectedStudent)
@@ -186,30 +94,214 @@
                 </div>
             @endif
 
-            {{-- BUTTON BAYAR --}}
+            {{-- LIST ANAK --}}
             @if($selectedStudent)
-                <div class="mb-3">
+                <h3 class="mb-2 font-semibold">
+                    Rincian Iuran - {{ $selectedStudent->name }}
+                </h3>
+            @endif
+
+            <div class="flex gap-3 mb-6">
+
+                @foreach($students as $student)
+                    <a href="{{ route('payments.index', ['student_id' => $student->id]) }}"
+                        class="flex items-center gap-2 px-4 py-2 shadow-sm rounded-xl transition
+                        {{ $selectedStudent && $selectedStudent->id == $student->id
+                            ? 'btn-primary'
+                            : 'bg-white border border-[var(--border)] text-[var(--text-main)] hover:border-[var(--primary)] hover:bg-[var(--primary-light)]' }}">
+
+                        {{-- ICON --}}
+                        <iconify-icon
+                            icon="solar:user-bold-duotone"
+                            width="20">
+                        </iconify-icon>
+
+                        {{-- NAME --}}
+                        <span class="text-sm font-semibold">
+                            {{ $student->name }}
+                        </span>
+
+                    </a>
+                @endforeach
+
+            </div>
+
+            {{-- TOTAL TUNGGAKAN --}}
+            <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
+
+                {{-- Total Tagihan --}}
+                <div class="stat-card">
+                    <div class="flex items-start justify-between mb-3">
+
+                        <span class="text-caption">
+                            Total Tagihan
+                        </span>
+
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                            <iconify-icon
+                                icon="solar:wallet-money-bold-duotone"
+                                width="18">
+                            </iconify-icon>
+                        </div>
+
+                    </div>
+
+                    <div class="text-data">
+                        Rp {{ number_format($totalUnpaid + $totalPaid) }}
+                    </div>
+                </div>
+
+                {{-- Total Dibayar --}}
+                <div class="stat-card"
+                    style="border-left-color: var(--success);">
+
+                    <div class="flex items-start justify-between mb-3">
+
+                        <span class="text-caption">
+                            Total Dibayar
+                        </span>
+
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
+                            <iconify-icon
+                                icon="solar:check-circle-bold-duotone"
+                                width="18">
+                            </iconify-icon>
+                        </div>
+
+                    </div>
+
+                    <div class="text-data text-[var(--success)]">
+                        Rp {{ number_format($totalPaid) }}
+                    </div>
+
+                </div>
+
+                {{-- Sisa Tagihan --}}
+                <div class="stat-card"
+                    style="border-left-color: var(--danger);">
+
+                    <div class="flex items-start justify-between mb-3">
+
+                        <span class="text-caption">
+                            Sisa Tagihan
+                        </span>
+
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
+                            <iconify-icon
+                                icon="solar:danger-bold-duotone"
+                                width="18">
+                            </iconify-icon>
+                        </div>
+
+                    </div>
+
+                    <div class="text-data text-[var(--danger)]">
+                        Rp {{ number_format($totalUnpaid) }}
+                    </div>
+
+                </div>
+            </div>
+            @endrole
+
+            @role('superadmin')
+            <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
+
+                {{-- Total Tagihan --}}
+                <div class="stat-card">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="text-caption">Total Tagihan</span>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                            <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
+                        </div>
+                    </div>
+                    <div class="text-data">
+                        Rp {{ number_format($totalTagihanAll) }}
+                    </div>
+                </div>
+
+                {{-- Total Dibayar --}}
+                <div class="stat-card" style="border-left-color: var(--success);">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="text-caption">Total Dibayar</span>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
+                            <iconify-icon icon="solar:check-circle-bold-duotone" width="18"></iconify-icon>
+                        </div>
+                    </div>
+                    <div class="text-data text-[var(--success)]">
+                        Rp {{ number_format($totalDibayarAll) }}
+                    </div>
+                </div>
+
+                {{-- Sisa Tagihan --}}
+                <div class="stat-card" style="border-left-color: var(--danger);">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="text-caption">Sisa Tagihan</span>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
+                            <iconify-icon icon="solar:danger-bold-duotone" width="18"></iconify-icon>
+                        </div>
+                    </div>
+                    <div class="text-data text-[var(--danger)]">
+                        Rp {{ number_format($sisaTagihanAll) }}
+                    </div>
+                </div>
+
+            </div>
+            @endrole
+
+            {{-- BUTTON BAYAR --}}
+            @role('orang_tua')
+            @if($selectedStudent)
+
+                <div class="mb-4">
+
                     @if($hasUnpaidNormal)
+
                         <a href="{{ route('payments.create', ['student_id' => $selectedStudent->id]) }}"
-                        class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                            class="flex items-center gap-2 shadow-sm btn-primary w-fit">
+
+                            <iconify-icon
+                                icon="solar:wallet-money-bold-duotone"
+                                width="20">
+                            </iconify-icon>
+
                             Bayar Iuran
+
                         </a>
 
                     @elseif($hasRejected)
+
                         <button disabled
-                            class="px-4 py-2 text-white bg-red-400 rounded cursor-not-allowed">
-                            Perbaiki Pembayaran Ditolak
+                            class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-400 shadow-sm cursor-not-allowed rounded-xl">
+
+                            <iconify-icon 
+                                icon="solar:danger-triangle-bold-duotone"
+                                width="20">
+                            </iconify-icon>
+
+                            Perbaiki Pembayaran
+
                         </button>
 
                     @else
+
                         <button disabled
-                            class="px-4 py-2 text-white bg-gray-400 rounded cursor-not-allowed">
+                            class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gray-400 shadow-sm cursor-not-allowed rounded-xl">
+
+                            <iconify-icon
+                                icon="solar:document-text-bold-duotone"
+                                width="20">
+                            </iconify-icon>
+
                             Tidak Ada Tagihan
+
                         </button>
+
                     @endif
+
                 </div>
+
             @endif
-            @endrole
+            @endrole            
             
             @role('superadmin')
 
@@ -333,12 +425,17 @@
 
                     <thead>
                         <tr>
-                            <th>Bulan</th>
-                            <th>Status</th>
-                            <th class="text-right">Nominal</th>
-                            <th>Bukti</th>
-                            <th>Tanggal Bayar</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="w-[18%]">Bulan</th>
+
+                            <th class="w-[16%]">Status</th>
+
+                            <th class="w-[16%] text-right">Nominal</th>
+
+                            <th class="w-[14%]">Bukti</th>
+
+                            <th class="w-[22%]">Tanggal Bayar</th>
+
+                            <th class="w-[14%] text-center">Aksi</th>
                         </tr>
                     </thead>
 
@@ -393,13 +490,42 @@
 
                             {{-- BUKTI --}}
                             <td>
+
                                 @if($payment->proof_file)
-                                    <img src="{{ asset('storage/' . $payment->proof_file) }}"
-                                        class="object-cover w-12 h-12 border rounded-lg cursor-pointer hover:shadow"
-                                        onclick="window.open(this.src)">
+
+                                    @php
+                                        $proofUrl = asset('storage/' . $payment->proof_file);
+                                        $ext = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
+                                    @endphp
+
+                                    {{-- IMAGE --}}
+                                    @if(in_array($ext, ['jpg','jpeg','png']))
+
+                                        <img src="{{ $proofUrl }}"
+                                            class="object-cover w-12 h-12 transition border rounded-lg cursor-pointer hover:shadow hover:scale-105"
+                                            onclick="openPaymentPreview('image', '{{ $proofUrl }}')">
+
+                                    {{-- PDF --}}
+                                    @elseif($ext === 'pdf')
+
+                                        <div
+                                            onclick="openPaymentPreview('pdf', '{{ $proofUrl }}')"
+                                            class="flex items-center justify-center w-12 h-12 transition bg-red-100 border rounded-lg cursor-pointer hover:shadow hover:scale-105">
+
+                                            <span class="text-[10px] font-bold text-red-600">
+                                                PDF
+                                            </span>
+
+                                        </div>
+
+                                    @endif
+
                                 @else
+
                                     <span class="text-small">-</span>
+
                                 @endif
+
                             </td>
 
                             {{-- TANGGAL --}}
@@ -420,8 +546,15 @@
 
                                     @elseif($payment->status == 'rejected')
                                         <a href="{{ route('payments.create', ['student_id' => $payment->student_id]) }}"
-                                        class="px-3 py-1 text-xs btn-primary">
-                                            Perbaiki & Bayar
+                                            class="flex items-center gap-1 px-3 py-1 text-xs shadow-sm btn-primary w-fit">
+
+                                            <iconify-icon
+                                                icon="solar:pen-bold-duotone"
+                                                width="16">
+                                            </iconify-icon>
+
+                                            Perbaiki
+
                                         </a>
 
                                     @elseif($payment->proof_file)
@@ -445,7 +578,7 @@
                     </tbody>
 
                     <tfoot>
-                        <tr class="border-t border-[var(--border)] bg-[var(--bg)]"">
+                        <tr class="border-t border-[var(--border)] bg-[var(--bg)]">
 
                             <td colspan="3" class="text-right text-small">
                                 Total
@@ -476,4 +609,82 @@
 
         </div>
     </div>
+    {{-- ================= PAYMENT PREVIEW MODAL ================= --}}
+    <div id="paymentPreviewModal"
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm">
+
+        {{-- CLOSE --}}
+        <button onclick="closePaymentPreview()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
+
+        <div class="w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="paymentPreviewImage"
+                class="hidden object-contain w-full max-h-[90vh] rounded-lg shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="paymentPreviewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+        </div>
+
+    </div>
 </x-app-layout>
+<script>
+
+    function openPaymentPreview(type, src) {
+
+        const modal = document.getElementById('paymentPreviewModal');
+
+        const image = document.getElementById('paymentPreviewImage');
+        const pdf = document.getElementById('paymentPreviewPdf');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+
+            image.src = src;
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        if (type === 'pdf') {
+
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closePaymentPreview() {
+
+        const modal = document.getElementById('paymentPreviewModal');
+
+        document.getElementById('paymentPreviewImage').src = '';
+        document.getElementById('paymentPreviewPdf').src = '';
+
+        modal.style.display = 'none';
+    }
+
+    // klik backdrop
+    document.getElementById('paymentPreviewModal')
+        .addEventListener('click', function(e) {
+
+            if (e.target.id === 'paymentPreviewModal') {
+                closePaymentPreview();
+            }
+
+        });
+
+</script>

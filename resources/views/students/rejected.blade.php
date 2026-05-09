@@ -14,7 +14,7 @@
                     <tr>
                         <th>Nama Anak</th>
                         <th>Orang Tua</th>
-                        <th>NIK</th>
+                        <th>NISN</th>
                         <th>Sekolah</th>
                         <th>Alasan Ditolak</th>
                         <th class="text-center">Aksi</th>
@@ -35,9 +35,9 @@
                             {{ $student->parent->name }}
                         </td>
 
-                        {{-- NIK --}}
+                        {{-- NISN --}}
                         <td class="font-mono text-xs text-[var(--text-tertiary)]">
-                            {{ $student->nik }}
+                            {{ $student->nisn }}
                         </td>
 
                         {{-- Sekolah --}}

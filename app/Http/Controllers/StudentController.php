@@ -105,7 +105,7 @@ class StudentController extends Controller
             'status' => 'pending'
         ]);
 
-        return redirect()->route('students.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Anak berhasil didaftarkan! Menunggu persetujuan.');
     }
 

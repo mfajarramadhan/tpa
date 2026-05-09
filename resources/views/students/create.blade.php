@@ -3,7 +3,25 @@
         <h2 class="text-xl font-semibold">Tambah Anak</h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
+
+        {{-- BUTTON --}}
+        <div class="mb-6">
+
+            <a href="{{ route('students.index') }}"
+                class="flex items-center gap-2 shadow-sm btn-primary">
+
+                <iconify-icon
+                    icon="heroicons:arrow-left-20-solid"
+                    width="20">
+                </iconify-icon>
+
+                Kembali
+
+            </a>
+
+        </div>
+        
         <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST" action="{{ route('students.store') }}" enctype="multipart/form-data">
@@ -80,10 +98,37 @@
                 <div class="mt-4">
                     <label class="block mb-1 text-sm font-semibold">Bukti Pembayaran</label>
 
-                    <img id="preview_proof" class="hidden w-32 mb-2 border rounded-lg"/>
+                    <div class="mb-3">
+
+                        <div id="preview_proof_wrapper"
+                            class="hidden">
+
+                            {{-- IMAGE --}}
+                            <img id="preview_proof"
+                                class="object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md"
+                                onclick="openUploadPreview('image', this.src)">
+
+                            {{-- PDF --}}
+                            <div id="preview_proof_pdf"
+                                onclick="openUploadPreview('pdf', this.dataset.src)"
+                                class="flex-col items-center justify-center hidden w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                <div class="text-4xl">
+                                    📄
+                                </div>
+
+                                <p class="mt-2 text-xs font-semibold text-red-500">
+                                    PDF
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                     <input type="file" name="proof_file" required
-                           onchange="previewImage(event, 'preview_proof')"
+                           onchange="previewFile(event, 'proof')"
                            class="w-full p-2 border rounded-lg">
 
                     <p class="text-xs text-gray-500">Maksimal ukuran file 2MB</p>
@@ -97,10 +142,33 @@
                 <div class="mt-4">
                     <label class="block mb-1 text-sm font-semibold">Upload KK</label>
 
-                    <img id="preview_kk" class="hidden w-32 mb-2 border rounded-lg"/>
+                    <div class="mb-3">
+
+                        <div id="preview_kk_wrapper"
+                            class="hidden">
+
+                            <img id="preview_kk"
+                                class="object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md"
+                                onclick="openUploadPreview('image', this.src)">
+
+                            <div id="preview_kk_pdf"
+                                onclick="openUploadPreview('pdf', this.dataset.src)"
+                                class="flex-col items-center justify-center hidden w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                <div class="text-4xl">📄</div>
+
+                                <p class="mt-2 text-xs font-semibold text-red-500">
+                                    PDF
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                     <input type="file" name="kk_file"
-                           onchange="previewImage(event, 'preview_kk')"
+                           onchange="previewFile(event, 'kk')"
                            class="w-full p-2 border rounded-lg">
 
                     <p class="text-xs text-gray-500">Maksimal ukuran file 2MB</p>
@@ -114,10 +182,33 @@
                 <div class="mt-4">
                     <label class="block mb-1 text-sm font-semibold">Upload Akta</label>
 
-                    <img id="preview_akta" class="hidden w-32 mb-2 border rounded-lg"/>
+                    <div class="mb-3">
+
+                        <div id="preview_akta_wrapper"
+                            class="hidden">
+
+                            <img id="preview_akta"
+                                class="object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md"
+                                onclick="openUploadPreview('image', this.src)">
+
+                            <div id="preview_akta_pdf"
+                                onclick="openUploadPreview('pdf', this.dataset.src)"
+                                class="flex-col items-center justify-center hidden w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                <div class="text-4xl">📄</div>
+
+                                <p class="mt-2 text-xs font-semibold text-red-500">
+                                    PDF
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                     <input type="file" name="birth_certificate_file"
-                           onchange="previewImage(event, 'preview_akta')"
+                           onchange="previewFile(event, 'akta')"
                            class="w-full p-2 border rounded-lg">
 
                     <p class="text-xs text-gray-500">Maksimal ukuran file 2MB</p>
@@ -138,17 +229,120 @@
 
         </div>
     </div>
+    
+    {{-- ================= UPLOAD PREVIEW MODAL ================= --}}
+    <div id="uploadPreviewModal"
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm">
 
-    {{-- SCRIPT PREVIEW --}}
-    <script>
-        function previewImage(event, id) {
-            const input = event.target;
-            const preview = document.getElementById(id);
+        {{-- CLOSE --}}
+        <button onclick="closeUploadPreview()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
 
-            if (input.files && input.files[0]) {
-                preview.src = URL.createObjectURL(input.files[0]);
-                preview.classList.remove('hidden');
-            }
-        }
-    </script>
+        <div class="w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="uploadPreviewImage"
+                class="hidden object-contain w-full max-h-[90vh] rounded-lg shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="uploadPreviewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+        </div>
+
+    </div>
 </x-app-layout>
+
+<script>
+
+    function previewFile(event, type) {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const wrapper = document.getElementById(`preview_${type}_wrapper`);
+        const image = document.getElementById(`preview_${type}`);
+        const pdf = document.getElementById(`preview_${type}_pdf`);
+
+        wrapper.classList.remove('hidden');
+
+        const fileType = file.type;
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (fileType.startsWith('image/')) {
+
+            image.src = URL.createObjectURL(file);
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        else if (fileType === 'application/pdf') {
+
+            pdf.dataset.src = URL.createObjectURL(file);
+
+            pdf.classList.remove('hidden');
+            pdf.classList.add('flex');
+        }
+    }
+
+    function openUploadPreview(type, src) {
+
+        const modal = document.getElementById('uploadPreviewModal');
+
+        const image = document.getElementById('uploadPreviewImage');
+        const pdf = document.getElementById('uploadPreviewPdf');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+
+            image.src = src;
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        if (type === 'pdf') {
+
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeUploadPreview() {
+
+        const modal = document.getElementById('uploadPreviewModal');
+
+        document.getElementById('uploadPreviewImage').src = '';
+        document.getElementById('uploadPreviewPdf').src = '';
+
+        modal.style.display = 'none';
+    }
+
+    // backdrop click
+    document.getElementById('uploadPreviewModal')
+        .addEventListener('click', function(e) {
+
+            if (e.target.id === 'uploadPreviewModal') {
+                closeUploadPreview();
+            }
+
+        });
+
+</script>

@@ -45,7 +45,19 @@ class SubjectController extends Controller
     {
         $classroom->load([
             'subjects' => function ($q) {
-                $q->withCount('materials');
+                $q->withCount([
+
+                // total materi
+                'materials as materials_count' => function ($query) {
+                    $query->where('is_task', false);
+                },
+
+                // total tugas
+                'materials as tasks_count' => function ($query) {
+                    $query->where('is_task', true);
+                }
+
+            ])->orderBy('day');
             }
         ]);
 
@@ -60,6 +72,9 @@ class SubjectController extends Controller
     public function show(Subject $subject)
     {
         $subject->load([
+            'materials' => function ($q) {
+                $q->latest();
+            },
             'materials.user',
             'materials.submissions.student'
         ]);
@@ -71,13 +86,13 @@ class SubjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:50',
-            'description' => 'nullable|string|max:100'
+            'day' => 'required|integer|min:1|max:7'
         ]);
 
         Subject::create([
             'classroom_id' => $classroom->id,
             'name' => $request->name,
-            'description' => $request->description
+            'day' => $request->day
         ]);
 
         return redirect()
@@ -94,12 +109,12 @@ class SubjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:50',
-            'description' => 'nullable|string|max:100'
+            'day' => 'required|integer|min:1|max:7'
         ]);
 
         $subject->update([
             'name' => $request->name,
-            'description' => $request->description
+            'day' => $request->day
         ]);
 
         return redirect()

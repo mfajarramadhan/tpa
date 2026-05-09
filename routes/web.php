@@ -74,13 +74,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/submissions/{id}/revise', [SubmissionController::class, 'revise'])->name('submissions.revise');
 
 
-    // Kehadiran
+    // Absensi
     Route::get('/attendance/student/{student}', [AttendanceController::class, 'student'])
         ->name('attendance.student');
     Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::get('/attendances/create', [AttendanceController::class, 'create'])->name('attendances.create');
     Route::get('/attendances/{classroom}', [AttendanceController::class, 'show'])->name('attendances.show');
     Route::post('/attendances', [AttendanceController::class, 'store'])->name('attendances.store');
+    // Rekap Absensi
+    Route::get('/attendance-recaps', [AttendanceController::class, 'recap'])->name('attendance.recap');
+    Route::post('/attendance-recaps/update/{detail}', [AttendanceController::class, 'updateRecap'])->name('attendance.recap.update');
 
 
     // Detail Pembayaran

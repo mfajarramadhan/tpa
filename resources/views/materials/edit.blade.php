@@ -93,15 +93,16 @@
 
                 {{-- YOUTUBE --}}
                 <div class="mb-4" id="youtubeWrapper">
-                    <label class="block mb-1 text-sm font-semibold">YouTube ID</label>
+                    <label class="block mb-1 text-sm font-semibold">Link YouTube</label>
                     <input type="text" name="youtube_link" id="youtubeInput"
                            value="{{ $material->youtube_link }}"
                            placeholder="Contoh: rzbjF2DRv1c"
                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
 
                     <p class="mt-1 text-xs text-gray-500">
-                        Masukkan kode unik YouTube (ID), bukan link utuh!<br>
-                        Contoh: https://youtu.be/rzbjF2DRv1c → <b>rzbjF2DRv1c</b>
+                        <strong>Masukkan kode unik link YouTube, bukan link utuh!</strong><br>
+                        Contoh 1: https://youtu.be/<b>BJu1Qcul7ig</b>?si=tmDo0cJ8kL3AzWH0 → <b>(BJu1Qcul7ig)</b><br>
+                        Contoh 2: https://youtube.com/shorts/<b>ujryWPV3_iI</b>?si=Ro8SpBbkyX4ap47W → <b>(ujryWPV3_iI)</b>
                     </p>
                 </div>
 

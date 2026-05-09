@@ -137,7 +137,7 @@ class MaterialController extends Controller
 
         // kalau isi youtube baru
         if ($request->filled('youtube_link')) {
-            $youtube = $request->youtube_link;
+            $youtube = $this->extractYoutubeId($request->youtube_link);
 
             // hapus file lama kalau ada
             if ($material->file_path) {
