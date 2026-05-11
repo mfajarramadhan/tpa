@@ -3,7 +3,7 @@
         <h2 class="text-xl font-semibold">Approval Pendaftaran</h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
             <div class="relative">
@@ -77,111 +77,349 @@
                     $payment = $student->payments->where('type', 'registration')->first();
                 @endphp
 
-                <div class="p-6 mb-4 bg-white shadow-sm rounded-2xl">
+                <div class="p-5 mx-auto mb-5 max-w-7xl card-panel">
 
-                    {{-- IDENTITAS --}}
-                    <div class="pb-4 mb-4 border-b">
-                        <h3 class="text-lg font-bold">{{ $student->name }}</h3>
-                        <p class="text-sm text-gray-500">
-                            Orang Tua: {{ $student->parent->name }}
-                        </p>
+                    {{-- TOP --}}
+                    <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+                        {{-- LEFT --}}
+                        <div class="flex-1 min-w-0">
+
+                            {{-- HEADER --}}
+                            <div class="flex items-start justify-between gap-4">
+
+                                <div>
+
+                                    <h3 class="text-xl font-bold text-slate-800">
+                                        {{ $student->name }}
+                                    </h3>
+
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        Orang Tua: {{ $student->parent->name }}
+                                    </p>
+
+                                </div>
+
+                                {{-- STATUS --}}
+                                <div class="shrink-0">
+
+                                    @if(!$payment || !$payment->proof_file)
+
+                                        <span class="badge badge-warning">
+                                            ⏳ Menunggu Pembayaran
+                                        </span>
+
+                                    @elseif($payment->status == 'pending')
+
+                                        <span class="badge badge-warning">
+                                            ⏳ Menunggu Verifikasi
+                                        </span>
+
+                                    @elseif($payment->status == 'paid')
+
+                                        <span class="badge badge-success">
+                                            ✔ Terverifikasi
+                                        </span>
+
+                                    @endif
+
+                                </div>
+
+                            </div>
+
+                            {{-- MINI DETAIL --}}
+                            <div class="grid grid-cols-2 gap-3 mt-5 text-sm md:grid-cols-4">
+
+                                <div class="p-3 rounded-xl bg-gray-50">
+
+                                    <p class="text-xs font-semibold text-slate-500">
+                                        NISN
+                                    </p>
+
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        {{ $student->nisn }}
+                                    </p>
+
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-gray-50">
+
+                                    <p class="text-xs font-semibold text-slate-500">
+                                        Gender
+                                    </p>
+
+                                    <p class="mt-1 font-bold text-slate-800">
+
+                                        @if($student->gender == 'L')
+                                            Laki-laki
+                                        @elseif($student->gender == 'P')
+                                            Perempuan
+                                        @else
+                                            -
+                                        @endif
+
+                                    </p>
+
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-gray-50">
+
+                                    <p class="text-xs font-semibold text-slate-500">
+                                        Tanggal Lahir
+                                    </p>
+
+                                    <p class="mt-1 font-bold text-slate-800">
+                                        {{ $student->birth_date }}
+                                    </p>
+
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-gray-50">
+
+                                    <p class="text-xs font-semibold text-slate-500">
+                                        Sekolah
+                                    </p>
+
+                                    <p class="mt-1 font-bold truncate text-slate-800"
+                                    title="{{ $student->school_origin }}">
+
+                                        {{ $student->school_origin }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            {{-- ALAMAT --}}
+                            <div class="p-3 mt-3 rounded-xl bg-gray-50">
+
+                                <p class="text-xs font-semibold text-slate-500">
+                                    Alamat
+                                </p>
+
+                                <p class="mt-1 text-sm font-bold break-words text-slate-800">
+                                    {{ $student->parent->address }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    {{-- DETAIL --}}
-                    <div class="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
-                        <p><span class="font-semibold">NIK:</span> {{ $student->nik }}</p>
-                        <p><span class="font-semibold">Tanggal Lahir:</span> {{ $student->birth_date }}</p>
-                        <p><span class="font-semibold">Jenis Kelamin:</span> {{ $student->gender }}</p>
-                        <p><span class="font-semibold">Sekolah Asal:</span> {{ $student->school_origin }}</p>
-                        <p class="md:col-span-2">
-                            <span class="font-semibold">Alamat:</span> {{ $student->parent->address }}
-                        </p>
-                    </div>
+                    {{-- DOKUMEN --}}
+                    <div class="pt-5 mt-5 border-t border-gray-100">
 
-                    {{-- DOKUMEN + PEMBAYARAN --}}
-                    <div class="pt-4 mt-4 border-t">
-                        <p class="mb-3 text-sm font-semibold">Dokumen</p>
+                        {{-- FOTO 3 SEJAJAR --}}
+                        <div class="grid grid-cols-3 gap-4">
 
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            
+                            {{-- BUKTI BAYAR --}}
+                            <div class="text-center">
 
+                                <p class="mb-3 text-xs font-semibold text-slate-500">
+                                    Bukti Bayar
+                                </p>
+
+                                @if($payment && $payment->proof_file)
+
+                                    @php
+                                        $paymentUrl = asset('storage/' . $payment->proof_file);
+                                        $paymentExt = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
+                                    @endphp
+
+                                    {{-- IMAGE --}}
+                                    @if(in_array($paymentExt, ['jpg', 'jpeg', 'png']))
+
+                                        <img src="{{ $paymentUrl }}"
+                                            onclick="openUploadPreview('image', '{{ $paymentUrl }}')"
+                                            class="object-cover w-full max-w-[90px] md:max-w-[140px] h-20 md:h-28 mx-auto border rounded-xl cursor-pointer hover:shadow-md hover:scale-[1.02] transition">
+
+                                    {{-- PDF --}}
+                                    @elseif($paymentExt === 'pdf')
+
+                                        <div onclick="openUploadPreview('pdf', '{{ $paymentUrl }}')"
+                                            class="flex flex-col items-center justify-center w-full max-w-[90px] md:max-w-[140px] h-20 md:h-28 mx-auto transition bg-red-100 border cursor-pointer rounded-xl hover:shadow-md hover:scale-[1.02]">
+
+                                            <div class="text-4xl">
+                                                📄
+                                            </div>
+
+                                            <p class="mt-2 text-xs font-semibold text-red-500">
+                                                PDF
+                                            </p>
+
+                                        </div>
+
+                                    @endif
+
+                                @else
+
+                                    <p class="text-xs text-gray-400">
+                                        Belum upload
+                                    </p>
+
+                                @endif
+
+                            </div>
+                            
                             {{-- KK --}}
                             <div class="text-center">
-                                <p class="mb-2 text-xs font-semibold text-gray-600">KK</p>
+
+                                <p class="mb-3 text-xs font-semibold text-slate-500">
+                                    Kartu Keluarga
+                                </p>
 
                                 @if($student->kk_file)
-                                    <img src="{{ asset('storage/' . $student->kk_file) }}"
-                                        class="object-cover w-32 mx-auto border rounded-lg cursor-pointer h-28 hover:shadow"
-                                        onclick="window.open(this.src)">
-                                    <a href="{{ asset('storage/' . $student->kk_file) }}"
-                                    target="_blank"
-                                    class="block mt-1 text-xs text-blue-600 underline">
-                                        Lihat ukuran penuh
-                                    </a>
+
+                                    @php
+                                        $kkUrl = asset('storage/' . $student->kk_file);
+                                        $kkExt = strtolower(pathinfo($student->kk_file, PATHINFO_EXTENSION));
+                                    @endphp
+
+                                    {{-- IMAGE --}}
+                                    @if(in_array($kkExt, ['jpg', 'jpeg', 'png']))
+
+                                        <img src="{{ $kkUrl }}"
+                                            onclick="openUploadPreview('image', '{{ $kkUrl }}')"
+                                            class="object-cover w-full max-w-[90px] md:max-w-[140px] h-20 md:h-28 mx-auto border rounded-xl cursor-pointer hover:shadow-md hover:scale-[1.02] transition">
+
+                                    {{-- PDF --}}
+                                    @elseif($kkExt === 'pdf')
+
+                                        <div onclick="openUploadPreview('pdf', '{{ $kkUrl }}')"
+                                            class="flex flex-col items-center justify-center w-full max-w-[90px] md:max-w-[140px] h-20 md:h-28 mx-auto transition bg-red-100 border cursor-pointer rounded-xl hover:shadow-md hover:scale-[1.02]">
+
+                                            <div class="text-4xl">
+                                                📄
+                                            </div>
+
+                                            <p class="mt-2 text-xs font-semibold text-red-500">
+                                                PDF
+                                            </p>
+
+                                        </div>
+
+                                    @endif
+
                                 @else
-                                    <p class="text-xs text-gray-400">Belum upload</p>
+
+                                    <p class="text-xs text-gray-400">
+                                        Belum upload
+                                    </p>
+
                                 @endif
+
                             </div>
 
                             {{-- AKTA --}}
                             <div class="text-center">
-                                <p class="mb-2 text-xs font-semibold text-gray-600">Akta</p>
+
+                                <p class="mb-3 text-xs font-semibold text-slate-500">
+                                    Akta Kelahiran
+                                </p>
 
                                 @if($student->birth_certificate_file)
-                                    <img src="{{ asset('storage/' . $student->birth_certificate_file) }}"
-                                        class="object-cover w-32 mx-auto border rounded-lg cursor-pointer h-28 hover:shadow"
-                                        onclick="window.open(this.src)">
-                                    <a href="{{ asset('storage/' . $student->birth_certificate_file) }}"
-                                    target="_blank"
-                                    class="block mt-1 text-xs text-blue-600 underline">
-                                        Lihat ukuran penuh
-                                    </a>
-                                @else
-                                    <p class="text-xs text-gray-400">Belum upload</p>
-                                @endif
-                            </div>
 
-                            {{-- BUKTI BAYAR --}}
-                            <div class="text-center">
-                                <p class="mb-2 text-xs font-semibold text-gray-600">Bukti Bayar</p>
+                                    @php
+                                        $aktaUrl = asset('storage/' . $student->birth_certificate_file);
+                                        $aktaExt = strtolower(pathinfo($student->birth_certificate_file, PATHINFO_EXTENSION));
+                                    @endphp
 
-                                @if($payment && $payment->proof_file)
-                                    <img src="{{ asset('storage/' . $payment->proof_file) }}"
-                                        class="object-cover w-32 mx-auto border rounded-lg cursor-pointer h-28 hover:shadow"
-                                        onclick="window.open(this.src)">
-                                    <a href="{{ asset('storage/' . $payment->proof_file) }}"
-                                    target="_blank"
-                                    class="block mt-1 text-xs text-blue-600 underline">
-                                        Lihat ukuran penuh
-                                    </a>
+                                    {{-- IMAGE --}}
+                                    @if(in_array($aktaExt, ['jpg', 'jpeg', 'png']))
+
+                                        <img src="{{ $aktaUrl }}"
+                                            onclick="openUploadPreview('image', '{{ $aktaUrl }}')"
+                                            class="object-cover w-full max-w-[90px] md:max-w-[140px] h-20 md:h-28 mx-auto border rounded-xl cursor-pointer hover:shadow-md hover:scale-[1.02] transition">
+
+                                    {{-- PDF --}}
+                                    @elseif($aktaExt === 'pdf')
+
+                                        <div onclick="openUploadPreview('pdf', '{{ $aktaUrl }}')"
+                                            class="flex flex-col items-center justify-center w-full max-w-[90px] md:max-w-[140px] h-20 md:h-28 mx-auto transition bg-red-100 border cursor-pointer rounded-xl hover:shadow-md hover:scale-[1.02]">
+
+                                            <div class="text-4xl">
+                                                📄
+                                            </div>
+
+                                            <p class="mt-2 text-xs font-semibold text-red-500">
+                                                PDF
+                                            </p>
+
+                                        </div>
+
+                                    @endif
+
                                 @else
-                                    <p class="text-xs text-gray-400">Belum upload</p>
+
+                                    <p class="text-xs text-gray-400">
+                                        Belum upload
+                                    </p>
+
                                 @endif
+
                             </div>
 
                         </div>
-
-                        {{-- STATUS --}}
-                        <div class="mt-4">
-                            @if(!$payment || !$payment->proof_file)
-                                <span class="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded-full">
-                                    ⏳ Menunggu pembayaran
-                                </span>
-
-                            @elseif($payment->status == 'pending')
-                                <span class="px-3 py-1 text-xs text-yellow-700 bg-yellow-100 rounded-full">
-                                    ⏳ Menunggu verifikasi
-                                </span>
-
-                            @elseif($payment->status == 'paid')
-                                <span class="px-3 py-1 text-xs text-green-700 bg-green-100 rounded-full">
-                                    ✔ Terverifikasi
-                                </span>
-                            @endif
-                        </div>
-                    </div>
 
                     {{-- ACTION --}}
-                    <div class="flex flex-col gap-3 pt-4 mt-4 border-t md:flex-row md:items-center md:justify-between">
+                    <div class="flex items-center justify-between pt-5 mt-5 border-t border-gray-100">
+
+                        {{-- REJECT --}}
+                        <form method="POST"
+                            action="{{ route('approval.students.reject', $student->id) }}"
+                            class="flex items-center gap-2"
+                            onsubmit="return confirm('Yakin ingin menolak siswa ini?')">
+                            @csrf
+
+                            <div x-data="{ openReject: false }" class="flex items-center gap-2">
+
+                            {{-- BUTTON OPEN MODAL --}}
+                            <button @click="openReject = true"
+                                    class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
+                                Reject
+                            </button>
+
+                            {{-- MODAL --}}
+                            <div x-show="openReject"
+                                x-transition
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+
+                                <div @click.outside="openReject = false"
+                                    class="w-full max-w-md p-5 bg-white shadow-xl rounded-xl">
+
+                                    <h2 class="mb-3 text-lg font-semibold">Alasan Penolakan</h2>
+
+                                    <form method="POST"
+                                        action="{{ route('approval.students.reject', $student->id) }}">
+                                        @csrf
+
+                                        <textarea name="reject_reason"
+                                                        rows="3"
+                                                        class="input-solid"
+                                                        placeholder="Tulis alasan..."
+                                                        required></textarea>
+
+                                        <div class="flex justify-end gap-2 mt-4">
+                                            <button type="button"
+                                                    @click="openReject = false"
+                                                    class="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300">
+                                                Batal
+                                            </button>
+
+                                            <button class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
+                                                Kirim
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        </form>
 
                         {{-- APPROVE --}}
                         <form method="POST"
@@ -246,61 +484,7 @@
 
                             </div>
                         </form>
-
-                        {{-- REJECT --}}
-                        <form method="POST"
-                            action="{{ route('approval.students.reject', $student->id) }}"
-                            class="flex items-center gap-2"
-                            onsubmit="return confirm('Yakin ingin menolak siswa ini?')">
-                            @csrf
-
-                            <div x-data="{ openReject: false }" class="flex items-center gap-2">
-
-                            {{-- BUTTON OPEN MODAL --}}
-                            <button @click="openReject = true"
-                                    class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
-                                Reject
-                            </button>
-
-                            {{-- MODAL --}}
-                            <div x-show="openReject"
-                                x-transition
-                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-
-                                <div @click.outside="openReject = false"
-                                    class="w-full max-w-md p-5 bg-white shadow-xl rounded-xl">
-
-                                    <h2 class="mb-3 text-lg font-semibold">Alasan Penolakan</h2>
-
-                                    <form method="POST"
-                                        action="{{ route('approval.students.reject', $student->id) }}">
-                                        @csrf
-
-                                        <textarea name="reject_reason"
-                                                rows="3"
-                                                placeholder="Masukkan alasan penolakan..."
-                                                class="w-full p-2 text-sm border rounded-lg resize-none focus:ring focus:ring-red-200"
-                                                required></textarea>
-
-                                        <div class="flex justify-end gap-2 mt-4">
-                                            <button type="button"
-                                                    @click="openReject = false"
-                                                    class="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300">
-                                                Batal
-                                            </button>
-
-                                            <button class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
-                                                Kirim
-                                            </button>
-                                        </div>
-                                    </form>
-
-                                </div>
-                            </div>
-
-                        </div>
-                        </form>
-
+                        
                     </div>
                 </div>
             @empty
@@ -310,4 +494,121 @@
             @endforelse
         </div>
     </div>
+
+    {{-- ================= UPLOAD PREVIEW MODAL ================= --}}
+    <div id="uploadPreviewModal"
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm">
+
+        {{-- CLOSE --}}
+        <button onclick="closeUploadPreview()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
+
+        <div class="w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="uploadPreviewImage"
+                class="hidden object-contain w-full max-h-[90vh] rounded-lg shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="uploadPreviewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+        </div>
+
+    </div>
 </x-app-layout>
+
+
+<script>
+
+    function previewFile(event, type) {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const wrapper = document.getElementById(`preview_${type}_wrapper`);
+        const image = document.getElementById(`preview_${type}`);
+        const pdf = document.getElementById(`preview_${type}_pdf`);
+
+        wrapper.classList.remove('hidden');
+
+        const fileType = file.type;
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (fileType.startsWith('image/')) {
+
+            image.src = URL.createObjectURL(file);
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        else if (fileType === 'application/pdf') {
+
+            pdf.dataset.src = URL.createObjectURL(file);
+
+            pdf.classList.remove('hidden');
+            pdf.classList.add('flex');
+        }
+    }
+
+    function openUploadPreview(type, src) {
+
+        const modal = document.getElementById('uploadPreviewModal');
+
+        const image = document.getElementById('uploadPreviewImage');
+        const pdf = document.getElementById('uploadPreviewPdf');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+
+            image.src = src;
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        if (type === 'pdf') {
+
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeUploadPreview() {
+
+        const modal = document.getElementById('uploadPreviewModal');
+
+        document.getElementById('uploadPreviewImage').src = '';
+        document.getElementById('uploadPreviewPdf').src = '';
+
+        modal.style.display = 'none';
+    }
+
+    // backdrop click
+    document.getElementById('uploadPreviewModal')
+        .addEventListener('click', function(e) {
+
+            if (e.target.id === 'uploadPreviewModal') {
+                closeUploadPreview();
+            }
+
+        });
+
+</script>

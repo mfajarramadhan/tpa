@@ -52,17 +52,25 @@
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
 
-                    <!-- Email -->
+                    <!-- LOGIN (EMAIL / PHONE) -->
                     <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value="{{ old('email') }}"
-                        placeholder="Email"
+                        id="login"
+                        name="login"
+                        type="text"
+                        autofocus
+                        value="{{ old('login') }}"
+                        placeholder="Email atau Nomor Telepon"
+                        maxlength="100"
+                        inputmode="text"
+                        oninput="
+                            if(this.value.startsWith('08')){
+                                this.value = this.value.replace(/[^0-9]/g, '');
+                            }
+                        "
                         class="w-full px-4 py-5 mb-6 text-lg font-medium border-b border-gray-300 text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         required autofocus>
 
-                    <x-input-error :messages="$errors->get('email')" class="mb-4" />
+                    <x-input-error :messages="$errors->get('login')" class="mb-4" />
 
                     <!-- Password -->
                     <div class="relative mb-6">

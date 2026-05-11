@@ -5,18 +5,27 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
         <div class="mx-auto space-y-6 max-w-7xl">
 
             
 
             {{-- ================= TAMBAH MATERI ================= --}}
             @role('guru|superadmin')
-            <div class="flex justify-end">
+            <div class="mb-4">
+
                 <a href="{{ route('materials.create', $subject->id) }}"
-                   class="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                    + Tambah Materi
+                class="flex items-center gap-2 shadow-sm btn-primary">
+
+                    <iconify-icon
+                        icon="solar:add-circle-bold-duotone"
+                        width="20">
+                    </iconify-icon>
+
+                    Tambah Materi
+
                 </a>
+
             </div>
             @endrole
 

@@ -61,7 +61,7 @@ class StudentSeeder extends Seeder
 
             // 🔹 USER SISWA
             $studentUser = User::where('email', $data['email'])->first();
-            $birthDate = Carbon::parse('2022-02-02')->format('dmY');
+            $birthDate = Carbon::parse('2018-01-01')->format('dmY');
 
             if (!$studentUser) {
                 $studentUser = User::create([

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">Upload Bukti Pembayaran</h2>
+        <h2 class="text-xl font-semibold">Bayar Iuran</h2>
     </x-slot>
 
     <div class="py-6 md:py-0">
@@ -8,7 +8,7 @@
         {{-- BUTTON --}}
         <div class="mb-6">
 
-            <a href="{{ route('students.index') }}"
+            <a href="{{ route('payments.index') }}"
                 class="flex items-center gap-2 shadow-sm btn-primary">
 
                 <iconify-icon
@@ -33,13 +33,78 @@
                 {{-- HIDDEN --}}
                 <input type="hidden" name="payment_id" value="{{ $payment->id }}">
 
+                {{-- HEADER --}}
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-gray-100">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:upload-bold-duotone"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-slate-800">
+                            Bayar Iuran
+                        </h2>
+
+                        <p class="text-sm text-slate-500">
+                            Upload bukti pembayaran iuran bulanan
+                        </p>
+
+                    </div>
+
+                </div>
+
                 {{-- INFO --}}
-                <div class="mb-4">
-                    <p><strong>Nama:</strong> {{ $payment->student->name }}</p>
-                    <p><strong>Bulan:</strong>
-                        {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
-                    </p>
-                    <p><strong>Nominal:</strong> Rp {{ number_format($payment->original_amount) }}</p>
+                <div class="p-5 mb-6 border border-gray-100 rounded-2xl bg-gray-50">
+
+                    <div class="grid gap-4 md:text-center md:grid-cols-3">
+
+                        {{-- NAMA --}}
+                        <div>
+
+                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-slate-500">
+                                Nama Siswa
+                            </p>
+
+                            <p class="font-bold text-slate-800">
+                                {{ $payment->student->name }}
+                            </p>
+
+                        </div>
+
+                        {{-- BULAN --}}
+                        <div>
+
+                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-slate-500">
+                                Bulan
+                            </p>
+
+                            <p class="font-bold text-slate-800">
+                                {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
+                            </p>
+
+                        </div>
+
+                        {{-- NOMINAL --}}
+                        <div>
+
+                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-slate-500">
+                                Nominal
+                            </p>
+
+                            <p class="font-bold text-slate-800">
+                                Rp {{ number_format($payment->original_amount) }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
                 @if($payment->proof_file)
@@ -49,19 +114,17 @@
                         $ext = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
                     @endphp
 
-                    <div class="p-4 mb-4 border border-yellow-200 shadow-sm rounded-xl bg-yellow-50">
+                    <div class="p-5 mb-6 border border-yellow-200 shadow-sm rounded-2xl bg-yellow-50">
 
                         {{-- HEADER --}}
                         <div class="flex items-center justify-between gap-4">
 
                             <div>
+
                                 <p class="text-sm font-semibold text-yellow-800">
                                     Bukti Pembayaran Sebelumnya
                                 </p>
 
-                                <p class="text-xs text-yellow-600">
-                                    Klik preview untuk melihat ukuran penuh
-                                </p>
                             </div>
 
                             {{-- STATUS --}}
@@ -83,14 +146,14 @@
 
                                 <img src="{{ $proofUrl }}"
                                     onclick="openProofPreview('image', '{{ $proofUrl }}')"
-                                    class="object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+                                    class="object-cover w-32 h-32 transition border cursor-pointer rounded-xl hover:scale-105 hover:shadow-md">
 
                             {{-- PDF --}}
                             @elseif($ext === 'pdf')
 
                                 <div
                                     onclick="openProofPreview('pdf', '{{ $proofUrl }}')"
-                                    class="flex flex-col items-center justify-center w-32 h-32 transition bg-white border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+                                    class="flex flex-col items-center justify-center w-32 h-32 transition bg-white border cursor-pointer rounded-xl hover:scale-105 hover:shadow-md">
 
                                     <div class="text-4xl">
                                         📄
@@ -109,7 +172,7 @@
                         {{-- REJECT NOTE --}}
                         @if($payment->status == 'rejected' && $payment->reject_reason)
 
-                            <div class="p-3 mt-4 border border-red-200 rounded-lg bg-red-50">
+                            <div class="p-3 mt-4 border border-red-200 rounded-xl bg-red-50">
 
                                 <p class="text-xs font-semibold text-red-600">
                                     Alasan Penolakan
@@ -128,7 +191,7 @@
                 @endif
 
                 {{-- BUKTI PEMBAYARAN --}}
-                <div class="mt-4">
+                <div class="mb-4">
 
                     <label class="block mb-2 text-sm font-semibold">
                         Bukti Pembayaran
@@ -139,7 +202,7 @@
                         class="hidden mb-4">
 
                         <p class="mb-2 text-xs font-semibold text-slate-500">
-                            Preview Baru
+                            File Baru
                         </p>
 
                         {{-- IMAGE --}}
@@ -173,7 +236,7 @@
                         name="proof_file"
                         required
                         onchange="previewProof(event)"
-                        class="w-full p-2 border rounded-xl">
+                        class="w-full p-2 border rounded-xl @error('proof_file') border-red-500 @enderror">
 
                     <p class="mt-1 text-xs text-gray-500">
                         Maksimal ukuran file 2MB
@@ -187,11 +250,17 @@
 
                 </div>
 
-                <button class="px-4 py-2 mt-4 text-white bg-blue-600 rounded">
-                    Upload Bukti
-                </button>
+                {{-- BUTTON --}}
+                <div class="mt-6">
+
+                    <button class="shadow-sm btn-primary">
+                        Upload Bukti
+                    </button>
+
+                </div>
 
             </form>
+
         </div>
     </div>
 

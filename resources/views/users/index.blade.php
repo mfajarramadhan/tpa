@@ -3,7 +3,7 @@
         <h2 class="text-xl font-semibold">Kelola User</h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
             <div class="relative">
@@ -125,17 +125,17 @@
 
                     <thead>
                         <tr>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="w-[28%]">Nama</th>
+                            <th class="w-[28%]">Email</th>
+                            <th class="w-[16%]">Role</th>
+                            <th class="w-[14%]">Status</th>
+                            <th class="w-[14%] !text-center">Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @forelse($users as $user)
-                            <tr class="{{ $user->trashed() ? 'opacity-50' : '' }}">
+                            <tr class="{{ $user->trashed() ? 'opacity-75' : '' }}">
                                 {{-- NAMA --}}
                                 <td class="font-semibold text-[var(--text-main)]">
                                     {{ $user->name }}
@@ -148,9 +148,19 @@
 
                                 {{-- ROLE --}}
                                 <td>
+                                    @php
+                                        $roleLabels = [
+                                            'siswa' => 'Siswa',
+                                            'guru' => 'Guru',
+                                            'orang_tua' => 'Orang Tua',
+                                            'superadmin' => 'Superadmin',
+                                        ];
+                                    @endphp
+
                                     <span class="badge badge-info">
                                         <iconify-icon icon="solar:user-id-bold-duotone"></iconify-icon>
-                                        {{ $user->roles->first()->name ?? '-' }}
+
+                                        {{ $roleLabels[$user->roles->first()->name ?? ''] ?? '-' }}
                                     </span>
                                 </td>
 
@@ -210,8 +220,8 @@
                                             <form method="POST" action="{{ route('users.restore', $user->id) }}">
                                                 @csrf
 
-                                                <button class="btn-icon bg-[var(--info-light)] border border-[var(--info)] hover:bg-[var(--info)]">
-                                                    <iconify-icon icon="solar:restart-bold-duotone"
+                                                <button class="group btn-icon bg-[var(--info-light)] border border-[var(--info)] hover:bg-[var(--info)]">
+                                                    <iconify-icon icon="solar:restart-bold"
                                                                   class="text-[var(--info)] group-hover:text-white"></iconify-icon>
                                                 </button>
                                             </form>
@@ -222,8 +232,9 @@
                                                 @method('DELETE')
 
                                                 <button onclick="return confirm('Hapus permanen?')"
-                                                        class="btn-icon bg-[var(--danger)] text-white">
-                                                    <iconify-icon icon="solar:trash-bin-trash-bold-duotone"></iconify-icon>
+                                                        class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]">
+                                                    <iconify-icon icon="heroicons:trash"
+                                                                  class="text-[var(--danger)] group-hover:text-white"></iconify-icon>
                                                 </button>
                                             </form>
 

@@ -38,14 +38,8 @@
 
             <a href="/users"
                class="nav-item {{ request()->is('users*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:users-group-rounded-bold-duotone"></iconify-icon>
+                <iconify-icon icon="solar:user-bold-duotone"></iconify-icon>
                 Kelola User
-            </a>
-
-             <a href="/payments"
-               class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
-                Iuran
             </a>
 
             <a href="/approval/students"
@@ -59,6 +53,8 @@
                 <iconify-icon icon="solar:user-cross-bold-duotone"></iconify-icon>
                 Siswa Ditolak
             </a>
+
+            
 
             <a href="/attendances"
                 class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">
@@ -76,6 +72,14 @@
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
                 Pembelajaran
+            </a>
+
+            <div class="px-4 mt-6 mb-3 text-caption">Pembayaran</div>
+
+             <a href="/payments"
+               class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
+                Iuran
             </a>
 
             <a href="/fees"
@@ -114,7 +118,7 @@
 
             <a href="/students"
                class="nav-item {{ request()->is('students*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:file-check-bold-duotone"></iconify-icon>
+                <iconify-icon icon="solar:user-bold-duotone"></iconify-icon>
                 Anak
             </a>
 

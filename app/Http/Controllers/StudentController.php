@@ -48,13 +48,14 @@ class StudentController extends Controller
                 'required',
                 'date',
                 function ($attribute, $value, $fail) {
-                    if (Carbon::parse($value)->age < 4) {
-                        $fail('Usia anak minimal 4 tahun');
+                    if (Carbon::parse($value)->age < 8) {
+                        $fail('Usia anak minimal 8 tahun!');
                     }
                 }
             ],
             'gender' => 'required|in:L,P',
             'school_origin' => 'required|string|max:255',    
+            'school_grade' => 'required|string|max:20',
             'kk_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
             'birth_certificate_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
             'proof_file' => 'required|mimes:jpg,jpeg,png,pdf|max:2048',
@@ -89,6 +90,7 @@ class StudentController extends Controller
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
             'school_origin' => $request->school_origin,
+            'school_grade' => $request->school_grade,
             'kk_file' => $kkPath,
             'birth_certificate_file' => $aktaPath,
             'status' => 'nonaktif'
@@ -106,7 +108,7 @@ class StudentController extends Controller
         ]);
 
         return redirect()->route('dashboard')
-            ->with('success', 'Anak berhasil didaftarkan! Menunggu persetujuan.');
+            ->with('success', 'Anak berhasil didaftarkan! Menunggu persetujuan admin.');
     }
 
     /**
@@ -145,6 +147,7 @@ class StudentController extends Controller
             'name' => 'required|string|max:255',
             'birth_date' => 'required|date',
             'school_origin' => 'nullable|string|max:255',
+            'school_grade' => 'required|string|max:20',
             'kk_file' => 'nullable|image|max:2048',
             'birth_certificate_file' => 'nullable|image|max:2048',
         ];
@@ -193,6 +196,7 @@ class StudentController extends Controller
             'name' => $request->name,
             'birth_date' => $request->birth_date,
             'school_origin' => $request->school_origin,
+            'school_grade' => $request->school_grade,
         ];
 
         if ($isAdmin) {
@@ -220,6 +224,12 @@ class StudentController extends Controller
     
     private function authorizeStudent($student)
     {
+        // SUPERADMIN BOLEH AKSES
+        if (Auth::user()->hasRole('superadmin')) {
+            return;
+        }
+
+        // ORANG TUA HANYA BISA AKSES ANAK SENDIRI
         if ($student->parent_id !== Auth::id()) {
             abort(403);
         }

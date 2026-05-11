@@ -5,32 +5,64 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-xl py-6 mx-auto">
+    <div class="py-6 md:py-0">
 
-        <div class="p-5 bg-white rounded shadow">
+        {{-- BUTTON --}}
+        <div class="mb-6">
+
+            <a href="javascript:history.back()"
+               class="flex items-center gap-2 shadow-sm btn-primary">
+
+                <iconify-icon
+                    icon="heroicons:arrow-left-20-solid"
+                    width="20">
+                </iconify-icon>
+
+                Kembali
+
+            </a>
+
+        </div>
+
+        {{-- CARD --}}
+        <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST"
                   action="{{ route('learning.subject.update', $subject->id) }}">
+
                 @csrf
                 @method('PUT')
 
                 {{-- NAMA --}}
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm font-semibold">Nama Mapel</label>
-                    <input type="text" name="name"
-                        value="{{ $subject->name }}"
-                        class="w-full p-2 border rounded"
-                        required>
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Nama Mapel
+                    </label>
+
+                    <input type="text"
+                           name="name"
+                           value="{{ $subject->name }}"
+                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200"
+                           required>
+
+                    @error('name')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
                 </div>
 
                 {{-- HARI --}}
                 <div class="mb-4">
+
                     <label class="block mb-1 text-sm font-semibold">
                         Hari
                     </label>
 
                     <select name="day"
-                            class="w-full p-2 border rounded-lg">
+                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
 
                         <option value="1" {{ $subject->day == 1 ? 'selected' : '' }}>
                             Senin
@@ -59,15 +91,22 @@
                             {{ $message }}
                         </p>
                     @enderror
+
                 </div>
 
-                <button class="px-4 py-2 text-white bg-blue-600 rounded">
-                    Update
-                </button>
+                {{-- BUTTON --}}
+                <div class="mt-6">
+
+                    <button class="shadow-sm btn-primary">
+                        Update
+                    </button>
+
+                </div>
 
             </form>
 
         </div>
 
     </div>
+
 </x-app-layout>

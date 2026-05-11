@@ -5,9 +5,27 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-xl py-6 mx-auto">
+    <div class="py-6 md:py-0">
 
-        <div class="p-5 bg-white rounded shadow">
+        {{-- BUTTON --}}
+        <div class="mb-6">
+
+            <a href="javascript:history.back()"
+               class="flex items-center gap-2 shadow-sm btn-primary">
+
+                <iconify-icon
+                    icon="heroicons:arrow-left-20-solid"
+                    width="20">
+                </iconify-icon>
+
+                Kembali
+
+            </a>
+
+        </div>
+
+        {{-- CARD --}}
+        <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST"
                   action="{{ route('learning.subject.store', $classroom->id) }}">
@@ -15,26 +33,33 @@
 
                 {{-- NAMA --}}
                 <div class="mb-4">
-                    <label class="block mb-1 text-sm font-semibold">Nama Mapel</label>
-                    <input type="text" name="name"
-                        class="w-full p-2 border rounded"
-                        required>
 
-                        @error('name')
+                    <label class="block mb-1 text-sm font-semibold">
+                        Nama Mata Pelajaran
+                    </label>
+
+                    <input type="text"
+                           name="name"
+                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200"
+                           required>
+
+                    @error('name')
                         <p class="mt-1 text-sm text-red-500">
                             {{ $message }}
                         </p>
                     @enderror
+
                 </div>
 
                 {{-- HARI --}}
                 <div class="mb-4">
+
                     <label class="block mb-1 text-sm font-semibold">
                         Hari
                     </label>
 
                     <select name="day"
-                            class="w-full p-2 border rounded-lg">
+                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
 
                         <option value="">Pilih Hari</option>
 
@@ -43,6 +68,7 @@
                         <option value="3">Rabu</option>
                         <option value="4">Kamis</option>
                         <option value="5">Jumat</option>
+
                     </select>
 
                     @error('day')
@@ -50,15 +76,22 @@
                             {{ $message }}
                         </p>
                     @enderror
+
                 </div>
 
-                <button class="px-4 py-2 text-white bg-blue-600 rounded">
-                    Simpan
-                </button>
+                {{-- BUTTON --}}
+                <div class="mt-6">
+
+                    <button class="shadow-sm btn-primary">
+                        Simpan
+                    </button>
+
+                </div>
 
             </form>
 
         </div>
 
     </div>
+
 </x-app-layout>

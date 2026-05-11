@@ -28,29 +28,147 @@
                 @csrf
                 @method('PUT')
 
+                {{-- HEADER --}}
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-gray-100">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="heroicons:user-solid"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-slate-800">
+                            Edit Anak
+                        </h2>
+
+                        <p class="text-sm text-slate-500">
+                            Perbarui informasi detail anak
+                        </p>
+
+                    </div>
+
+                </div>
+
                 {{-- NAMA --}}
                 <div class="mb-4">
-                    <label>Nama</label>
-                    <input type="text" name="name"
-                        value="{{ $student->name }}"
-                        class="w-full p-2 border rounded">
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Nama
+                    </label>
+
+                    <input type="text"
+                        name="name"
+                        value="{{ old('name', $student->name) }}"
+                        class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+
+                    @error('name')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
                 </div>
 
                 {{-- TANGGAL LAHIR --}}
                 <div class="mb-4">
-                    <label>Tanggal Lahir</label>
-                    <input type="date" name="birth_date"
-                        value="{{ $student->birth_date }}"
-                        max="{{ now()->subYears(4)->format('Y-m-d') }}"
-                        class="w-full p-2 border rounded">
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Tanggal Lahir
+                    </label>
+
+                    <input type="date"
+                        name="birth_date"
+                        value="{{ old('birth_date', $student->birth_date) }}"
+                        max="{{ now()->subYears(8)->format('Y-m-d') }}"
+                        class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+
+                    @error('birth_date')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
                 </div>
 
                 {{-- SEKOLAH --}}
                 <div class="mb-4">
-                    <label>Sekolah Asal</label>
-                    <input type="text" name="school_origin"
-                        value="{{ $student->school_origin }}"
-                        class="w-full p-2 border rounded">
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Sekolah Asal
+                    </label>
+
+                    <input type="text"
+                        name="school_origin"
+                        value="{{ old('school_origin', $student->school_origin) }}"
+                        class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+
+                    @error('school_origin')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
+                </div>
+
+                {{-- KELAS DI SEKOLAH --}}
+                <div class="mb-4">
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Kelas di Sekolah
+                    </label>
+
+                    <select name="school_grade"
+                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+
+                        <option value="1 SD" {{ old('school_grade', $student->school_grade) == '1 SD' ? 'selected' : '' }}>
+                            1 SD
+                        </option>
+
+                        <option value="2 SD" {{ old('school_grade', $student->school_grade) == '2 SD' ? 'selected' : '' }}>
+                            2 SD
+                        </option>
+
+                        <option value="3 SD" {{ old('school_grade', $student->school_grade) == '3 SD' ? 'selected' : '' }}>
+                            3 SD
+                        </option>
+
+                        <option value="4 SD" {{ old('school_grade', $student->school_grade) == '4 SD' ? 'selected' : '' }}>
+                            4 SD
+                        </option>
+
+                        <option value="5 SD" {{ old('school_grade', $student->school_grade) == '5 SD' ? 'selected' : '' }}>
+                            5 SD
+                        </option>
+
+                        <option value="6 SD" {{ old('school_grade', $student->school_grade) == '6 SD' ? 'selected' : '' }}>
+                            6 SD
+                        </option>
+
+                        <option value="7 SMP" {{ old('school_grade', $student->school_grade) == '7 SMP' ? 'selected' : '' }}>
+                            7 SMP
+                        </option>
+
+                        <option value="8 SMP" {{ old('school_grade', $student->school_grade) == '8 SMP' ? 'selected' : '' }}>
+                            8 SMP
+                        </option>
+
+                        <option value="9 SMP" {{ old('school_grade', $student->school_grade) == '9 SMP' ? 'selected' : '' }}>
+                            9 SMP
+                        </option>
+
+                    </select>
+
+                    @error('school_grade')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
                 </div>
 
                 {{-- KK --}}
@@ -112,7 +230,7 @@
                             class="hidden">
 
                             <p class="mb-2 text-xs font-semibold text-slate-500">
-                                Preview Baru
+                                File Baru
                             </p>
 
                             {{-- IMAGE --}}
@@ -145,6 +263,11 @@
                         onchange="previewDocument(event, 'kk')"
                         class="w-full p-2 border rounded-xl">
 
+                    @error('kk_file')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
                 </div>
 
                 {{-- AKTA --}}
@@ -210,7 +333,7 @@
                             class="hidden">
 
                             <p class="mb-2 text-xs font-semibold text-slate-500">
-                                Preview Baru
+                                File Baru
                             </p>
 
                             {{-- IMAGE --}}
@@ -247,9 +370,14 @@
                         onchange="previewDocument(event, 'akta')"
                         class="w-full p-2 border rounded-xl">
 
+                    @error('birth_certificate_file')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror  
                 </div>
 
-                <button class="px-4 py-2 text-white bg-yellow-500 rounded">
+                <button class="shadow-sm btn-primary">
                     Update
                 </button>
             </form>

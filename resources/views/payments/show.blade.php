@@ -8,11 +8,71 @@
     <div class="max-w-6xl py-6 mx-auto">
 
         {{-- ALERT --}}
-            @if(session('success'))
-                <div class="p-3 mb-4 text-green-700 bg-green-100 rounded">
-                    {{ session('success') }}
+        <div class="relative">
+
+            {{-- FLOATING ALERT WRAPPER --}}
+            <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
+
+                {{-- SUCCESS --}}
+                @if(session('success'))
+                <div
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-init="setTimeout(() => show = false, 3000)"
+                    @click.outside="show = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 -translate-y-3"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0 -translate-y-2"
+                    class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                        bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
+                        bg-opacity-80 backdrop-blur-sm">
+
+                    <div class="text-sm font-semibold ms-2">
+                        {{ session('success') }}
+                    </div>
+
+                    <button @click="show = false"
+                        class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                        ✕
+                    </button>
                 </div>
-            @endif
+                @endif
+
+
+                {{-- ERROR --}}
+                @if(session('error'))
+                <div
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-init="setTimeout(() => show = false, 3000)"
+                    @click.outside="show = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 -translate-y-3"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0 -translate-y-2"
+                    class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                        bg-gradient-to-t from-[var(--danger)] to-red-400 
+                        bg-opacity-80 backdrop-blur-sm">
+
+                    <div class="text-sm font-semibold ms-2">
+                        {{ session('error') }}
+                    </div>
+
+                    <button @click="show = false"
+                        class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                        ✕
+                    </button>
+                </div>
+                @endif
+
+            </div>
+
+        </div>
 
         {{-- TOTAL --}}
         <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
@@ -51,12 +111,13 @@
 
                 <thead>
                     <tr>
-                        <th>Bulan</th>
-                        <th>Tanggal Pembayaran</th>
-                        <th>Nominal</th>
-                        <th>Status</th>
-                        <th>Bukti</th>
-                        <th class="text-center">Aksi</th>
+                        <th class="w-[16%]">Bulan</th>
+                        <th class="w-[18%]">Tanggal Pembayaran</th>
+                        <th class="w-[18%] text-right">Nominal</th>
+                        <th class="w-[12%]">Status</th>
+                        <th class="w-[12%]">Bukti</th>
+                        <th class="w-[8%] !text-center">Aksi</th>
+                        <th class="w-[16%]">Catatan</th>
                     </tr>
                 </thead>
 
@@ -174,8 +235,9 @@
 
                         </td>
 
-                        {{-- Aksi --}}
+                        {{-- AKSI --}}
                         <td class="text-center">
+
                             @if($payment->proof_file && $payment->status == 'pending')
 
                                 <div x-data="{ open: false }">
@@ -186,6 +248,7 @@
                                         <form method="POST"
                                             action="{{ route('payments.approve', $payment->id) }}"
                                             onsubmit="return confirm('Yakin ingin menyetujui pembayaran ini?')">
+
                                             @csrf
 
                                             <button class="btn-icon group bg-[var(--success-light)] border border-[var(--success)] hover:bg-[var(--success)]"
@@ -197,6 +260,7 @@
                                                 </iconify-icon>
 
                                             </button>
+
                                         </form>
 
                                         {{-- REJECT --}}
@@ -204,16 +268,16 @@
                                             class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
                                             title="Tolak">
 
-                                        <iconify-icon icon="heroicons:x-circle"
-                                                    width="18"
-                                                    class="text-[var(--danger)] group-hover:text-white transition">
-                                        </iconify-icon>
+                                            <iconify-icon icon="heroicons:x-circle"
+                                                        width="18"
+                                                        class="text-[var(--danger)] group-hover:text-white transition">
+                                            </iconify-icon>
 
-                                    </button>
+                                        </button>
 
                                     </div>
 
-                                    {{-- MODAL (DIPISAH DARI FLEX) --}}
+                                    {{-- MODAL --}}
                                     <div x-show="open"
                                         x-cloak
                                         x-transition
@@ -222,9 +286,13 @@
                                         <div @click.outside="open = false"
                                             class="w-full max-w-md p-5 shadow-md bg-surface rounded-xl">
 
-                                            <h3 class="mb-3">Alasan Penolakan</h3>
+                                            <h3 class="mb-3">
+                                                Alasan Penolakan
+                                            </h3>
 
-                                            <form method="POST" action="{{ route('payments.reject', $payment->id) }}">
+                                            <form method="POST"
+                                                action="{{ route('payments.reject', $payment->id) }}">
+
                                                 @csrf
 
                                                 <textarea name="reject_reason"
@@ -234,6 +302,7 @@
                                                         required></textarea>
 
                                                 <div class="flex justify-end gap-2 mt-4">
+
                                                     <button type="button"
                                                             @click="open = false"
                                                             class="btn-outline">
@@ -243,23 +312,47 @@
                                                     <button class="btn-primary bg-[var(--danger)] hover:bg-red-700">
                                                         Kirim
                                                     </button>
+
                                                 </div>
+
                                             </form>
 
                                         </div>
+
                                     </div>
 
                                 </div>
 
-                            @elseif($payment->status == 'rejected')
+                            @else
 
-                                <span class="text-xs text-[var(--danger)]">
-                                    {{ $payment->reject_reason }}
+                                <span class="text-small">
+                                    -
                                 </span>
 
-                            @else
-                                <span class="text-small">-</span>
                             @endif
+
+                        </td>
+
+                        {{-- CATATAN --}}
+                        <td class="max-w-[250px]">
+
+                            @if($payment->reject_reason)
+
+                                <p class="text-sm text-[var(--danger)] line-clamp-3 cursor-help"
+                                title="{{ $payment->reject_reason }}">
+
+                                    {{ $payment->reject_reason }}
+
+                                </p>
+
+                            @else
+
+                                <span class="text-small">
+                                    -
+                                </span>
+
+                            @endif
+
                         </td>
 
                     </tr>

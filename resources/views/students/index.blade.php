@@ -85,10 +85,10 @@
 
                     <thead>
                         <tr>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="w-[36%]">Nama</th>
+                            <th class="w-[36%]">Email</th>
+                            <th class="w-[14%]">Status</th>
+                            <th class="w-[14%] !text-center">Aksi</th>
                         </tr>
                     </thead>
 

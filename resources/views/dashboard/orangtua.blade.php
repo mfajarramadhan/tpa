@@ -186,17 +186,17 @@
                                     
                                     @if($monthlyPayments->isEmpty())
 
-                                        <p class="text-sm text-slate-400">
+                                        <p class="text-sm font-semibold text-slate-400">
                                             Belum ada data iuran
                                         </p>
 
                                     @else
 
-                                        <p class="text-xs font-semibold tracking-wide uppercase text-slate-400">
+                                        <p class="text-sm font-semibold text-slate-400">
                                             Sisa Tagihan
                                         </p>
 
-                                        <p class="mt-1 text-2xl font-bold text-[var(--danger)]">
+                                        <p class="mt-1 text-xl font-bold text-[var(--danger)]">
                                             Rp {{ number_format($sisaTagihan) }}
                                         </p>
 

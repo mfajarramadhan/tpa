@@ -124,7 +124,7 @@ class PaymentController extends Controller
                         $status = 'Lunas';
 
                     } elseif ($totalTagihan == 0) {
-                        $status = 'Tidak ada tagihan';
+                        $status = 'Tanpa tagihan';
 
                     } else {
                         $status = 'Belum Bayar';
@@ -144,7 +144,7 @@ class PaymentController extends Controller
                             'Menunggak' => 2,
                             'Belum Bayar' => 3,
                             'Lunas' => 4,
-                            'Tidak ada tagihan' => 5,
+                            'Tanpa tagihan' => 5,
                             default => 99,
                         }
                     ];

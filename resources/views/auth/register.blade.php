@@ -56,7 +56,7 @@
                     <!-- PHONE -->
                     <input id="phone" name="phone" type="text"
                         value="{{ old('phone') }}"
-                        placeholder="08xxxxxxxxxx"
+                        placeholder="Nomor Telepon"
                         maxlength="13"
                         inputmode="numeric"
                         pattern="[0-9]{10,13}"

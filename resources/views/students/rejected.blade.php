@@ -1,28 +1,30 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold">
-            Data Siswa Ditolak
+            Pendaftaran Ditolak
         </h2>
     </x-slot>
 
-    <div class="max-w-6xl py-6 mx-auto">
+    <div class="py-6 mx-auto md:py-0 max-w-7xl">
 
         <div class="overflow-x-auto card-panel">
             <table class="w-full text-sm table-custom">
 
                 <thead>
                     <tr>
-                        <th>Nama Anak</th>
-                        <th>Orang Tua</th>
-                        <th>NISN</th>
-                        <th>Sekolah</th>
-                        <th>Alasan Ditolak</th>
-                        <th class="text-center">Aksi</th>
+                        <th class="w-[20%]">Nama Anak</th>
+                        <th class="w-[18%]">Orang Tua</th>
+                        <th class="w-[14%]">NISN</th>
+                        <th class="w-[18%]">Sekolah Asal</th>
+                        <th class="w-[20%]">Alasan Ditolak</th>
+                        <th class="w-[10%] !text-center">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
+
                 @forelse($students as $student)
+
                     <tr>
 
                         {{-- Nama Anak --}}
@@ -41,44 +43,82 @@
                         </td>
 
                         {{-- Sekolah --}}
-                        <td>
-                            {{ $student->school_origin }}
+                        <td class="max-w-[220px]">
+
+                            <p class="line-clamp-2"
+                            title="{{ $student->school_origin }}">
+
+                                {{ $student->school_origin }}
+
+                            </p>
+
                         </td>
 
                         {{-- Alasan Ditolak --}}
-                        <td>
-                            <span class="badge badge-danger">
-                                <iconify-icon icon="solar:close-circle-bold-duotone"></iconify-icon>
-                                {{ $student->reject_reason ?? '-' }}
-                            </span>
+                        <td class="max-w-[240px]">
+
+                            @if($student->reject_reason)
+
+                                <p class="text-sm text-[var(--danger)] line-clamp-3 cursor-help"
+                                title="{{ $student->reject_reason }}">
+
+                                    {{ $student->reject_reason }}
+
+                                </p>
+
+                            @else
+
+                                <span class="text-small">
+                                    -
+                                </span>
+
+                            @endif
+
                         </td>
 
                         {{-- Aksi --}}
                         <td>
+
                             <div class="flex justify-center">
 
-                                <form method="POST" action="{{ route('students.destroy', $student->id) }}">
+                                <form method="POST"
+                                    action="{{ route('students.destroy', $student->id) }}">
+
                                     @csrf
                                     @method('DELETE')
 
                                     <button onclick="return confirm('Yakin hapus data ini?')"
-                                            class="btn-icon bg-[var(--danger-light)] text-[var(--danger)] hover:bg-[var(--danger)] hover:text-white"
-                                            title="Hapus">
-                                        <iconify-icon icon="solar:trash-bin-trash-bold-duotone" width="18"></iconify-icon>
+                                            title="Hapus"
+                                            class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]">
+
+                                        <iconify-icon icon="heroicons:trash"
+                                                    class="text-[var(--danger)] group-hover:text-white">
+                                        </iconify-icon>
+
                                     </button>
+
                                 </form>
 
                             </div>
+
                         </td>
 
                     </tr>
+
                 @empty
+
                     <tr>
-                        <td colspan="6" class="py-6 text-center">
+
+                        <td colspan="6" class="py-10 text-center text-small">
+
                             Tidak ada data siswa ditolak
+
                         </td>
+
                     </tr>
+
                 @endforelse
+
                 </tbody>
 
             </table>

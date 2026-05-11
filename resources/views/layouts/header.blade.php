@@ -65,7 +65,17 @@
                         {{ Auth::user()->name }}
                     </div>
                     <div class="text-xs text-[var(--text-tertiary)]">
-                        {{ Auth::user()->getRoleNames()->first() }}
+                        @php
+                            $roleLabels = [
+                                'siswa' => 'Siswa',
+                                'guru' => 'Guru',
+                                'orang_tua' => 'Orang Tua',
+                                'superadmin' => 'Superadmin',
+                            ];
+                        @endphp
+
+                        {{ $roleLabels[Auth::user()->getRoleNames()->first()] ?? '-' }}
+
                     </div>
                 </div>
 

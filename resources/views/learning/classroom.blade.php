@@ -5,19 +5,28 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
             @role('superadmin')
             <div class="mb-4">
+
                 <a href="{{ route('learning.subject.create', $classroom->id) }}"
-                class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
-                    + Tambah Mapel
+                class="flex items-center gap-2 shadow-sm btn-primary">
+
+                    <iconify-icon
+                        icon="solar:add-circle-bold-duotone"
+                        width="20">
+                    </iconify-icon>
+
+                    Tambah Mapel
+
                 </a>
+
             </div>
             @endrole
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
 
                 @foreach($classroom->subjects as $subject)
 

@@ -136,7 +136,7 @@
                             <th class="p-3">Status</th>
                             <th class="p-3 text-center">File</th>
                             <th class="p-3 text-center">Aksi</th>
-                            <th class="p-3 text-center">Note</th>
+                            <th class="p-3 text-center">Catatan</th>
                         </tr>
                     </thead>
 
@@ -369,12 +369,19 @@
 
                                     @if($submission && $submission->note)
 
-                                        <div class="max-w-[220px] mx-auto text-xs text-gray-600">
+                                        <div class="max-w-[220px] mx-auto text-xs text-gray-600 line-clamp-3 cursor-help"
+                                            title="{{ $submission->note }}">
+
                                             {{ $submission->note }}
+
                                         </div>
 
                                     @else
-                                        <span class="text-gray-400">-</span>
+
+                                        <span class="text-gray-400">
+                                            -
+                                        </span>
+
                                     @endif
 
                                 </td>

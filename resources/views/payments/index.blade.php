@@ -117,7 +117,7 @@
                         </iconify-icon>
 
                         {{-- NAME --}}
-                        <span class="text-sm font-semibold">
+                        <span class="text-sm font-semibold ">
                             {{ $student->name }}
                         </span>
 
@@ -312,12 +312,12 @@
                     <table class="w-full text-sm table-custom">
                         <thead>
                             <tr>
-                                <th>Siswa</th>
-                                <th>Orang Tua</th>
-                                <th>Asal Sekolah</th>
-                                <th class="text-right">Tagihan</th>
-                                <th>Status</th>
-                                <th class="text-right">Aksi</th>
+                                <th class="w-[22%]">Siswa</th>
+                                <th class="w-[22%]">Orang Tua</th>
+                                <th class="w-[24%]">Asal Sekolah</th>
+                                <th class="w-[12%]">Tagihan</th>
+                                <th class="w-[14%]">Status</th>
+                                <th class="w-[6%] !text-center">Aksi</th>
                             </tr>
                         </thead>
 
@@ -341,7 +341,7 @@
                                     } elseif ($status == 'Menunggu Konfirmasi') {
                                         $badge = 'badge-warning';
                                         $icon = 'solar:clock-circle-bold-duotone';
-                                    } elseif ($status == 'Tidak ada tagihan') {
+                                    } elseif ($status == 'Tanpa tagihan') {
                                         $badge = 'badge-info';
                                         $icon = 'solar:info-circle-bold-duotone';
                                     } else {
@@ -396,7 +396,7 @@
                                     </td>
 
                                     <!-- Aksi -->
-                                    <td class="text-right">
+                                    <td class="text-center">
                                         <a href="{{ route('payments.student.show', $student->id) }}"
                                         class="btn-icon border border-[var(--primary)] hover:border-[var(--primary)]"
                                         title="Detail">

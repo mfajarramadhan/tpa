@@ -27,6 +27,32 @@
             <form method="POST" action="{{ route('students.store') }}" enctype="multipart/form-data">
                 @csrf
 
+                {{-- HEADER --}}
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-gray-100">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:user-plus-bold-duotone"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-slate-800">
+                            Tambah Anak
+                        </h2>
+
+                        <p class="text-sm text-slate-500">
+                            Daftarkan anak baru
+                        </p>
+
+                    </div>
+
+                </div>
+
                 {{-- NAMA --}}
                 <div class="mb-4">
                     <label class="block mb-1 text-sm font-semibold">Nama</label>
@@ -56,7 +82,7 @@
                     <label class="block mb-1 text-sm font-semibold">Tanggal Lahir</label>
                     <input type="date" name="birth_date"
                            value="{{ old('birth_date') }}"
-                           max="{{ now()->subYears(4)->format('Y-m-d') }}"
+                           max="{{ now()->subYears(8)->format('Y-m-d') }}"
                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
                     @error('birth_date')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
@@ -76,7 +102,7 @@
                     @enderror
                 </div>
 
-                {{-- SEKOLAH --}}
+                {{-- ASAL SEKOLAH --}}
                 <div class="mb-4">
                     <label class="block mb-1 text-sm font-semibold">Sekolah Asal</label>
                     <input type="text" name="school_origin"
@@ -86,6 +112,66 @@
                     @error('school_origin')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- KELAS DI SEKOLAH --}}
+                <div class="mb-4">
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Kelas di Sekolah
+                    </label>
+
+                    <select name="school_grade"
+                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+
+                        <option value="">
+                            Pilih Kelas
+                        </option>
+
+                        <option value="1 SD" {{ old('school_grade') == '1 SD' ? 'selected' : '' }}>
+                            1 SD
+                        </option>
+
+                        <option value="2 SD" {{ old('school_grade') == '2 SD' ? 'selected' : '' }}>
+                            2 SD
+                        </option>
+
+                        <option value="3 SD" {{ old('school_grade') == '3 SD' ? 'selected' : '' }}>
+                            3 SD
+                        </option>
+
+                        <option value="4 SD" {{ old('school_grade') == '4 SD' ? 'selected' : '' }}>
+                            4 SD
+                        </option>
+
+                        <option value="5 SD" {{ old('school_grade') == '5 SD' ? 'selected' : '' }}>
+                            5 SD
+                        </option>
+
+                        <option value="6 SD" {{ old('school_grade') == '6 SD' ? 'selected' : '' }}>
+                            6 SD
+                        </option>
+
+                        <option value="7 SMP" {{ old('school_grade') == '7 SMP' ? 'selected' : '' }}>
+                            1 SMP
+                        </option>
+
+                        <option value="8 SMP" {{ old('school_grade') == '8 SMP' ? 'selected' : '' }}>
+                            2 SMP
+                        </option>
+
+                        <option value="9 SMP" {{ old('school_grade') == '9 SMP' ? 'selected' : '' }}>
+                            3 SMP
+                        </option>
+
+                    </select>
+
+                    @error('school_grade')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
                 </div>
 
                 {{-- INFO BIAYA --}}
@@ -220,7 +306,7 @@
 
                 {{-- BUTTON --}}
                 <div class="mt-6">
-                    <button class="px-5 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <button class="shadow-sm btn-primary">
                         Simpan
                     </button>
                 </div>

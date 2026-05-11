@@ -10,40 +10,58 @@ class SubjectSeeder extends Seeder
 {
     public function run(): void
     {
-        $mapelList = [
-            'Fiqih',
-            'SKI',
-            'Aqidah',
-            'Akhlak',
-            'BHS Arab',
-            'Al Qur\'an',
-            'Hadist',
-            'Akhlakul Badin',
-            'Safinah',
-            'Kaligrafi',
-            'Tahfidz Juz 30'
+        $subjectsPerDay = [
+
+            // Senin
+            1 => [
+                'Fiqih',
+                'SKI',
+            ],
+
+            // Selasa
+            2 => [
+                'Aqidah',
+                'Akhlak',
+            ],
+
+            // Rabu
+            3 => [
+                'Bahasa Arab',
+                'Al-Qur\'an',
+            ],
+
+            // Kamis
+            4 => [
+                'Hadist',
+                'Safinah',
+            ],
+
+            // Jumat
+            5 => [
+                'Kaligrafi',
+                'Tahfidz Juz 30',
+            ],
+
         ];
 
         $classrooms = Classroom::all();
 
         foreach ($classrooms as $classroom) {
 
-            // ambil random 5 mapel
-            $randomSubjects = collect($mapelList)
-                ->shuffle()
-                ->take(5)
-                ->values();
+            foreach ($subjectsPerDay as $day => $subjects) {
 
-            foreach ($randomSubjects as $index => $subject) {
+                foreach ($subjects as $subjectName) {
 
-                Subject::create([
-                    'classroom_id' => $classroom->id,
-                    'name' => $subject,
+                    Subject::create([
+                        'classroom_id' => $classroom->id,
+                        'name' => $subjectName,
+                        'day' => $day,
+                    ]);
 
-                    // 1-5 = senin-jumat
-                    'day' => $index + 1
-                ]);
+                }
+
             }
+
         }
     }
 }

@@ -14,8 +14,8 @@ class FeeSeeder extends Seeder
     public function run(): void
     {
         Fee::firstOrCreate([
-            'registration_fee' => 100000,
-            'monthly_fee' => 50000
+            'registration_fee' => 500000,
+            'monthly_fee' => 100000
         ]);
     }
 }

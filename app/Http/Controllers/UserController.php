@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Classroom;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -65,9 +66,9 @@ class UserController extends Controller
         // dd($request);
         $request->validate([
             'name' => 'required',
-            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/'],
+            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/', 'unique:users,phone'],
+            'email' => ['required', 'email', 'unique:users,email'],
             'address' => 'nullable|string',
-            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role' => 'required'
         ]);
@@ -94,17 +95,17 @@ class UserController extends Controller
     }
 
     // 🔷 DETAIL USER
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::with(['student.classroom'])->findOrFail($id);
+        $user->load(['student.classroom']);
 
         return view('users.show', compact('user'));
     }
 
     // 🔷 FORM EDIT USER
-    public function edit($id)
+    public function edit(User $user)
     {
-        $user = User::with('student')->findOrFail($id);
+        $user->load('student');
 
         $classrooms = Classroom::all();
 
@@ -112,21 +113,67 @@ class UserController extends Controller
     }
 
     // 🔷 UPDATE DATA USER
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrFail($id);
-
         $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/'],
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'address' => 'nullable|string|max:255',
-            'password' => 'nullable|min:6',
-        ]);
+
+        // USER
+        'name' => 'required|string|max:255',
+
+        'phone' => [
+            'required',
+            'regex:/^08[0-9]{8,11}$/',
+            'unique:users,phone,' . $user->id
+        ],
+
+        'email' => [
+            'required',
+            'email',
+            'unique:users,email,' . $user->id
+        ],
+
+        'address' => 'nullable|string|max:255',
+
+        'password' => 'nullable|min:6',
+
+        // STUDENT
+        'classroom_id' => 'nullable|exists:classrooms,id',
+
+        'nisn' => [
+            'nullable',
+            'digits:10',
+            'unique:students,nisn,' . optional($user->student)->id
+        ],
+
+        'birth_date' => [
+            'nullable',
+            'date',
+            function ($attribute, $value, $fail) {
+
+                if ($value && Carbon::parse($value)->age < 8) {
+
+                    $fail('Usia anak minimal 8 tahun!');
+
+                }
+
+            }
+        ],
+
+        'gender' => 'nullable|in:L,P',
+
+        'school_origin' => 'nullable|string|max:255',
+
+        'school_grade' => 'nullable|string|max:20',
+
+    ]);
 
         // PROTEKSI SUPERADMIN
         if ($user->hasRole('superadmin') && auth()->id() != $user->id) {
-            return back()->with('error', 'Tidak bisa mengubah superadmin lain');
+
+            return back()->with(
+                'error',
+                'Tidak bisa mengubah superadmin lain'
+            );
         }
 
         $data = [
@@ -138,89 +185,128 @@ class UserController extends Controller
 
         // PASSWORD OPTIONAL
         if ($request->filled('password')) {
+
             $data['password'] = bcrypt($request->password);
         }
 
         $user->update($data);
 
+        /*
+        =====================================================
+        UPDATE STUDENT
+        =====================================================
+        */
         if ($user->student) {
+
             $user->student->update([
+
                 'classroom_id' => $request->classroom_id,
-                'nik' => $request->nik,
+                'nisn' => $request->nisn,
                 'birth_date' => $request->birth_date,
                 'gender' => $request->gender,
-                'school_origin' => $request->school_origin
+                'school_origin' => $request->school_origin,
+                'school_grade' => $request->school_grade
+
             ]);
         }
 
-        return redirect()->route('users.index')
+        return redirect()
+            ->route('users.index')
             ->with('success', 'User berhasil diupdate');
     }
 
     // 🔷 UPDATE ROLE (CEPAT - DROPDOWN)
-    public function updateRole(Request $request, $id)
+    public function updateRole(Request $request, User $user)
     {
-        $user = User::findOrFail($id);
-
         $currentRole = $user->roles->first()->name;
+
         $newRole = $request->role;
 
         // LARANG JADI SISWA
         if ($newRole == 'siswa') {
-            return back()->with('error', 'Role siswa tidak bisa di-set manual');
+
+            return back()->with(
+                'error',
+                'Role siswa tidak bisa di-set manual'
+            );
         }
 
         // SUPERADMIN TIDAK BOLEH DIUBAH
         if ($currentRole == 'superadmin') {
-            return back()->with('error', 'Role superadmin tidak boleh diubah');
+
+            return back()->with(
+                'error',
+                'Role superadmin tidak boleh diubah'
+            );
         }
 
         $user->syncRoles([$newRole]);
 
-        return back()->with('success', 'Role berhasil diubah');
+        return back()->with(
+            'success',
+            'Role berhasil diubah'
+        );
     }
 
     // 🔷 TOGGLE STATUS
-    public function toggleStatus($id)
+    public function toggleStatus(User $user)
     {
-        $user = User::findOrFail($id);
+        $user->status =
+            $user->status == 'aktif'
+            ? 'nonaktif'
+            : 'aktif';
 
-        $user->status = $user->status == 'aktif' ? 'nonaktif' : 'aktif';
         $user->save();
 
-        return back()->with('success', 'Status diubah');
+        return back()->with(
+            'success',
+            'Status diubah'
+        );
     }
 
     // 🔷 DELETE USER
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
-
         // jangan sampai hapus diri sendiri
         if ($user->id == auth()->id()) {
-            return back()->with('error', 'Tidak bisa menghapus akun sendiri');
+
+            return back()->with(
+                'error',
+                'Tidak bisa menghapus akun sendiri'
+            );
         }
 
         $user->delete();
 
-        return back()->with('success', 'User berhasil dihapus');
+        return back()->with(
+            'success',
+            'User berhasil dihapus'
+        );
     }
 
     public function forceDelete($id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()
+            ->findOrFail($id);
 
         $user->forceDelete();
 
-        return back()->with('success', 'User dihapus permanen');
+        return back()->with(
+            'success',
+            'User dihapus permanen'
+        );
     }
 
     public function restore($id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()
+            ->findOrFail($id);
 
         $user->restore();
 
-        return back()->with('success', 'User berhasil dikembalikan');
+        return back()->with(
+            'success',
+            'User berhasil dikembalikan'
+        );
     }
 }
