@@ -54,7 +54,11 @@
                 Siswa Ditolak
             </a>
 
-            
+            <a href="{{ route('academic-years.index') }}"
+                class="nav-item {{ request()->is('academic-years*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:calendar-bold-duotone"></iconify-icon>
+                Tahun Akademik
+            </a>
 
             <a href="/attendances"
                 class="nav-item {{ request()->is('attendances/*') ? 'active' : '' }}">

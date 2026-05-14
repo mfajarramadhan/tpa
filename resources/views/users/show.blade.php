@@ -208,6 +208,19 @@
 
                         </div>
 
+                        {{-- NISN --}}
+                        <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+
+                            <p class="text-sm font-semibold text-slate-500">
+                                Tahun Akademik
+                            </p>
+
+                            <p class="text-sm font-bold text-right text-slate-800">
+                                {{ $user->student->academicYear->name ?? '-' }}
+                            </p>
+
+                        </div>
+
                         {{-- TANGGAL LAHIR --}}
                         <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
 

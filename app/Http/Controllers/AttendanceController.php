@@ -108,6 +108,7 @@ class AttendanceController extends Controller
         $attendance = Attendance::firstOrCreate(
             [
                 'classroom_id' => $request->classroom_id,
+                'academic_year_id' => activeAcademicYear()->id,
                 'date' => now()->toDateString(),
                 'session' => $request->session,
             ],
@@ -120,6 +121,7 @@ class AttendanceController extends Controller
         $attendancePagi = Attendance::with('details')
             ->where([
                 'classroom_id' => $request->classroom_id,
+                'academic_year_id' => activeAcademicYear()->id,
                 'date' => now()->toDateString(),
                 'session' => 'pagi'
             ])
@@ -137,6 +139,7 @@ class AttendanceController extends Controller
         $attendanceSore = Attendance::with('details')
             ->where([
                 'classroom_id' => $request->classroom_id,
+                'academic_year_id' => activeAcademicYear()->id,
                 'date' => now()->toDateString(),
                 'session' => 'sore'
             ])
@@ -213,7 +216,7 @@ class AttendanceController extends Controller
         return redirect()->route('attendances.create', [
             'classroom_id' => $request->classroom_id,
             'session' => $request->session
-        ])->with('success', 'Absensi berhasil disimpan');
+        ])->with('success', 'Absensi berhasil disimpan!');
     }
 
     /**

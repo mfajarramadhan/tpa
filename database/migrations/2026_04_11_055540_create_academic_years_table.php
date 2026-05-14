@@ -11,11 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classrooms', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 10); 
-            $table->timestamps();
-        });
+        Schema::create('academic_years', function (Blueprint $table) {
+
+        $table->id();
+
+        // contoh: 2025/2026
+        $table->string('name', 9);
+
+        // hanya 1 aktif
+        $table->boolean('is_active')
+            ->default(false);
+
+        $table->timestamps();
+    });
     }
 
     /**
@@ -23,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classrooms');
+        Schema::dropIfExists('academic_years');
     }
 };

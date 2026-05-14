@@ -20,9 +20,10 @@ class Payment extends Model
         'proof_file',
         'status',
         'paid_at',
+        'academic_year_id',
         'approved_by',
         'approved_at',
-        'reject_reason',
+        'reject_reason'
     ];
 
     public function student()
@@ -35,8 +36,13 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function getFinalAmountAttribute()
+    // public function getFinalAmountAttribute()
+    // {
+    //     return $this->original_amount + $this->adjustment;
+    // }
+
+    public function academicYear()
     {
-        return $this->original_amount + $this->adjustment;
+        return $this->belongsTo(AcademicYear::class);
     }
 }

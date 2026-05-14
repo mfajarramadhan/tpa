@@ -427,6 +427,7 @@ class PaymentController extends Controller
                 if (!$exists) {
                     Payment::create([
                         'student_id' => $student->id,
+                        'academic_year_id' => activeAcademicYear()->id,
                         'type' => 'monthly',
                         'month' => $month,
                         'original_amount' => $fee->monthly_fee, //ubah nominal default di FeeSeeder

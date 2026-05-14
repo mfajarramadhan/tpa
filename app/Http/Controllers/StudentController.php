@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
 use App\Models\Fee;
 use App\Models\Payment;
 use App\Models\Student;
@@ -21,7 +22,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Auth::user()->students()->with('classroom')->get();
+        $students = Auth::user()->students()->with('classroom')->latest()->get();
 
         return view('students.index', compact('students'));
     }
@@ -69,6 +70,12 @@ class StudentController extends Controller
         // format tanggal lahir (ddmmyyyy)
         $birthDate = Carbon::parse($request->birth_date)->format('dmY');
 
+        // Tahun akademik
+        $academicYear = AcademicYear::where('is_active', true)->first();
+        if (!$academicYear) {
+            return back()->with('error', 'Tahun ajaran aktif belum tersedia');
+        }
+
         // Buat akun siswa
         $user = User::create([
             'name' => $request->name,
@@ -85,6 +92,7 @@ class StudentController extends Controller
             'parent_id' => Auth::user()->id,
             'user_id' => $user->id,
             'classroom_id' => null,
+            'academic_year_id' => $academicYear->id,
             'nisn' => $request->nisn,
             'name' => $request->name,
             'birth_date' => $request->birth_date,
@@ -99,6 +107,7 @@ class StudentController extends Controller
         // Buat pembayaran registrasi
         Payment::create([
             'student_id' => $student->id,
+            'academic_year_id' => $academicYear->id,
             'type' => 'registration',
             'month' => null,
             'original_amount' => 100000,
@@ -107,7 +116,7 @@ class StudentController extends Controller
             'status' => 'pending'
         ]);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('students.index')
             ->with('success', 'Anak berhasil didaftarkan! Menunggu persetujuan admin.');
     }
 
@@ -248,7 +257,7 @@ class StudentController extends Controller
     }
 
     public function submitReapply(Request $request, $id)
-    {
+    { 
         $student = Student::findOrFail($id);
 
         if ($student->status !== 'ditolak') {
@@ -334,13 +343,20 @@ class StudentController extends Controller
 
         } else {
 
-            // kalau belum ada (edge case)
+            // kalau belum ada
             if ($request->hasFile('payment_proof')) {
 
                 $newProof = $request->file('payment_proof')->store('payments', 'public');
 
+                // Tahun akademik
+                $academicYear = AcademicYear::where('is_active', true)->first();
+                if (!$academicYear) {
+                    return back()->with('error', 'Tahun ajaran aktif belum tersedia');
+                }
+
                 Payment::create([
                     'student_id' => $student->id,
+                    'academic_year_id' => $academicYear->id,
                     'type' => 'registration',
                     'original_amount' => 100000,
                     'amount' => 100000,

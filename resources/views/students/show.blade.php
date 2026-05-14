@@ -75,6 +75,32 @@
                     </p>
 
                 </div>
+                
+                {{-- NISN --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        NISN
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+                        {{ $student->nisn ?? '-' }}
+                    </p>
+
+                </div>
+                
+                {{-- Tahun Akademik --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Tahun Akademik
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+                        {{ $student->academicYear->name ?? '-' }}
+                    </p>
+
+                </div>
 
                 {{-- EMAIL --}}
                 <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
@@ -102,19 +128,6 @@
                             ? \Carbon\Carbon::parse($student->birth_date)->format('d M Y')
                             : '-' }}
 
-                    </p>
-
-                </div>
-
-                {{-- NISN --}}
-                <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
-
-                    <p class="text-sm font-semibold text-slate-500">
-                        NISN
-                    </p>
-
-                    <p class="text-sm font-bold text-right text-slate-800">
-                        {{ $student->nisn ?? '-' }}
                     </p>
 
                 </div>

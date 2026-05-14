@@ -149,18 +149,6 @@
                             6 SD
                         </option>
 
-                        <option value="7 SMP" {{ old('school_grade', $student->school_grade) == '7 SMP' ? 'selected' : '' }}>
-                            7 SMP
-                        </option>
-
-                        <option value="8 SMP" {{ old('school_grade', $student->school_grade) == '8 SMP' ? 'selected' : '' }}>
-                            8 SMP
-                        </option>
-
-                        <option value="9 SMP" {{ old('school_grade', $student->school_grade) == '9 SMP' ? 'selected' : '' }}>
-                            9 SMP
-                        </option>
-
                     </select>
 
                     @error('school_grade')

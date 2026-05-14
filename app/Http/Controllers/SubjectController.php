@@ -11,62 +11,14 @@ class SubjectController extends Controller
     /**
      * 🔹 STEP 1: LIST KELAS (seperti absensi)
      */
-    public function index()
-    {
-        $user = auth()->user();
-
-        if ($user->hasRole('guru') || $user->hasRole('superadmin')) {
-            $classrooms = $classrooms = Classroom::withCount('subjects')->get();
-
-        } elseif ($user->hasRole('siswa')) {
-            $classrooms = Classroom::where('id', $user->student->classroom_id)
-                ->withCount('subjects')
-                ->get();
-
-        } elseif ($user->hasRole('orang_tua')) {
-            $classrooms = Classroom::whereIn(
-                    'id',
-                    $user->students->pluck('classroom_id')
-                )
-                ->withCount('subjects')
-                ->get();
-        } else {
-            $classrooms = collect();
-        }
-
-        return view('learning.index', compact('classrooms'));
-    }
+    
 
 
-    /**
-     * 🔹 STEP 2: LIST MAPEL PER KELAS
-     */
-    public function classroom(Classroom $classroom)
-    {
-        $classroom->load([
-            'subjects' => function ($q) {
-                $q->withCount([
-
-                // total materi
-                'materials as materials_count' => function ($query) {
-                    $query->where('is_task', false);
-                },
-
-                // total tugas
-                'materials as tasks_count' => function ($query) {
-                    $query->where('is_task', true);
-                }
-
-            ])->orderBy('day');
-            }
-        ]);
-
-        return view('learning.classroom', compact('classroom'));
-    }
+    
 
     public function create(Classroom $classroom)
     {
-        return view('learning.create', compact('classroom'));
+        return view('learning.subject-create', compact('classroom'));
     }
 
     public function show(Subject $subject)
@@ -102,7 +54,7 @@ class SubjectController extends Controller
 
     public function edit(Subject $subject)
     {
-        return view('learning.edit', compact('subject'));
+        return view('learning.subject-edit', compact('subject'));
     }
 
     public function update(Request $request, Subject $subject)

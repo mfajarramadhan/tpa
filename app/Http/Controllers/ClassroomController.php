@@ -2,63 +2,150 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // List Kelas
     public function index()
     {
-        //
+        $user = auth()->user();
+
+        // SUPERADMIN & GURU
+        if (
+            $user->hasRole('guru') ||
+            $user->hasRole('superadmin')
+        ) {
+            $classrooms = Classroom::withCount('subjects')->get();
+
+        // SISWA
+        } elseif ($user->hasRole('siswa')) {
+
+            $classrooms = Classroom::where(
+                    'id',
+                    $user->student->classroom_id
+                )->withCount('subjects')->get();
+
+        // ORANG TUA
+        } elseif ($user->hasRole('orang_tua')) {
+
+            $classrooms = Classroom::whereIn(
+                    'id',
+                    $user->students
+                        ->pluck('classroom_id')
+                )->withCount('subjects')->get();
+        } else {
+            $classrooms = collect();
+        }
+
+        return view(
+            'learning.index',
+            compact('classrooms')
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        //
+        return view('learning.classroom-create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:50'
+        ]);
+
+        Classroom::create([
+            'name' => $request->name,
+        ]);
+
+        return redirect()
+            ->route('learning.index')
+            ->with(
+                'success',
+                'Kelas berhasil ditambahkan!'
+            );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+
+    // List Mapel
+    public function show(Classroom $classroom)
     {
-        //
+        $classroom->load([
+            'subjects' => function ($q) {
+                $q->withCount([
+
+                // total materi
+                'materials as materials_count' => function ($query) {
+                    $query->where('is_task', false);
+                },
+
+                // total tugas
+                'materials as tasks_count' => function ($query) {
+                    $query->where('is_task', true);
+                }
+
+            ])->orderBy('day');
+            }
+        ]);
+
+        return view('learning.classroom', compact('classroom'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+
+    public function edit(Classroom $classroom)
     {
-        //
+        return view('learning.classroom-edit', compact('classroom'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+
+    public function update(Request $request, Classroom $classroom)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:50'
+        ]);
+
+        $classroom->update([
+            'name' => $request->name
+        ]);
+
+        return redirect()
+            ->route('learning.index')
+            ->with(
+                'success',
+                'Kelas berhasil diperbarui!'
+            );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+
+    public function destroy(Classroom $classroom)
     {
-        //
+        // CEK SISWA
+        if ($classroom->students()->count()) {
+
+            return back()->with(
+                'error',
+                'Kelas masih memiliki siswa!'
+            );
+        }
+
+        // CEK SUBJECT
+        if ($classroom->subjects()->count()) {
+
+            return back()->with(
+                'error',
+                'Kelas masih memiliki mata pelajaran!'
+            );
+        }
+
+        $classroom->delete();
+
+        return back()->with(
+            'success',
+            'Kelas berhasil dihapus!'
+        );
     }
 }

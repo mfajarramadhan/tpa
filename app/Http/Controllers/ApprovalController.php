@@ -16,7 +16,7 @@ class ApprovalController extends Controller
             ->with(['parent', 'user'])
             ->get();
 
-        $classrooms = Classroom::all();
+        $classrooms = Classroom::withCount('students')->get();
 
         return view('approval.students', compact('students', 'classrooms'));
     }

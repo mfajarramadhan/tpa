@@ -27,6 +27,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
 
             $table->timestamp('paid_at')->nullable();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
 
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('approved_at')->nullable();

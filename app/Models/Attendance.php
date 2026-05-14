@@ -12,6 +12,7 @@ class Attendance extends Model
     protected $fillable = [
         'student_id',
         'classroom_id',
+        'academic_year_id',
         'date',
         'session',
         'status',
@@ -36,5 +37,12 @@ class Attendance extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(
+            AcademicYear::class
+        );
     }
 }

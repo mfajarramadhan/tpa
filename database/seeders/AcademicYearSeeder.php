@@ -1,0 +1,18 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\AcademicYear;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class AcademicYearSeeder extends Seeder
+{
+    public function run(): void
+    {
+        AcademicYear::create([
+            'name' => '2025/2026',
+            'is_active' => true
+        ]);
+    }
+}

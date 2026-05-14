@@ -17,6 +17,9 @@
             <div class="text-xs font-semibold text-[var(--text-tertiary)] mt-0.5 uppercase tracking-wide hidden sm:block">
                 {{ $subheader ?? '' }}
             </div>
+            <div class="text-xs font-semibold text-[var(--text-tertiary)] mt-0.5 uppercase tracking-wide hidden sm:block">
+                Tahun Akademik {{ activeAcademicYear()->name }}
+            </div>
         </div>
     </div>
 

@@ -20,4 +20,4 @@
     {{ $slot }}
 
 </body>
-</html>
+</html>     

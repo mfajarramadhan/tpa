@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('classroom_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
             $table->date('date'); // tanggal absensi
             $table->enum('session', ['pagi', 'sore']);
-            $table->foreignId('created_by')->constrained('users'); // guru/admin
+            $table->foreignId('created_by')->constrained('users'); // guru
             $table->timestamps();
 
             $table->unique(['classroom_id', 'date', 'session']); // 1 kelas 1 hari 1 absensi

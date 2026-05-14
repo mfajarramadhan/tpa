@@ -14,7 +14,6 @@ class Classroom extends Model
 
     protected $fillable = [
         'name',
-        'academic_year'
     ];
 
     public function students()

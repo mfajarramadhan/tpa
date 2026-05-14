@@ -21,11 +21,13 @@ class Student extends Model
         'parent_id',
         'user_id',
         'classroom_id',
+        'academic_year_id',
         'nisn',
         'name',
         'birth_date',
         'gender',
         'school_origin',
+        'school_grade',
         'reject_reason',
         'kk_file',
         'birth_certificate_file',
@@ -66,6 +68,11 @@ class Student extends Model
     public function submissions()
     {
         return $this->hasMany(Submission::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 
     // 🔹 Parse tanggal lahir untuk umur

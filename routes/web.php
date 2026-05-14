@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\MaterialController;
@@ -27,41 +29,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-
-    // Kelola User
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
-    Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
     
 
-    // Route Kelas khusus daftar ulang
+    // Route daftar ulang
     Route::get('/students/rejected', [ApprovalController::class, 'rejected'])->name('students.rejected');
-    // Route Kelas
+    // Route Siswa
     Route::resource('students', StudentController::class);
-    // Approval
+    // Route Approval
     Route::get('/students/{id}/reapply', [StudentController::class, 'reapply'])->name('students.reapply');
     Route::post('/students/{id}/reapply', [StudentController::class, 'submitReapply'])->name('students.reapply.submit');
 
 
+    // Route Kelas 
+    Route::get('/learning', [ClassroomController::class, 'index'])->name('learning.index');
+    Route::get('/learning/{classroom}', [ClassroomController::class, 'show'])->name('learning.classroom');
+    Route::get('/learning/classroom/create', [ClassroomController::class, 'create'])->name('learning.classroom.create');
+    Route::post('/learning/classroom', [ClassroomController::class, 'store'])->name('learning.classroom.store');
+    Route::get('/learning/classroom/{classroom}/edit', [ClassroomController::class, 'edit'])->name('learning.classroom.edit');
+    Route::put('/learning/classroom/{classroom}', [ClassroomController::class, 'update'])->name('learning.classroom.update');
+    Route::delete('/learning/classroom/{classroom}', [ClassroomController::class, 'destroy'])->name('learning.classroom.destroy');
+    
+    
     // Route Mapel
-    Route::get('/learning', [SubjectController::class, 'index'])->name('learning.index');
     Route::get('/learning/subject/{subject}', [SubjectController::class, 'show'])->name('learning.subject');
-    Route::get('/learning/{classroom}', [SubjectController::class, 'classroom'])->name('learning.classroom');
     Route::get('/learning/{classroom}/create', [SubjectController::class, 'create'])->name('learning.subject.create');
     Route::post('/learning/{classroom}', [SubjectController::class, 'store'])->name('learning.subject.store');
     Route::get('/learning/subject/{subject}/edit', [SubjectController::class, 'edit'])->name('learning.subject.edit');
     Route::put('/learning/subject/{subject}', [SubjectController::class, 'update'])->name('learning.subject.update');
     Route::delete('/learning/subject/{subject}', [SubjectController::class, 'destroy'])->name('learning.subject.destroy');
-
-
-    // Route Kelola Materi
-    Route::get('/materials/create/{subject}', [MaterialController::class, 'create'])->name('materials.create');
-    Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
-    Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
-    Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
-    Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
-    Route::get('/materials/{material}/submissions', [SubmissionController::class, 'index'])->name('materials.submissions');
 
 
     // Route Pengumpulan Tugas
@@ -103,6 +98,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/approval/students/{id}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
 
         // Kelola User
+        // Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
+        Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
+
+        // Kelola User
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
@@ -120,6 +120,22 @@ Route::middleware('auth')->group(function () {
         Route::post('/fees/update', [FeeController::class, 'update'])->name('fees.update');
         // Adjustment = Penurunan biaya
         Route::post('/fees/adjustment', [AdjustmentController::class, 'apply'])->name('fees.adjustment.apply');
+
+
+        // Route Tahun Akademik
+        Route::resource('academic-years', AcademicYearController::class);
+        Route::post('/academic-years/{academicYear}/set-active', [AcademicYearController::class, 'setActive'])->name('academic-years.setActive');
+    });
+
+    // Khusus Guru
+    Route::middleware('role:guru')->group(function () {
+        // Route Kelola Materi
+        Route::get('/materials/create/{subject}', [MaterialController::class, 'create'])->name('materials.create');
+        Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
+        Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
+        Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
+        Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+        Route::get('/materials/{material}/submissions', [SubmissionController::class, 'index'])->name('materials.submissions');
     });
 });
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('classroom_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
 
             $table->string('nisn', 10)->unique();
             $table->string('name', 100); 

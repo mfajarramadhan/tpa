@@ -128,7 +128,7 @@
                             </div>
 
                             {{-- MINI DETAIL --}}
-                            <div class="grid grid-cols-2 gap-3 mt-5 text-sm md:grid-cols-4">
+                            <div class="grid grid-cols-2 gap-3 mt-5 text-sm md:grid-cols-5">
 
                                 <div class="p-3 rounded-xl bg-gray-50">
 
@@ -177,13 +177,28 @@
                                 <div class="p-3 rounded-xl bg-gray-50">
 
                                     <p class="text-xs font-semibold text-slate-500">
-                                        Sekolah
+                                        Asal Sekolah
                                     </p>
 
                                     <p class="mt-1 font-bold truncate text-slate-800"
                                     title="{{ $student->school_origin }}">
 
                                         {{ $student->school_origin }}
+
+                                    </p>
+
+                                </div>
+
+                                <div class="p-3 rounded-xl bg-gray-50">
+
+                                    <p class="text-xs font-semibold text-slate-500">
+                                        Kelas di Sekolah
+                                    </p>
+
+                                    <p class="mt-1 font-bold truncate text-slate-800"
+                                    title="{{ $student->school_grade }}">
+
+                                        {{ $student->school_grade }}
 
                                     </p>
 
@@ -462,7 +477,7 @@
                                                     required>
                                                 <option value="">-- Pilih Kelas --</option>
                                                 @foreach($classrooms as $class)
-                                                    <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                                    <option value="{{ $class->id }}">{{ $class->name }} - ({{ $class->students_count }} Siswa)</option>
                                                 @endforeach
                                             </select>
 

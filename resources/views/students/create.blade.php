@@ -84,6 +84,10 @@
                            value="{{ old('birth_date') }}"
                            max="{{ now()->subYears(8)->format('Y-m-d') }}"
                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+                    <!-- Info -->
+                    <p class="text-xs text-[var(--text-tertiary)] italic mb-1 mt-1">
+                        <span class="font-bold">Catatan:</span> Umur anak minimal 8 tahun!
+                    </p>
                     @error('birth_date')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
@@ -150,18 +154,6 @@
 
                         <option value="6 SD" {{ old('school_grade') == '6 SD' ? 'selected' : '' }}>
                             6 SD
-                        </option>
-
-                        <option value="7 SMP" {{ old('school_grade') == '7 SMP' ? 'selected' : '' }}>
-                            1 SMP
-                        </option>
-
-                        <option value="8 SMP" {{ old('school_grade') == '8 SMP' ? 'selected' : '' }}>
-                            2 SMP
-                        </option>
-
-                        <option value="9 SMP" {{ old('school_grade') == '9 SMP' ? 'selected' : '' }}>
-                            3 SMP
                         </option>
 
                     </select>

@@ -6,6 +6,17 @@
     <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
+            <!-- Welcome Section -->
+            <div class="flex flex-col items-start justify-between gap-4 mb-8 sm:flex-row sm:items-center">
+                <div>
+                    <h1 class="flex items-center gap-2 m-0">Selamat Datang, {{ Auth::user()->name }} <iconify-icon icon="solar:hand-stars-bold-duotone" class="text-[#FFC107]"></iconify-icon></h1>
+                    <p class="text-body mt-1 font-medium text-[var(--text-tertiary)]">Berikut ringkasan informasi anak secara real-time!</p>
+                </div>
+                <button class="shadow-sm btn-primary">
+                    <iconify-icon icon="solar:printer-bold-duotone" width="20"></iconify-icon> Cetak Ringkasan
+                </button>
+            </div>
+
             <div class="grid gap-6 md:grid-cols-2">
                 @foreach($students as $student)
                     <div class="p-5 bg-white border-l-4 shadow-sm rounded-2xl

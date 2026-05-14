@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AcademicYear;
 use App\Models\Classroom;
 use App\Models\Payment;
 use App\Models\Student;
@@ -42,17 +43,17 @@ class StudentSeeder extends Seeder
         $studentsData = [
             [
                 'name' => 'Rama',
-                'email' => 'rama02022022@gmail.com',
+                'email' => 'rama01012018@gmail.com',
                 'nisn' => '3275061210',
             ],
             [
                 'name' => 'Vito',
-                'email' => 'vito02022022@gmail.com',
+                'email' => 'vito01012018@gmail.com',
                 'nisn' => '3275061211',
             ],
             [
                 'name' => 'Yasin',
-                'email' => 'yasin02022022@gmail.com',
+                'email' => 'yasin01012018@gmail.com',
                 'nisn' => '3275061212',
             ],
         ];
@@ -84,12 +85,14 @@ class StudentSeeder extends Seeder
                 $student = Student::create([
                     'user_id' => $studentUser->id,
                     'parent_id' => $parent->id,
+                    'classroom_id' => $classroom?->id,
+                    'academic_year_id' => AcademicYear::where('is_active', true)->first()->id,
                     'name' => $data['name'],
                     'nisn' => $data['nisn'],
-                    'birth_date' => '2022-02-02',
+                    'birth_date' => '2017-01-01',
                     'gender' => 'L',
                     'school_origin' => 'SDN KALIBARU 1',
-                    'classroom_id' => $classroom?->id,
+                    'school_grade' => '2 SD',
                     'kk_file' => 'kk/0TjlvsDxxZexqujklYBIwJgDHepzMc1H5FjFpAld.png',
                     'birth_certificate_file' => 'akta/s7hsfay5ZI8SOHZ6jv79BDp0byPYVpkParrecLUi.png',
                     'status' => 'aktif',
@@ -105,6 +108,7 @@ class StudentSeeder extends Seeder
             if (!$existingPayment) {
                 Payment::create([
                     'student_id' => $student->id,
+                    'academic_year_id' => AcademicYear::where('is_active', true)->first()->id,
                     'type' => 'registration',
                     'month' => null,
                     'original_amount' => 50000,
