@@ -6,56 +6,98 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
 
         <div class="mx-auto space-y-6 max-w-7xl">
 
             {{-- TAB --}}
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-3 mb-6">
 
                 {{-- HARIAN --}}
                 <a href="{{ route('attendance.recap', [
-                    'tab' => 'daily',
-                    'date' => request('date'),
-                    'classroom_id' => request('classroom_id')
-                ]) }}"
-                class="px-4 py-2 rounded-lg
-                {{ request('tab', 'daily') == 'daily'
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-white border' }}">
+                        'tab' => 'daily',
+                        'date' => request('date'),
+                        'classroom_id' => request('classroom_id')
+                    ]) }}"
 
-                    Harian
+                    class="flex items-center gap-2 px-4 py-2 shadow-sm rounded-xl transition-all duration-200
+
+                    {{ request('tab', 'daily') == 'daily'
+                        ? 'btn-primary'
+                        : 'bg-surface border border-custom text-[var(--text-main)]
+                        hover:border-[var(--primary)]
+                        hover:bg-[var(--primary-light)]
+                        hover:text-[var(--primary)]' }}">
+
+                    {{-- ICON --}}
+                    <iconify-icon
+                        icon="solar:calendar-date-bold-duotone"
+                        width="20">
+                    </iconify-icon>
+
+                    {{-- TEXT --}}
+                    <span class="text-sm font-semibold">
+                        Harian
+                    </span>
 
                 </a>
 
                 {{-- BULANAN --}}
                 <a href="{{ route('attendance.recap', [
-                    'tab' => 'monthly',
-                    'month' => request('month'),
-                    'year' => request('year'),
-                    'classroom_id' => request('classroom_id')
-                ]) }}"
-                class="px-4 py-2 rounded-lg
-                {{ request('tab') == 'monthly'
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-white border' }}">
+                        'tab' => 'monthly',
+                        'month' => request('month'),
+                        'year' => request('year'),
+                        'classroom_id' => request('classroom_id')
+                    ]) }}"
 
-                    Bulanan
+                    class="flex items-center gap-2 px-4 py-2 shadow-sm rounded-xl transition-all duration-200
+
+                    {{ request('tab') == 'monthly'
+                        ? 'btn-primary'
+                        : 'bg-surface border border-custom text-[var(--text-main)]
+                        hover:border-[var(--primary)]
+                        hover:bg-[var(--primary-light)]
+                        hover:text-[var(--primary)]' }}">
+
+                    {{-- ICON --}}
+                    <iconify-icon
+                        icon="solar:calendar-bold-duotone"
+                        width="20">
+                    </iconify-icon>
+
+                    {{-- TEXT --}}
+                    <span class="text-sm font-semibold">
+                        Bulanan
+                    </span>
 
                 </a>
 
                 {{-- TAHUNAN --}}
                 <a href="{{ route('attendance.recap', [
-                    'tab' => 'yearly',
-                    'year' => request('year'),
-                    'classroom_id' => request('classroom_id')
-                ]) }}"
-                class="px-4 py-2 rounded-lg
-                {{ request('tab') == 'yearly'
-                    ? 'bg-[var(--primary)] text-white'
-                    : 'bg-white border' }}">
+                        'tab' => 'yearly',
+                        'year' => request('year'),
+                        'classroom_id' => request('classroom_id')
+                    ]) }}"
 
-                    Tahunan
+                    class="flex items-center gap-2 px-4 py-2 shadow-sm rounded-xl transition-all duration-200
+
+                    {{ request('tab') == 'yearly'
+                        ? 'btn-primary'
+                        : 'bg-surface border border-custom text-[var(--text-main)]
+                        hover:border-[var(--primary)]
+                        hover:bg-[var(--primary-light)]
+                        hover:text-[var(--primary)]' }}">
+
+                    {{-- ICON --}}
+                    <iconify-icon
+                        icon="solar:calendar-mark-bold-duotone"
+                        width="20">
+                    </iconify-icon>
+
+                    {{-- TEXT --}}
+                    <span class="text-sm font-semibold">
+                        Tahunan
+                    </span>
 
                 </a>
 
@@ -64,7 +106,7 @@
             {{-- ================= FILTER HARIAN ================= --}}
             @if(request('tab', 'daily') == 'daily')
 
-                <div class="p-5 bg-white shadow-sm rounded-xl">
+                <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
                     <form method="GET"
                         action="{{ route('attendance.recap') }}">
@@ -73,33 +115,57 @@
                             name="tab"
                             value="daily">
 
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
                             {{-- TANGGAL --}}
                             <div>
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Tanggal
                                 </label>
 
                                 <input type="date"
                                     name="date"
                                     value="{{ $date }}"
-                                    class="w-full border-gray-300 rounded-lg">
+                                    class="input-solid w-full
+                                    bg-[var(--surface)]
+                                    border-2 border-[var(--border)]
+                                    shadow-sm rounded-xl">
 
                             </div>
 
-                            {{-- KELAS --}}
-                            @role('superadmin|guru')
+                            {{-- BUTTON --}}
+                            <div class="flex items-end">
 
-                            <div>
+                                <button class="w-full shadow-sm btn-primary">
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                    <iconify-icon
+                                        icon="solar:chart-bold-duotone"
+                                        width="20">
+                                    </iconify-icon>
+
+                                    Tampilkan
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        {{-- KELAS --}}
+                        @role('guru')
+
+                            <div class="mt-4">
+
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Kelas
                                 </label>
 
                                 <select name="classroom_id"
-                                        class="w-full border-gray-300 rounded-lg">
+                                        class="input-solid w-full
+                                        bg-[var(--surface)]
+                                        border-2 border-[var(--border)]
+                                        shadow-sm rounded-xl">
 
                                     <option value="">
                                         Pilih Kelas
@@ -120,26 +186,13 @@
 
                             </div>
 
-                            @else
+                        @else
 
-                                <input type="hidden"
-                                    name="classroom_id"
-                                    value="{{ $classroomId }}">
+                            <input type="hidden"
+                                name="classroom_id"
+                                value="{{ $classroomId }}">
 
-                            @endrole
-
-                            {{-- BUTTON --}}
-                            <div class="flex items-end">
-
-                                <button class="w-full btn-primary">
-
-                                    Tampilkan Rekap
-
-                                </button>
-
-                            </div>
-
-                        </div>
+                        @endrole
 
                     </form>
 
@@ -150,7 +203,7 @@
             {{-- ================= FILTER BULANAN ================= --}}
             @if(request('tab') == 'monthly')
 
-                <div class="p-5 bg-white shadow-sm rounded-xl">
+                <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
                     <form method="GET"
                         action="{{ route('attendance.recap') }}">
@@ -159,17 +212,21 @@
                             name="tab"
                             value="monthly">
 
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
+                        {{-- ROW --}}
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
                             {{-- BULAN --}}
                             <div>
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Bulan
                                 </label>
 
                                 <select name="month"
-                                        class="w-full border-gray-300 rounded-lg">
+                                        class="input-solid w-full
+                                        bg-[var(--surface)]
+                                        border-2 border-[var(--border)]
+                                        shadow-sm rounded-xl">
 
                                     @foreach(range(1,12) as $monthLoop)
 
@@ -189,12 +246,15 @@
                             {{-- TAHUN --}}
                             <div>
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Tahun
                                 </label>
 
                                 <select name="year"
-                                        class="w-full border-gray-300 rounded-lg">
+                                        class="input-solid w-full
+                                        bg-[var(--surface)]
+                                        border-2 border-[var(--border)]
+                                        shadow-sm rounded-xl">
 
                                     @foreach(range(now()->year, now()->year - 5) as $yearLoop)
 
@@ -211,17 +271,38 @@
 
                             </div>
 
-                            {{-- KELAS --}}
-                            @role('superadmin|guru')
+                            {{-- BUTTON --}}
+                            <div class="flex items-end">
 
-                            <div>
+                                <button class="w-full shadow-sm btn-primary">
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                    <iconify-icon
+                                        icon="solar:chart-bold-duotone"
+                                        width="20">
+                                    </iconify-icon>
+
+                                    Tampilkan
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        {{-- KELAS --}}
+                        @role('superadmin|guru')
+
+                            <div class="mt-4">
+
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Kelas
                                 </label>
 
                                 <select name="classroom_id"
-                                        class="w-full border-gray-300 rounded-lg">
+                                        class="input-solid w-full
+                                        bg-[var(--surface)]
+                                        border-2 border-[var(--border)]
+                                        shadow-sm rounded-xl">
 
                                     <option value="">
                                         Pilih Kelas
@@ -242,26 +323,13 @@
 
                             </div>
 
-                            @else
+                        @else
 
                             <input type="hidden"
                                 name="classroom_id"
                                 value="{{ $classroomId }}">
 
-                            @endrole
-
-                            {{-- BUTTON --}}
-                            <div class="flex items-end">
-
-                                <button class="w-full btn-primary">
-
-                                    Tampilkan Rekap
-
-                                </button>
-
-                            </div>
-
-                        </div>
+                        @endrole
 
                     </form>
 
@@ -272,7 +340,7 @@
             {{-- ================= FILTER TAHUNAN ================= --}}
             @if(request('tab') == 'yearly')
 
-                <div class="p-5 bg-white shadow-sm rounded-xl">
+                <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
                     <form method="GET"
                         action="{{ route('attendance.recap') }}">
@@ -281,17 +349,21 @@
                             name="tab"
                             value="yearly">
 
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                        {{-- ROW 1 --}}
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
                             {{-- TAHUN --}}
                             <div>
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Tahun
                                 </label>
 
                                 <select name="year"
-                                        class="w-full border-gray-300 rounded-lg">
+                                        class="input-solid w-full
+                                        bg-[var(--surface)]
+                                        border-2 border-[var(--border)]
+                                        shadow-sm rounded-xl">
 
                                     @foreach(range(now()->year, now()->year - 5) as $yearLoop)
 
@@ -308,17 +380,38 @@
 
                             </div>
 
-                            {{-- KELAS --}}
-                            @role('superadmin|guru')
+                            {{-- BUTTON --}}
+                            <div class="flex items-end">
 
-                            <div>
+                                <button class="w-full shadow-sm btn-primary">
 
-                                <label class="block mb-1 text-sm font-semibold">
+                                    <iconify-icon
+                                        icon="solar:chart-bold-duotone"
+                                        width="20">
+                                    </iconify-icon>
+
+                                    Tampilkan
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        {{-- ROW 2 --}}
+                        @role('guru')
+
+                            <div class="mt-4">
+
+                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Kelas
                                 </label>
 
                                 <select name="classroom_id"
-                                        class="w-full border-gray-300 rounded-lg">
+                                        class="input-solid w-full
+                                        bg-[var(--surface)]
+                                        border-2 border-[var(--border)]
+                                        shadow-sm rounded-xl">
 
                                     <option value="">
                                         Pilih Kelas
@@ -339,26 +432,13 @@
 
                             </div>
 
-                            @else
+                        @else
 
                             <input type="hidden"
                                 name="classroom_id"
                                 value="{{ $classroomId }}">
 
-                            @endrole
-
-                            {{-- BUTTON --}}
-                            <div class="flex items-end">
-
-                                <button class="w-full btn-primary">
-
-                                    Tampilkan Rekap
-
-                                </button>
-
-                            </div>
-
-                        </div>
+                        @endrole
 
                     </form>
 

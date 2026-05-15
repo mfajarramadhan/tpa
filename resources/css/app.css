@@ -8,9 +8,14 @@
     overflow-x: hidden;
 }
     /* Primary Colors - STRICTLY SOLID, NO GRADIENTS */
-    --primary: #190182;
+    /* --primary: #190182;
     --primary-dark: #12015c;
-    --primary-light: rgba(25, 1, 130, 0.08);
+    --primary-light: rgba(25, 1, 130, 0.08); */
+
+    /* ===== LIGHT MODE ===== */
+    --primary: #0D7F4C;
+    --primary-dark: #065F38;
+    --primary-light: rgba(13, 127, 76, 0.15);   
     
     /* Base Colors */
     --bg: #F8F9FA;
@@ -45,9 +50,17 @@
 
 /* Dark Mode Variables */
 .dark {
-    --primary: #634bea; /* Lighter vivid blue for dark mode contrast */
+    /* Lighter vivid blue for dark mode contrast */
+    /* --primary: #634bea; 
     --primary-dark: #190182;
-    --primary-light: rgba(99, 75, 234, 0.15);
+    --primary-light: rgba(99, 75, 234, 0.15); */
+    
+    /* ===== DARK MODE ===== */
+    --primary: #1BAA6E;
+    --primary-dark: #0E7C50;
+
+    /* metallic glow */
+    --primary-light: rgba(27, 170, 110, 0.18);
     
     --bg: #121212;
     --surface: #1E1E1E;
@@ -63,6 +76,12 @@
     
     --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* DATE INPUT ICON DARK MODE */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.5);
+    cursor: pointer;
 }
 
 body {

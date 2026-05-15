@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Classroom;
 use App\Models\Payment;
 use App\Models\Student;
+use App\Notifications\PaymentApprovedNotification;
+use App\Notifications\PaymentRejectedNotification;
 use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
@@ -21,13 +23,13 @@ class ApprovalController extends Controller
         return view('approval.students', compact('students', 'classrooms'));
     }
 
-    public function approveStudent(Request $request, $id)
+
+    // Pendaftaran disetujui
+    public function approveStudent(Request $request, Student $student)
     {
          $request->validate([
             'classroom_id' => 'required|exists:classrooms,id'
         ]);
-
-        $student = Student::findOrFail($id);
 
         // ambil payment registration
         $payment = Payment::where('student_id', $student->id)
@@ -43,6 +45,15 @@ class ApprovalController extends Controller
         $payment->update([
             'status' => 'paid'
         ]);
+
+        // Kirim notifikasi ke orangtua siswa
+        $parent = $student->parent;
+
+        if ($parent) {
+            $parent->notify(
+                new PaymentApprovedNotification($payment)
+            );
+        }
 
         // update siswa di table student
         $student->update([
@@ -60,18 +71,41 @@ class ApprovalController extends Controller
         return back()->with('success', 'Pendaftaran berhasil disetujui! Siswa terdaftar kedalam kelas');
     }
 
-    public function rejectStudent(Request $request, $id)
+
+    // Pendaftaran ditolak
+    public function rejectStudent(Request $request, Student $student)
     {
         $request->validate([
             'reject_reason' => 'required|string'
         ]);
 
-        $student = Student::findOrFail($id);
-
         $student->update([
             'status' => 'ditolak',
             'reject_reason' => $request->reject_reason
         ]);
+
+
+        // Ambil pembayaran registrasi
+        $payment = Payment::where('student_id', $student->id)
+            ->where('type', 'registration')
+            ->first();
+
+        if ($payment) {
+
+            $payment->update([
+                'status' => 'rejected',
+                'reject_reason' => $request->reject_reason
+            ]);
+
+            /// Kirim notifikasi ke orangtua
+            $parent = $student->parent;
+
+            if ($parent) {
+                $parent->notify(
+                    new PaymentRejectedNotification($payment)
+                );
+            }
+        }
 
         if ($student->user) {
             $student->user->update([
@@ -79,7 +113,7 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Pendaftaran ditolak! Silakan hubungi orang tua siswa');
+        return back()->with('success', 'Pendaftaran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
     }
 
     public function rejected()

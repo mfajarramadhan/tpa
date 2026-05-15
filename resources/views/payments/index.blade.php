@@ -6,6 +6,7 @@
     <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
+            {{-- Alert --}}
             <div class="relative">
 
                 {{-- FLOATING ALERT WRAPPER --}}
@@ -71,6 +72,7 @@
                 </div>
 
             </div>
+            
             @role('orang_tua')
             {{-- Cek ada tagihan atau tidak --}}
             @if($selectedStudent)
@@ -105,10 +107,14 @@
 
                 @foreach($students as $student)
                     <a href="{{ route('payments.index', ['student_id' => $student->id]) }}"
-                        class="flex items-center gap-2 px-4 py-2 shadow-sm rounded-xl transition
+                        class="flex items-center gap-2 px-4 py-2 shadow-sm rounded-xl transition-all duration-200
+
                         {{ $selectedStudent && $selectedStudent->id == $student->id
                             ? 'btn-primary'
-                            : 'bg-white border border-[var(--border)] text-[var(--text-main)] hover:border-[var(--primary)] hover:bg-[var(--primary-light)]' }}">
+                            : 'bg-surface border border-custom text-[var(--text-main)]
+                            hover:border-[var(--primary)]
+                            hover:bg-[var(--primary-light)]
+                            hover:text-[var(--primary)]' }}">
 
                         {{-- ICON --}}
                         <iconify-icon
@@ -117,7 +123,7 @@
                         </iconify-icon>
 
                         {{-- NAME --}}
-                        <span class="text-sm font-semibold ">
+                        <span class="text-sm font-semibold">
                             {{ $student->name }}
                         </span>
 
@@ -130,14 +136,14 @@
             <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
 
                 {{-- Total Tagihan --}}
-                <div class="stat-card">
+                <div class="stat-card" style="border-left-color: var(--warning);">
                     <div class="flex items-start justify-between mb-3">
 
                         <span class="text-caption">
                             Total Tagihan
                         </span>
 
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--warning-light)] text-[var(--warning)]">
                             <iconify-icon
                                 icon="solar:wallet-money-bold-duotone"
                                 width="18">
@@ -146,14 +152,14 @@
 
                     </div>
 
-                    <div class="text-data">
+                    <div class="text-data text-[var(--warning)]">
                         Rp {{ number_format($totalUnpaid + $totalPaid) }}
                     </div>
                 </div>
 
                 {{-- Total Dibayar --}}
                 <div class="stat-card"
-                    style="border-left-color: var(--success);">
+                    style="border-left-color: var(--primary);">
 
                     <div class="flex items-start justify-between mb-3">
 
@@ -161,7 +167,7 @@
                             Total Dibayar
                         </span>
 
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
                             <iconify-icon
                                 icon="solar:check-circle-bold-duotone"
                                 width="18">
@@ -170,7 +176,7 @@
 
                     </div>
 
-                    <div class="text-data text-[var(--success)]">
+                    <div class="text-data text-[var(--primary)]">
                         Rp {{ number_format($totalPaid) }}
                     </div>
 
@@ -207,27 +213,27 @@
             <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
 
                 {{-- Total Tagihan --}}
-                <div class="stat-card">
+                <div class="stat-card" style="border-left-color: var(--warning);">
                     <div class="flex items-start justify-between mb-3">
                         <span class="text-caption">Total Tagihan</span>
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--warning-light)] text-[var(--warning)]">
                             <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
                         </div>
                     </div>
-                    <div class="text-data">
+                    <div class="text-data text-[var(--warning)]">
                         Rp {{ number_format($totalTagihanAll) }}
                     </div>
                 </div>
 
                 {{-- Total Dibayar --}}
-                <div class="stat-card" style="border-left-color: var(--success);">
+                <div class="stat-card" style="border-left-color: var(--primary);">
                     <div class="flex items-start justify-between mb-3">
                         <span class="text-caption">Total Dibayar</span>
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
                             <iconify-icon icon="solar:check-circle-bold-duotone" width="18"></iconify-icon>
                         </div>
                     </div>
-                    <div class="text-data text-[var(--success)]">
+                    <div class="text-data text-[var(--primary)]">
                         Rp {{ number_format($totalDibayarAll) }}
                     </div>
                 </div>

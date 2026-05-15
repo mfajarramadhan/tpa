@@ -6,6 +6,8 @@ use App\Models\Material;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Notifications\MaterialUploadedNotification;
 
 class MaterialController extends Controller
 {
@@ -85,7 +87,7 @@ class MaterialController extends Controller
             $filePath = $request->file('file')->store('materials', 'public');
         }
 
-        Material::create([
+        $material = Material::create([
             'subject_id' => $request->subject_id,
             'user_id' => auth()->id(),
             'title' => $request->title,
@@ -95,8 +97,41 @@ class MaterialController extends Controller
             'is_task' => $request->has('is_task'),
         ]);
 
-        return redirect()->route('learning.subject', $request->subject_id)
-            ->with('success', 'Materi berhasil ditambahkan');
+        // Filter sebelum kirim notifikasi 
+        // Classroom material
+        $classroomId = $material->subject->classroom_id;
+
+        // Siswa sesuai kelas
+        $students = User::role('siswa')
+            ->whereHas('student', function ($q) use ($classroomId) {
+                $q->where('classroom_id', $classroomId);
+            })
+            ->get();
+
+        // Orang tua siswa di kelas tersebut
+        $parents = User::role('orang_tua')
+            ->whereHas('students', function ($q) use ($classroomId) {
+                $q->where('classroom_id', $classroomId);
+            })
+            ->get();
+
+        // Merge penerima notif
+        $receivers = $students->merge($parents);
+
+        // Kirim notifikasi ke orangtua & siswa
+        foreach ($receivers as $user) {
+
+            $user->notify(
+                new MaterialUploadedNotification($material)
+            );
+
+        }
+
+        return redirect()->route('learning.subject', $request->subject_id)->with('success',
+            $material->is_task
+                ? 'Berhasil menambahkan tugas baru!'
+                : 'Berhasil menambahkan materi baru!'
+        );
     }
 
     public function edit(Material $material)

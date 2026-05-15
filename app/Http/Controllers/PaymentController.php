@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Fee;
 use App\Models\Payment;
 use App\Models\Student;
+use App\Models\User;
+use App\Notifications\PaymentApprovedNotification;
+use App\Notifications\PaymentRejectedNotification;
+use App\Notifications\PaymentUploadedNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -247,7 +251,16 @@ class PaymentController extends Controller
             'paid_at' => now(),
         ]);
 
-        return redirect()->route('payments.index')->with('success', 'Bukti pembayaran berhasil diupload');
+        // Kirim notifikasi ke superadmin
+        $superadmins = User::role('superadmin')->get();
+
+        foreach ($superadmins as $admin) {
+            $admin->notify(
+                new PaymentUploadedNotification($payment)
+            );
+        }
+
+        return redirect()->route('payments.index')->with('success', 'Bayar iuran berhasil! Menunggu verifikasi admin.');
     }
 
     /**
@@ -324,6 +337,8 @@ class PaymentController extends Controller
         //
     }
 
+
+    // Iuran bulanan disetujui
     public function approve($id)
     {
         if (!Auth::user()->hasRole('superadmin')) {
@@ -372,12 +387,23 @@ class PaymentController extends Controller
                 'approved_at' => now()
             ]);
 
-            return back()->with('success', 'Iuran berhasil disetujui');
+            // Kirim notifikasi ke orangtua siswa
+            $parent = $payment->student->parent;
+
+            if ($parent) {
+                $parent->notify(
+                    new PaymentApprovedNotification($payment)
+                );
+            }
+
+            return back()->with('success', 'Pembayaran iuran disetujui!');
         }
 
-        return back()->with('error', 'Tipe pembayaran tidak valid');
+        return back()->with('error', 'Pembayaran iuran tidak valid! ');
     }
 
+
+    // batalkan approve iuran bulanan (unapprove)
     public function unapprove($id)
     {
         $payment = Payment::findOrFail($id);
@@ -388,11 +414,13 @@ class PaymentController extends Controller
 
         $payment->update([
             'status' => 'pending',
-            'approved_by' => null
+            'approved_by' => null,
+            'approved_at' => null
         ]);
 
         return back()->with('success', 'Pembayaran dibatalkan');
     }
+
 
     private function generateMonthlyBills()
     {
@@ -441,6 +469,8 @@ class PaymentController extends Controller
         }
     }
 
+
+    // Iuran bulanan ditolak
     public function reject(Request $request, $id)
     {
         if (!Auth::user()->hasRole('superadmin')) {
@@ -463,6 +493,15 @@ class PaymentController extends Controller
             // proof_file tetap 
         ]);
 
-        return back()->with('success', 'Pembayaran berhasil ditolak, silakan konfirmasi ke orang tua siswa!');
+        // Kirim notifikasi ke orangtua
+        $parent = $payment->student->parent;
+
+        if ($parent) {
+            $parent->notify(
+                new PaymentRejectedNotification($payment)
+            );
+        }
+
+        return back()->with('success', 'Pembayaran iuran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
     }
 }

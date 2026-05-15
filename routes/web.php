@@ -8,6 +8,7 @@ use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
@@ -25,6 +26,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
+    // Notifikasi
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -36,8 +41,8 @@ Route::middleware('auth')->group(function () {
     // Route Siswa
     Route::resource('students', StudentController::class);
     // Route Approval
-    Route::get('/students/{id}/reapply', [StudentController::class, 'reapply'])->name('students.reapply');
-    Route::post('/students/{id}/reapply', [StudentController::class, 'submitReapply'])->name('students.reapply.submit');
+    Route::get('/students/{student}/reapply', [StudentController::class, 'reapply'])->name('students.reapply');
+    Route::post('/students/{student}/reapply', [StudentController::class, 'submitReapply'])->name('students.reapply.submit');
 
 
     // Route Kelas 
@@ -83,26 +88,28 @@ Route::middleware('auth')->group(function () {
 
     // Detail Pembayaran
     Route::resource('payments', PaymentController::class);
-    // Detail pembayaran per siswa
-    Route::get('/students/{student}/payments', [PaymentController::class, 'show'])->name('payments.student.show');
-    Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
-    Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
-    Route::post('/payments/{payment}/unapprove', [PaymentController::class, 'unapprove'])->name('payments.unapprove');
 
 
     // Khusus Superadmin
     Route::middleware('role:superadmin')->group(function () {
         // Approval Siswa Baru
         Route::get('/approval/students', [ApprovalController::class, 'students'])->name('approval.students');
-        Route::post('/approval/students/{id}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');
-        Route::post('/approval/students/{id}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
+        Route::post('/approval/students/{student}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');
+        
+        Route::post('/approval/students/{student}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
+
+
+        // Detail pembayaran per siswa
+        Route::get('/students/{student}/payments', [PaymentController::class, 'show'])->name('payments.student.show');
+        Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
+        Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
+        // batalkan approve iuran bulanan (unapprove)
+        Route::post('/payments/{payment}/unapprove', [PaymentController::class, 'unapprove'])->name('payments.unapprove');
+
 
         // Kelola User
-        // Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
-
-        // Kelola User
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');

@@ -75,48 +75,127 @@
 
         </div>
 
-            <div class="mb-4">
+            <div class="flex justify-end mb-6">
                 <a href="{{ route('users.create') }}"
-                class="flex items-center gap-2 shadow-sm btn-primary">
+                class="flex items-center gap-2 shadow-md btn-primary">
                     <iconify-icon icon="solar:user-plus-bold-duotone" width="20"></iconify-icon>
                     Tambah User
                 </a>
             </div>
 
-            {{-- 🔍 FILTER --}}
-            <form method="GET" class="flex flex-wrap items-center gap-2 mb-4">
+            {{-- FILTER --}}
+            <form method="GET" class="mb-4">
 
-                <input type="text"
-                    name="name"
-                    value="{{ request('name') }}"
-                    placeholder="Cari nama..."
-                    class="input-solid inline-block flex-none w-fit max-w-40 bg-[var(--surface)] rounded-xl py-2.5 px-3">
+                <div class="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
 
-                <select name="role" class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5">
-                    <option value="">Semua Role</option>
-                    <option value="superadmin">Super Admin</option>
-                    <option value="guru">Guru</option>
-                    <option value="orang_tua">Orang Tua</option>
-                    <option value="siswa">Siswa</option>
-                </select>
+                    {{-- ROW 1 MOBILE --}}
+                    <div class="flex gap-2 md:contents">
 
-                <select name="status" class="input-solid max-w-40 w-fit min-w-[150px] bg-[var(--surface)] rounded-xl py-2.5">
-                    {{-- <option value="" {{ $status === '' ? 'selected' : '' }}>Semua Status</option> --}}
-                    <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Aktif</option>
-                    <option value="nonaktif" {{ $status === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                    <option value="deleted" {{ $status === 'deleted' ? 'selected' : '' }}>Dihapus</option>
-                </select>
+                        {{-- SEARCH --}}
+                        <input type="text"
+                            name="name"
+                            value="{{ request('name') }}"
+                            placeholder="Cari nama..."
+                            class="input-solid flex-1 md:flex-none md:w-fit md:max-w-40
+                            bg-[var(--surface)]
+                            rounded-xl
+                            py-2.5 px-3
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            focus:border-[var(--primary)]">
 
-                <button class="btn-outline flex items-center gap-2 rounded-xl py-2.5 border-[var(--border)] hover:bg-[var(--primary-light)] hover:border-[var(--primary)] hover:text-[var(--primary)]">
-                    <iconify-icon icon="solar:filter-bold-duotone" width="20"></iconify-icon>
-                    Filter
-                </button>
+                        {{-- ROLE --}}
+                        <select name="role"
+                            class="input-solid flex-1 md:flex-none md:max-w-40 md:min-w-[150px]
+                            bg-[var(--surface)]
+                            rounded-xl
+                            py-2.5
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            focus:border-[var(--primary)]">
 
-                <!-- Button Clear -->
-                <a href="{{ route('users.index') }}"
-                    class="btn-outline flex items-center justify-center rounded-xl py-2.5 border-[var(--border)] hover:bg-[var(--primary-light)] hover:border-[var(--primary)] hover:text-[var(--primary)]">
-                    <iconify-icon icon="solar:close-circle-bold-duotone" width="22"></iconify-icon>
-                </a>
+                            <option value="">Semua Role</option>
+                            <option value="superadmin">Super Admin</option>
+                            <option value="guru">Guru</option>
+                            <option value="orang_tua">Orang Tua</option>
+                            <option value="siswa">Siswa</option>
+
+                        </select>
+
+                    </div>
+
+                    {{-- ROW 2 MOBILE --}}
+                    <div class="flex gap-2 md:contents">
+
+                        {{-- STATUS --}}
+                        <select name="status"
+                            class="input-solid flex-1 md:flex-none md:max-w-40 md:min-w-[150px]
+                            bg-[var(--surface)]
+                            rounded-xl
+                            py-2.5
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            focus:border-[var(--primary)]">
+
+                            <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>
+                                Aktif
+                            </option>
+
+                            <option value="nonaktif" {{ $status === 'nonaktif' ? 'selected' : '' }}>
+                                Nonaktif
+                            </option>
+
+                            <option value="deleted" {{ $status === 'deleted' ? 'selected' : '' }}>
+                                Dihapus
+                            </option>
+
+                        </select>
+
+                        {{-- FILTER BUTTON --}}
+                        <button
+                            class="btn-outline flex items-center justify-center gap-2
+                            rounded-xl
+                            py-2.5 px-4
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            hover:bg-[var(--primary-light)]
+                            hover:border-[var(--primary)]
+                            hover:text-[var(--primary)]
+                            transition-all duration-200">
+
+                            <iconify-icon
+                                icon="solar:filter-bold-duotone"
+                                width="20">
+                            </iconify-icon>
+
+                            <span class="hidden sm:inline">
+                                Filter
+                            </span>
+
+                        </button>
+
+                        {{-- CLEAR --}}
+                        <a href="{{ route('users.index') }}"
+                            class="btn-outline flex items-center justify-center
+                            rounded-xl
+                            py-2.5 px-3
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            hover:bg-[var(--primary-light)]
+                            hover:border-[var(--primary)]
+                            hover:text-[var(--primary)]
+                            transition-all duration-200">
+
+                            <iconify-icon
+                                icon="solar:close-circle-bold-duotone"
+                                width="22">
+                            </iconify-icon>
+
+                        </a>
+
+                    </div>
+
+                </div>
 
             </form>
 

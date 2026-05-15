@@ -29,9 +29,34 @@
 
             <form method="POST"
                   action="{{ route('learning.subject.update', $subject->id) }}">
-
                 @csrf
                 @method('PUT')
+
+                {{-- HEADER --}}
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-gray-100">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:clipboard-check-linear"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-slate-800">
+                            Edit Mata Pelajaran
+                        </h2>
+
+                        <p class="text-sm text-slate-500">
+                            Perbarui informasi mata pelajaran
+                        </p>
+
+                    </div>
+
+                </div>
 
                 {{-- NAMA --}}
                 <div class="mb-4">

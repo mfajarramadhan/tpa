@@ -28,7 +28,7 @@
         @if($student->reject_reason)
             <div class="p-4 mb-6 border border-red-200 rounded-xl bg-red-50">
                 <p class="mb-1 text-sm font-semibold text-red-600">
-                    Alasan Ditolak
+                    Alasan Penolakan
                 </p>
                 {{ $student->reject_reason }}
             </div>
@@ -95,111 +95,10 @@
                         required>
                 </div>
 
-                {{-- BUKTI PEMBAYARAN --}}
-                <div class="mt-4">
-                    <label class="block mb-1 text-sm font-semibold">Bukti Pembayaran</label>
-
-                    <div class="mb-3">
-
-                        {{-- PREVIEW AREA --}}
-                        <div class="flex flex-col gap-4 mb-4 md:flex-row">
-
-                            {{-- FILE LAMA --}}
-                            @php
-                                $payment = \App\Models\Payment::where('student_id', $student->id)
-                                    ->where('type', 'registration')
-                                    ->first();
-                            @endphp
-
-                            @if($payment && $payment->proof_file)
-
-                                @php
-                                    $proofUrl = asset('storage/' . $payment->proof_file);
-                                    $proofExt = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
-                                @endphp
-
-                                <div>
-
-                                    <p class="mb-2 text-xs font-semibold text-slate-500">
-                                        File Sebelumnya
-                                    </p>
-
-                                    {{-- IMAGE --}}
-                                    @if(in_array($proofExt, ['jpg','jpeg','png']))
-
-                                        <img src="{{ $proofUrl }}"
-                                            onclick="openUploadPreview('image', '{{ $proofUrl }}')"
-                                            class="object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
-
-                                    {{-- PDF --}}
-                                    @elseif($proofExt === 'pdf')
-
-                                        <div
-                                            onclick="openUploadPreview('pdf', '{{ $proofUrl }}')"
-                                            class="flex flex-col items-center justify-center w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
-
-                                            <div class="text-4xl">
-                                                📄
-                                            </div>
-
-                                            <p class="mt-2 text-xs font-semibold text-red-500">
-                                                PDF
-                                            </p>
-
-                                        </div>
-
-                                    @endif
-
-                                </div>
-
-                            @endif
-
-                            {{-- PREVIEW BARU --}}
-                            <div id="preview_proof_wrapper"
-                                class="hidden">
-
-                                <p class="mb-2 text-xs font-semibold text-slate-500">
-                                    Preview Baru
-                                </p>
-
-                                {{-- IMAGE --}}
-                                <img id="preview_proof"
-                                    class="hidden object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md"
-                                    onclick="openUploadPreview('image', this.src)">
-
-                                {{-- PDF --}}
-                                <div id="preview_proof_pdf"
-                                    onclick="openUploadPreview('pdf', this.dataset.src)"
-                                    class="flex-col items-center justify-center hidden w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
-
-                                    <div class="text-4xl">
-                                        📄
-                                    </div>
-
-                                    <p class="mt-2 text-xs font-semibold text-red-500">
-                                        PDF
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    <input type="file" name="payment_proof" required
-                           onchange="previewFile(event, 'proof')"
-                           class="w-full p-2 border rounded-lg">
-
-                    <p class="text-xs text-gray-500">Maksimal ukuran file 2MB</p>
-
-                    @error('payment_proof')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 {{-- KK --}}
                 <div class="mt-4">
-                    <label class="block mb-1 text-sm font-semibold">Upload KK</label>
+                    <label class="block text-sm font-semibold">Kartu Keluarga</label>
+                    <p class="mb-2 text-xs text-gray-500">*Tidak perlu upload ulang jika dokumen sebelumnya sudah sesuai!</p>
 
                     <div class="mb-3">
 
@@ -318,7 +217,8 @@
 
                 {{-- AKTA --}}
                 <div class="mt-4">
-                    <label class="block mb-1 text-sm font-semibold">Upload Akta</label>
+                    <label class="block text-sm font-semibold">Akta Kelahiran</label>
+                    <p class="mb-2 text-xs text-gray-500">*Tidak perlu upload ulang jika dokumen sebelumnya sudah sesuai!</p>
 
                     <div class="mb-3">
 
@@ -412,6 +312,114 @@
                     @enderror
                 </div>
 
+                {{-- INFO BIAYA --}}
+                <div class="p-3 mt-4 text-sm bg-yellow-100 rounded-lg">
+                    <strong>Biaya Pendaftaran:</strong>
+                    Rp {{ number_format($fee->registration_fee) }}
+                </div>
+                
+                {{-- BUKTI PEMBAYARAN --}}
+                <div class="mt-4">
+                    <label class="block mb-1 text-sm font-semibold">Bukti Pembayaran</label>
+
+                    <div class="mb-3">
+
+                        {{-- PREVIEW AREA --}}
+                        <div class="flex flex-col gap-4 mb-4 md:flex-row">
+
+                            {{-- FILE LAMA --}}
+                            @php
+                                $payment = \App\Models\Payment::where('student_id', $student->id)
+                                    ->where('type', 'registration')
+                                    ->first();
+                            @endphp
+
+                            @if($payment && $payment->proof_file)
+
+                                @php
+                                    $proofUrl = asset('storage/' . $payment->proof_file);
+                                    $proofExt = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
+                                @endphp
+
+                                <div>
+
+                                    <p class="mb-2 text-xs font-semibold text-slate-500">
+                                        File Sebelumnya
+                                    </p>
+
+                                    {{-- IMAGE --}}
+                                    @if(in_array($proofExt, ['jpg','jpeg','png']))
+
+                                        <img src="{{ $proofUrl }}"
+                                            onclick="openUploadPreview('image', '{{ $proofUrl }}')"
+                                            class="object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                    {{-- PDF --}}
+                                    @elseif($proofExt === 'pdf')
+
+                                        <div
+                                            onclick="openUploadPreview('pdf', '{{ $proofUrl }}')"
+                                            class="flex flex-col items-center justify-center w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                            <div class="text-4xl">
+                                                📄
+                                            </div>
+
+                                            <p class="mt-2 text-xs font-semibold text-red-500">
+                                                PDF
+                                            </p>
+
+                                        </div>
+
+                                    @endif
+
+                                </div>
+
+                            @endif
+
+                            {{-- PREVIEW BARU --}}
+                            <div id="preview_proof_wrapper"
+                                class="hidden">
+
+                                <p class="mb-2 text-xs font-semibold text-slate-500">
+                                    Preview Baru
+                                </p>
+
+                                {{-- IMAGE --}}
+                                <img id="preview_proof"
+                                    class="hidden object-cover w-32 h-32 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md"
+                                    onclick="openUploadPreview('image', this.src)">
+
+                                {{-- PDF --}}
+                                <div id="preview_proof_pdf"
+                                    onclick="openUploadPreview('pdf', this.dataset.src)"
+                                    class="flex-col items-center justify-center hidden w-32 h-32 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                    <div class="text-4xl">
+                                        📄
+                                    </div>
+
+                                    <p class="mt-2 text-xs font-semibold text-red-500">
+                                        PDF
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    <input type="file" name="payment_proof" required
+                           onchange="previewFile(event, 'proof')"
+                           class="w-full p-2 border rounded-lg">
+
+                    <p class="text-xs text-gray-500">Maksimal ukuran file 2MB</p>
+
+                    @error('payment_proof')
+                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+                
                 <button class="flex items-center gap-2 mt-4 shadow-sm btn-primary">
                     <iconify-icon
                         icon="solar:refresh-bold-duotone"

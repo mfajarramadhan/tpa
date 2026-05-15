@@ -30,8 +30,33 @@
 
             <form method="POST"
                   action="{{ route('learning.classroom.store') }}">
-
                 @csrf
+
+                {{-- HEADER --}}
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-gray-100">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:home-add-linear"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-slate-800">
+                            Tambah Kelas
+                        </h2>
+
+                        <p class="text-sm text-slate-500">
+                            Tambahkan kelas baru
+                        </p>
+
+                    </div>
+
+                </div>
 
                 {{-- NAMA --}}
                 <div class="mb-4">

@@ -7,6 +7,8 @@ use App\Models\Student;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Notifications\SubmissionUploadedNotification;
 
 class SubmissionController extends Controller
 {
@@ -112,20 +114,30 @@ class SubmissionController extends Controller
         }
 
         // update atau create
-        Submission::updateOrCreate(
+        $submission = Submission::updateOrCreate(
             [
                 'material_id' => $material->id,
                 'student_id' => auth()->user()->student->id,
             ],
             [
                 'file_path' => $path,
-                'link' => $link,
-                'status' => 'terkirim'
+                'link' => $request->link,
+                'status' => 'terkirim',
+                'note' => null
             ]
         );
 
+        // Kirim notifikasi ke guru
+        $gurus = User::role('guru')->get();
+        
+        foreach ($gurus as $guru) {
+            $guru->notify(
+                new SubmissionUploadedNotification($submission)
+            );
+        }
+
         return redirect()->route('learning.subject', $material->subject_id)
-            ->with('success', 'Tugas berhasil diupload');
+            ->with('success', 'Tugas berhasil diupload!');
     }
 
     public function destroy(Submission $submission)

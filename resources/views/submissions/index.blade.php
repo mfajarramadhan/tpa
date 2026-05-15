@@ -369,7 +369,7 @@
 
                                     @if($submission && $submission->note)
 
-                                        <div class="max-w-[220px] mx-auto text-xs text-gray-600 line-clamp-3 cursor-help"
+                                        <div class="max-w-[220px] mx-auto text-xs text-gray-600 break-words"
                                             title="{{ $submission->note }}">
 
                                             {{ $submission->note }}

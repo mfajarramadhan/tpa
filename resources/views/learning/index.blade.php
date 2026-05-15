@@ -77,10 +77,10 @@
 
             {{-- TAMBAH KELAS --}}
             @role('superadmin')
-            <div class="mb-4">
+            <div class="flex justify-end mb-6">
 
                 <a href="{{ route('learning.classroom.create') }}"
-                class="flex items-center gap-2 shadow-sm btn-primary">
+                class="flex items-center gap-2 shadow-md btn-primary">
 
                     <iconify-icon
                         icon="solar:add-circle-bold-duotone"
@@ -94,15 +94,15 @@
             </div>
             @endrole
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 
-                @foreach($classrooms as $classroom)
+            @foreach($classrooms as $classroom)
 
                 <div class="relative">
 
                     {{-- CARD --}}
                     <a href="{{ route('learning.classroom', $classroom->id) }}"
-                    class="block p-5 transition-all duration-200 bg-white border-l-4 shadow-sm rounded-2xl border-[var(--primary)] hover:shadow-md hover:-translate-y-0.5">
+                    class="block p-5 transition-all duration-200 bg-surface border border-custom border-l-4 !border-l-[var(--primary)] shadow-sm rounded-2xl hover:shadow-md hover:-translate-y-0.5">
 
                         {{-- HEADER --}}
                         <div class="flex items-start justify-between gap-3 mb-4">
@@ -122,12 +122,12 @@
                                 </div>
 
                                 {{-- TITLE --}}
-                                <h3 class="text-lg font-bold break-words text-slate-800">
+                                <h3 class="text-lg font-bold break-words text-[var(--text-main)]">
                                     {{ $classroom->name }}
                                 </h3>
 
                                 {{-- STATS --}}
-                                <div class="flex items-center gap-2 mt-2 text-xs text-slate-500">
+                                <div class="flex items-center gap-2 mt-2 text-xs text-[var(--text-tertiary)]">
 
                                     <div class="flex items-center gap-1">
 
@@ -151,12 +151,11 @@
                     {{-- DROPDOWN --}}
                     @role('superadmin')
 
-                    <div x-data="{ open: false }"
-                        class="absolute top-4 right-4">
+                    <div x-data="{ open: false }" class="absolute top-4 right-4">
 
                         {{-- BUTTON --}}
                         <button @click.stop="open = !open"
-                                class="flex items-center justify-center transition w-9 h-9 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500">
+                                class="flex items-center justify-center w-9 h-9 transition rounded-xl bg-[var(--bg)] hover:bg-[var(--primary-light)] text-[var(--text-secondary)] border border-custom shadow-sm">
 
                             <iconify-icon
                                 icon="solar:menu-dots-bold"
@@ -169,12 +168,12 @@
                         <div x-show="open"
                             @click.outside="open = false"
                             x-transition
-                            class="absolute right-0 z-50 w-40 mt-2 overflow-hidden bg-white border shadow-lg rounded-xl border-slate-100">
+                            class="absolute right-0 z-50 w-40 mt-2 overflow-hidden border shadow-lg bg-surface border-custom rounded-xl">
 
                             {{-- EDIT --}}
                             <a href="{{ route('learning.classroom.edit', $classroom->id) }}"
                             @click.stop
-                            class="flex items-center gap-2 px-4 py-3 text-sm transition hover:bg-slate-50">
+                            class="flex items-center gap-2 px-4 py-3 text-sm transition text-[var(--text-main)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)]">
 
                                 <iconify-icon
                                     icon="solar:pen-bold-duotone"
@@ -194,7 +193,7 @@
                                 @method('DELETE')
 
                                 <button onclick="return confirm('Yakin hapus kelas ini?')"
-                                        class="flex items-center w-full gap-2 px-4 py-3 text-sm text-left text-red-600 transition hover:bg-red-50">
+                                        class="flex items-center w-full gap-2 px-4 py-3 text-sm text-left text-red-500 transition hover:bg-red-500/10">
 
                                     <iconify-icon
                                         icon="solar:trash-bin-trash-bold-duotone"
@@ -215,7 +214,7 @@
 
                 </div>
 
-                @endforeach
+            @endforeach
 
             </div>
 

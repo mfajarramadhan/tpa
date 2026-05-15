@@ -177,21 +177,6 @@
                                 <div class="p-3 rounded-xl bg-gray-50">
 
                                     <p class="text-xs font-semibold text-slate-500">
-                                        Asal Sekolah
-                                    </p>
-
-                                    <p class="mt-1 font-bold truncate text-slate-800"
-                                    title="{{ $student->school_origin }}">
-
-                                        {{ $student->school_origin }}
-
-                                    </p>
-
-                                </div>
-
-                                <div class="p-3 rounded-xl bg-gray-50">
-
-                                    <p class="text-xs font-semibold text-slate-500">
                                         Kelas di Sekolah
                                     </p>
 
@@ -203,6 +188,34 @@
                                     </p>
 
                                 </div>
+
+                                <div class="hidden p-3 sm:block rounded-xl bg-gray-50">
+
+                                    <p class="text-xs font-semibold text-slate-500">
+                                        Sekolah Asal
+                                    </p>
+
+                                    <p class="mt-1 font-bold truncate text-slate-800"
+                                    title="{{ $student->school_origin }}">
+
+                                        {{ $student->school_origin }}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            {{-- Sekolah Asal --}}
+                            <div class="p-3 mt-3 sm:hidden rounded-xl bg-gray-50">
+
+                                <p class="text-xs font-semibold text-slate-500">
+                                    Sekolah Asal
+                                </p>
+
+                                <p class="mt-1 text-sm font-bold break-words text-slate-800">
+                                    {{ $student->school_origin }}
+                                </p>
 
                             </div>
 
@@ -504,7 +517,7 @@
                 </div>
             @empty
                 <div class="p-6 text-center bg-white shadow-sm rounded-2xl">
-                    Tidak ada data approval
+                    Belum ada data pendaftaran!
                 </div>
             @endforelse
         </div>

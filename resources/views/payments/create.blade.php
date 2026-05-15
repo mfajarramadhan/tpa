@@ -34,7 +34,7 @@
                 <input type="hidden" name="payment_id" value="{{ $payment->id }}">
 
                 {{-- HEADER --}}
-                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-gray-100">
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-custom">
 
                     <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
 
@@ -47,11 +47,11 @@
 
                     <div>
 
-                        <h2 class="text-xl font-bold text-slate-800">
+                        <h2 class="text-xl font-bold text-[var(--text-main)]">
                             Bayar Iuran
                         </h2>
 
-                        <p class="text-sm text-slate-500">
+                        <p class="text-sm text-[var(--text-secondary)]">
                             Upload bukti pembayaran iuran bulanan
                         </p>
 
@@ -60,18 +60,18 @@
                 </div>
 
                 {{-- INFO --}}
-                <div class="p-5 mb-6 border border-gray-100 rounded-2xl bg-gray-50">
+                <div class="p-5 mb-6 border border-custom rounded-2xl bg-[var(--bg)]">
 
                     <div class="grid gap-4 md:text-center md:grid-cols-3">
 
                         {{-- NAMA --}}
                         <div>
 
-                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-slate-500">
+                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-[var(--text-tertiary)]">
                                 Nama Siswa
                             </p>
 
-                            <p class="font-bold text-slate-800">
+                            <p class="font-bold text-[var(--text-main)]">
                                 {{ $payment->student->name }}
                             </p>
 
@@ -80,11 +80,11 @@
                         {{-- BULAN --}}
                         <div>
 
-                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-slate-500">
+                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-[var(--text-tertiary)]">
                                 Bulan
                             </p>
 
-                            <p class="font-bold text-slate-800">
+                            <p class="font-bold text-[var(--text-main)]">
                                 {{ \Carbon\Carbon::createFromFormat('Y-m', $payment->month)->format('F Y') }}
                             </p>
 
@@ -93,11 +93,11 @@
                         {{-- NOMINAL --}}
                         <div>
 
-                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-slate-500">
+                            <p class="mb-1 text-xs font-semibold tracking-wide uppercase text-[var(--text-tertiary)]">
                                 Nominal
                             </p>
 
-                            <p class="font-bold text-slate-800">
+                            <p class="font-bold text-[var(--text-main)]">
                                 Rp {{ number_format($payment->original_amount) }}
                             </p>
 
@@ -114,14 +114,14 @@
                         $ext = strtolower(pathinfo($payment->proof_file, PATHINFO_EXTENSION));
                     @endphp
 
-                    <div class="p-5 mb-6 border border-yellow-200 shadow-sm rounded-2xl bg-yellow-50">
+                    <div class="p-5 mb-6 border shadow-sm rounded-2xl border-yellow-300/40 bg-yellow-500/10">
 
                         {{-- HEADER --}}
                         <div class="flex items-center justify-between gap-4">
 
                             <div>
 
-                                <p class="text-sm font-semibold text-yellow-800">
+                                <p class="text-sm font-semibold text-[var(--text-tertiary)]">
                                     Bukti Pembayaran Sebelumnya
                                 </p>
 
@@ -172,7 +172,7 @@
                         {{-- REJECT NOTE --}}
                         @if($payment->status == 'rejected' && $payment->reject_reason)
 
-                            <div class="p-3 mt-4 border border-red-200 rounded-xl bg-red-50">
+                            <div class="p-3 mt-4 border rounded-xl border-[var(--danger)]/30 bg-[var(--danger-light)]">
 
                                 <p class="text-xs font-semibold text-red-600">
                                     Alasan Penolakan
@@ -201,7 +201,7 @@
                     <div id="preview_proof_wrapper"
                         class="hidden mb-4">
 
-                        <p class="mb-2 text-xs font-semibold text-slate-500">
+                        <p class="mb-2 text-xs font-semibold text-[var(--text-tertiary)]">
                             File Baru
                         </p>
 
@@ -213,7 +213,7 @@
                         {{-- PDF --}}
                         <div id="preview_proof_pdf"
                             onclick="openProofPreview('pdf', this.dataset.src)"
-                            class="flex-col items-center justify-center hidden w-32 h-32 transition bg-red-100 border cursor-pointer rounded-xl hover:scale-105 hover:shadow-md">
+                            class="flex-col items-center justify-center hidden w-32 h-32 transition bg-[var(--danger-light)] border border-[var(--danger)]/20 cursor-pointer rounded-xl hover:scale-105 hover:shadow-md">
 
                             <div class="text-4xl">
                                 📄
@@ -223,7 +223,7 @@
                                 PDF
                             </p>
 
-                            <p class="mt-1 text-[10px] text-gray-500">
+                            <p class="mt-1 text-[10px] text-[var(--text-tertiary)]">
                                 Klik untuk preview
                             </p>
 
@@ -236,9 +236,9 @@
                         name="proof_file"
                         required
                         onchange="previewProof(event)"
-                        class="w-full p-2 border rounded-xl @error('proof_file') border-red-500 @enderror">
+                        class="w-full p-2 border rounded-xl bg-surface border-custom text-[var(--text-main)] @error('proof_file') border-red-500 @enderror">
 
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p class="mt-1 text-xs text-[var(--text-tertiary)]">
                         Maksimal ukuran file 2MB
                     </p>
 
@@ -283,7 +283,7 @@
 
             {{-- PDF --}}
             <iframe id="proofPreviewPdf"
-                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+                class="hidden w-full bg-surface rounded-lg h-[90vh] shadow-2xl">
             </iframe>
 
         </div>

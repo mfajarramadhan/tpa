@@ -20,7 +20,7 @@
 <body class="flex h-screen overflow-x-hidden text-body">
 
     {{-- SIDEBAR --}}
-    @include('layouts.navigation')
+    @include('layouts.sidebar')
 
     {{-- OVERLAY --}}
     <div id="mobile-overlay"

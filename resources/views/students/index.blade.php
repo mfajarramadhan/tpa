@@ -1,11 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">Data Anak</h2>
+        <h2 class="text-xl font-semibold">Kelola Anak</h2>
     </x-slot>
 
     <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
+            {{-- Alert --}}
             <div class="relative">
 
                 {{-- FLOATING ALERT WRAPPER --}}
@@ -72,7 +73,7 @@
 
             </div>
 
-            <div class="mb-4">
+            <div class="flex justify-end mb-6">
                 <a href="{{ route('students.create') }}"
                 class="flex items-center gap-2 shadow-sm btn-primary">
                     <iconify-icon icon="solar:user-plus-bold-duotone" width="20"></iconify-icon>
@@ -137,14 +138,7 @@
                                 {{-- Aksi --}}
                                 <td>
                                     <div class="flex justify-center gap-2">
-
-                                        {{-- Rekap Absensi --}}
-                                        <a href="{{ route('attendance.student', $student->id) }}"
-                                        class="btn-icon bg-[var(--info-light)] text-[var(--info)] hover:bg-[var(--info)] hover:text-white"
-                                        title="Rekap Absensi">
-                                            <iconify-icon icon="solar:calendar-bold-duotone" width="18"></iconify-icon>
-                                        </a>
-
+                                        
                                         {{-- Detail --}}
                                         <a href="{{ route('students.show', $student->id) }}"
                                         class="btn-icon border border-[var(--primary)] hover:border-[var(--primary)]"
@@ -159,18 +153,20 @@
                                             <iconify-icon icon="heroicons:pencil-square" width="18" class="text-[var(--warning-dark)] group-hover:text-white transition"></iconify-icon>                                        
                                         </a>
 
-                                        {{-- Delete --}}
-                                        {{-- <form action="{{ route('students.destroy', $student->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
+                                        {{-- Daftar Ulang (Hanya Jika Ditolak) --}}
+                                        @if($student->status == 'ditolak')
 
-                                            <button onclick="return confirm('Yakin hapus data ini?')"
-                                                class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
-                                                title="Hapus">
-                                                    <iconify-icon icon="heroicons:trash" width="18" class="text-[var(--danger)] group-hover:text-white transition"></iconify-icon>
-                                            </button>
-                                        </form> --}}
+                                            <a href="{{ route('students.reapply', $student->id) }}"
+                                                class="flex items-center gap-2 px-3 text-sm font-medium transition border rounded-lg py-2 justify-center bg-[var(--danger-light)] border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)] hover:text-white group"
+                                                title="Daftar Ulang">
 
+                                                <iconify-icon icon="solar:restart-bold-duotone"
+                                                            width="18"
+                                                            class="text-[var(--danger)] group-hover:text-white transition">
+                                                </iconify-icon>
+                                            </a>
+
+                                        @endif
                                     </div>
                                 </td>
 

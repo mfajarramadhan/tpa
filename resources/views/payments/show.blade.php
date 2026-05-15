@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-6xl py-6 mx-auto">
+    <div class="py-6 mx-auto md:py-0 max-w-7xl">
 
         {{-- ALERT --}}
         <div class="relative">
@@ -74,32 +74,49 @@
 
         </div>
 
+        {{-- BUTTON --}}
+        <div class="mb-6">
+
+            <a href="{{ route('payments.index') }}"
+               class="flex items-center gap-2 shadow-sm btn-primary">
+
+                <iconify-icon
+                    icon="heroicons:arrow-left-20-solid"
+                    width="20">
+                </iconify-icon>
+
+                Kembali
+
+            </a>
+
+        </div>
+
         {{-- TOTAL --}}
         <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
 
+        {{-- Total Dibayar --}}
+        <div class="stat-card" style="border-left-color: var(--primary);">
+            <div class="flex items-start justify-between mb-3">
+                <span class="text-caption">Total Dibayar</span>
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                    <iconify-icon icon="solar:check-circle-bold-duotone" width="18" class="text-[var(--primary)]"></iconify-icon>
+                </div>
+            </div>
+            <div class="text-data text-[var(--primary)]">
+                Rp {{ number_format($totalPaid) }}
+            </div>
+        </div>
+        
         {{-- Total Tunggakan --}}
         <div class="stat-card" style="border-left-color: var(--danger);">
             <div class="flex items-start justify-between mb-3">
-                <span class="text-caption">Total Tunggakan</span>
+                <span class="text-caption">Sisa Tagihan</span>
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
                     <iconify-icon icon="solar:danger-bold-duotone" width="18" class="text-[var(--danger)]"></iconify-icon>
                 </div>
             </div>
             <div class="text-data text-[var(--danger)]">
                 Rp {{ number_format($totalUnpaid) }}
-            </div>
-        </div>
-
-        {{-- Total Dibayar --}}
-        <div class="stat-card" style="border-left-color: var(--success);">
-            <div class="flex items-start justify-between mb-3">
-                <span class="text-caption">Total Dibayar</span>
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--success-light)] text-[var(--success)]">
-                    <iconify-icon icon="solar:check-circle-bold-duotone" width="18" class="text-[var(--success)]"></iconify-icon>
-                </div>
-            </div>
-            <div class="text-data text-[var(--success)]">
-                Rp {{ number_format($totalPaid) }}
             </div>
         </div>
 
@@ -338,7 +355,7 @@
 
                             @if($payment->reject_reason)
 
-                                <p class="text-sm text-[var(--danger)] line-clamp-3 cursor-help"
+                                <p class="text-sm text-[var(--danger)] break-words"
                                 title="{{ $payment->reject_reason }}">
 
                                     {{ $payment->reject_reason }}

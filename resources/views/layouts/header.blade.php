@@ -26,7 +26,7 @@
     {{-- RIGHT: Actions --}}
     <div class="flex items-center gap-3 sm:gap-5">
 
-        {{-- 🔍 Search --}}
+        {{-- Search --}}
         <div class="relative items-center hidden md:flex">
             <iconify-icon icon="solar:magnifier-linear"
                 class="absolute left-3.5 text-[var(--text-tertiary)]"
@@ -37,24 +37,35 @@
                 class="input-solid pl-11 py-2 w-64 rounded-full border-transparent bg-[var(--bg)] focus:bg-surface">
         </div>
 
-        {{-- 🌙 Theme Toggle --}}
+        {{-- Theme Toggle --}}
         <button onclick="toggleTheme()"
             class="btn-icon bg-[var(--bg)] rounded-full hover:bg-[var(--border)]"
             id="theme-toggle">
             <iconify-icon icon="solar:moon-bold-duotone" width="22"></iconify-icon>
         </button>
 
-        {{-- 🔔 Notification --}}
-        <button class="btn-icon relative bg-[var(--bg)] rounded-full hover:bg-[var(--border)]">
+        {{-- Notification --}}
+        <a href="{{ route('notifications.index') }}" class="btn-icon relative bg-[var(--bg)] rounded-full hover:bg-[var(--border)]">
             <iconify-icon icon="solar:bell-bold-duotone" width="22"
                 class="text-[var(--text-main)]"></iconify-icon>
 
             {{-- badge --}}
-            <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-surface"></span>
-        </button>
+            @if(auth()->user()->unreadNotifications->count())
 
-        {{-- 👤 User Dropdown --}}
-        <div class="relative">
+                <span class="absolute top-1 right-1
+                    min-w-[18px] h-[18px]
+                    px-1 text-[10px]
+                    rounded-full bg-red-500 text-white
+                    border-2 border-surface
+                    flex items-center justify-center">
+                    {{ auth()->user()->unreadNotifications->count() }}
+                </span>
+
+            @endif
+        </a>
+
+        {{-- User Dropdown --}}
+        <div class="relative" id="userDropdownWrapper">
             <button onclick="toggleUserDropdown()"
                 class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--bg)] transition">
 
@@ -106,3 +117,25 @@
 
     </div>
 </header>
+<script>
+
+    function toggleUserDropdown() {
+        document
+            .getElementById('userDropdown')
+            .classList
+            .toggle('hidden');
+    }
+
+    document.addEventListener('click', function(e) {
+
+        const wrapper = document.getElementById('userDropdownWrapper');
+
+        const dropdown = document.getElementById('userDropdown');
+
+        if (!wrapper.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+
+    });
+
+</script>
