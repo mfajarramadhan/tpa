@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
             {{-- tombol --}}

@@ -26,7 +26,7 @@
         <div class="p-6 mx-auto max-w-7xl card-panel">
 
             {{-- HEADER --}}
-            <div class="flex items-center gap-3 px-3 pb-5 border-b border-gray-100">
+            <div class="flex items-center gap-3 px-3 pb-5 border-b border-custom">
 
                 <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
                     <iconify-icon 
@@ -36,11 +36,11 @@
                 </div>
 
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800">
+                    <h2 class="text-xl font-bold text-[var(--text-main)]">
                         Detail Anak
                     </h2>
 
-                    <p class="text-sm text-slate-500">
+                    <p class="text-sm text-[var(--text-tertiary)]">
                         Informasi detail anak
                     </p>
                 </div>

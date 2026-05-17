@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
-    public function students()
+    public function show()
     {
         $students = Student::where('status', 'nonaktif')
             ->with(['parent', 'user'])
@@ -20,7 +20,7 @@ class ApprovalController extends Controller
 
         $classrooms = Classroom::withCount('students')->get();
 
-        return view('approval.students', compact('students', 'classrooms'));
+        return view('approval.show', compact('students', 'classrooms'));
     }
 
 

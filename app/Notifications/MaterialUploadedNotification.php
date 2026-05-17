@@ -36,8 +36,8 @@ class MaterialUploadedNotification extends Notification
             'title' =>
 
                 $this->material->is_task
-                    ? 'Tugas Baru'
-                    : 'Materi Baru',
+                    ? 'Tugas Baru!'
+                    : 'Materi Baru!',
 
             'message' =>
 

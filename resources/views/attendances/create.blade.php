@@ -6,6 +6,7 @@
     <div class="py-6 md:py-0">
         <div class="mx-auto max-w-7xl">
 
+            {{-- Alert --}}
             <div class="relative">
 
                 {{-- FLOATING ALERT WRAPPER --}}

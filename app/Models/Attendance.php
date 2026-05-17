@@ -15,7 +15,6 @@ class Attendance extends Model
         'academic_year_id',
         'date',
         'session',
-        'status',
         'created_by'
     ];
 

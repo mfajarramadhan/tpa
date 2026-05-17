@@ -450,11 +450,8 @@ class AttendanceController extends Controller
             $month = $request->month ?? now()->month;
             $year = $request->year ?? now()->year;
 
-            /*
-            =====================================================
-            SISWA
-            =====================================================
-            */
+            // Ambil siswa aktif di kelas saat ini
+            // Alumni / siswa naik kelas history rekap absensi tidak ditampilkan (tersimpan di DB)
             $students = Student::where('classroom_id', $classroomId)
                 ->orderBy('name')
                 ->get();
@@ -541,11 +538,8 @@ class AttendanceController extends Controller
             // filter
             $year = $request->year ?? now()->year;
 
-            /*
-            =====================================================
-            SISWA
-            =====================================================
-            */
+            // Ambil siswa aktif di kelas saat ini
+            // Alumni / siswa naik kelas history rekap absensi tidak ditampilkan (tersimpan di DB)
             $students = Student::where('classroom_id', $classroomId)
                 ->orderBy('name')
                 ->get();

@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('academic_years', function (Blueprint $table) {
 
-        $table->id();
+            $table->id();
 
-        // contoh: 2025/2026
-        $table->string('name', 9);
+            // contoh: 2025/2026
+            $table->string('name', 9);
 
-        // hanya 1 aktif
-        $table->boolean('is_active')
-            ->default(false);
+            // hanya 1 aktif
+            $table->boolean('is_active')
+                ->default(false);
 
-        $table->timestamps();
-    });
+            $table->timestamps();
+        });
     }
 
     /**

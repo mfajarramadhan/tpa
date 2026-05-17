@@ -44,12 +44,12 @@ class LoginRequest extends FormRequest
 
         $login = $this->input('login');
 
-        // cek apakah email atau phone
+        // Cek apakah email atau phone
         $field = filter_var($login, FILTER_VALIDATE_EMAIL)
             ? 'email'
             : 'phone';
 
-        if (! Auth::attempt([
+        if (!Auth::attempt([
             $field => $login,
             'password' => $this->password,
         ], $this->boolean('remember'))) {

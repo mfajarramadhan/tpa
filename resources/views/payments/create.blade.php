@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
+        <x-slot name="header">
         <h2 class="text-xl font-semibold">Bayar Iuran</h2>
     </x-slot>
 

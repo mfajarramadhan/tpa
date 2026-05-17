@@ -75,34 +75,40 @@
                 Iuran Bulanan
             </a>
 
-            <div class="px-4 mt-6 mb-3 text-caption">Approval</div>
+            <div class="px-4 mt-6 mb-3 text-caption">Pendaftaran</div>
             
             <a href="/approval/students"
             class="nav-item {{ request()->is('approval/*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:user-check-bold-duotone"></iconify-icon>
-                Pendaftaran
+                Approval
             </a>
 
             <a href="/students/rejected"
             class="nav-item {{ request()->is('students/rejected') ? 'active' : '' }}">
                 <iconify-icon icon="solar:user-cross-bold-duotone"></iconify-icon>
-                Siswa Ditolak
+                Ditolak
             </a>
 
             <div class="px-4 mt-6 mb-3 text-caption">Akademik</div>
-
-            <a href="{{ route('academic-years.index') }}"
-                class="nav-item {{ request()->is('academic-years*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:calendar-bold-duotone"></iconify-icon>
-                Tahun Akademik
-            </a>
 
             <a href="/learning"
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
                 Pembelajaran
             </a>
+            
+            <a href="{{ route('promotions.index') }}"
+                class="nav-item {{ request()->is('promotions*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:calendar-bold-duotone"></iconify-icon>
+                Kenaikan Kelas
+            </a>
 
+            <a href="{{ route('academic-years.index') }}"
+                class="nav-item {{ request()->is('academic-years*') ? 'active' : '' }}">
+                <iconify-icon icon="solar:calendar-bold-duotone"></iconify-icon>
+                Tahun Akademik
+            </a>
+        
             <div class="px-4 mt-6 mb-3 text-caption">Pengaturan</div>
 
             <a href="/fees"

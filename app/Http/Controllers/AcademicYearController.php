@@ -37,7 +37,7 @@ class AcademicYearController extends Controller
                 'regex:/^\d{4}\/\d{4}$/'
             ]
         ], [
-            'name.regex' => 'Format tahun akademik harus 2025/2026'
+            'name.regex' => 'Format tidak sesuai! (Contoh: 2026/2027)'
         ]);
 
         // VALIDASI TAHUN BERURUTAN CONTOH: 2025/2026
@@ -46,7 +46,7 @@ class AcademicYearController extends Controller
         if ((int)$endYear !== ((int)$startYear + 1)) {
 
             return back()->withErrors([
-                'name' => 'Tahun akademik harus berurutan'
+                'name' => 'Tahun akademik harus berurutan! (Contoh: 2026/2027)'
             ])->withInput();
         }
 
@@ -56,8 +56,61 @@ class AcademicYearController extends Controller
 
         return back()->with(
             'success',
-            'Tahun akademik berhasil ditambahkan'
+            'Tahun akademik berhasil ditambahkan!'
         );
+    }
+
+
+    /*
+    =====================================================
+    EDIT
+    =====================================================
+    */
+    public function edit(AcademicYear $academicYear)
+    {
+        return view(
+            'academic-years.edit',
+            compact('academicYear')
+        );
+    }
+
+
+    /*
+    =====================================================
+    UPDATE
+    =====================================================
+    */
+    public function update(Request $request, AcademicYear $academicYear)
+    {
+        $request->validate([
+            'name' => [
+                'required',
+                'unique:academic_years,name,' . $academicYear->id,
+                'regex:/^\d{4}\/\d{4}$/'
+            ]
+        ], [
+            'name.regex' => 'Format tidak sesuai! (Contoh: 2026/2027)'
+        ]);
+
+        // Validasi tahun berurutan
+        [$startYear, $endYear] = explode('/', $request->name);
+
+        if ((int)$endYear !== ((int)$startYear + 1)) {
+
+            return back()->withErrors([
+                'name' => 'Tahun akademik harus berurutan! (Contoh: 2026/2027)'
+            ])->withInput();
+        }
+
+        $academicYear->update([
+            'name' => $request->name
+        ]);
+
+        return redirect()->route('academic-years.index')
+            ->with(
+                'success',
+                'Tahun akademik berhasil diperbarui!'
+            );
     }
 
     /*
@@ -79,31 +132,7 @@ class AcademicYearController extends Controller
 
         return back()->with(
             'success',
-            'Tahun akademik aktif berhasil diubah'
-        );
-    }
-
-    /*
-    =====================================================
-    DELETE
-    =====================================================
-    */
-    public function destroy(AcademicYear $academicYear)
-    {
-        // jangan hapus yg aktif
-        if ($academicYear->is_active) {
-
-            return back()->with(
-                'error',
-                'Tahun akademik aktif tidak bisa dihapus'
-            );
-        }
-
-        $academicYear->delete();
-
-        return back()->with(
-            'success',
-            'Tahun akademik berhasil dihapus'
+            'Tahun akademik aktif berhasil diperbarui!'
         );
     }
 }

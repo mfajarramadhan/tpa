@@ -20,10 +20,10 @@ class Material extends Model
         'is_task',
     ];
 
-    public function class()
-    {
-        return $this->belongsTo(Classroom::class);
-    }
+    // public function class()
+    // {
+    //     return $this->belongsTo(Classroom::class);
+    // }
 
     public function creator()
     {

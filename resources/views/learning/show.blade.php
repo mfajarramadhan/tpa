@@ -5,6 +5,73 @@
         </h2>
     </x-slot>
 
+    {{-- Alert --}}
+    <div class="relative">
+
+        {{-- FLOATING ALERT WRAPPER --}}
+        <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
+
+            {{-- SUCCESS --}}
+            @if(session('success'))
+            <div
+                x-data="{ show: true }"
+                x-show="show"
+                x-init="setTimeout(() => show = false, 3000)"
+                @click.outside="show = false"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 -translate-y-3"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0 -translate-y-2"
+                class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                    bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
+                    bg-opacity-80 backdrop-blur-sm">
+
+                <div class="text-sm font-semibold ms-2">
+                    {{ session('success') }}
+                </div>
+
+                <button @click="show = false"
+                    class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                    ✕
+                </button>
+            </div>
+            @endif
+
+
+            {{-- ERROR --}}
+            @if(session('error'))
+            <div
+                x-data="{ show: true }"
+                x-show="show"
+                x-init="setTimeout(() => show = false, 3000)"
+                @click.outside="show = false"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 -translate-y-3"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0 -translate-y-2"
+                class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                    bg-gradient-to-t from-[var(--danger)] to-red-400 
+                    bg-opacity-80 backdrop-blur-sm">
+
+                <div class="text-sm font-semibold ms-2">
+                    {{ session('error') }}
+                </div>
+
+                <button @click="show = false"
+                    class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                    ✕
+                </button>
+            </div>
+            @endif
+
+        </div>
+
+    </div>
+
     <div class="py-6 md:py-0">
         <div class="flex items-center justify-between mb-6">
 
@@ -37,72 +104,6 @@
         </div>
         
         <div class="mx-auto space-y-6 max-w-7xl">
-            {{-- Alert --}}
-            <div class="relative">
-
-                {{-- FLOATING ALERT WRAPPER --}}
-                <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
-
-                    {{-- SUCCESS --}}
-                    @if(session('success'))
-                    <div
-                        x-data="{ show: true }"
-                        x-show="show"
-                        x-init="setTimeout(() => show = false, 3000)"
-                        @click.outside="show = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 -translate-y-3"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
-                            bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
-                            bg-opacity-80 backdrop-blur-sm">
-
-                        <div class="text-sm font-semibold ms-2">
-                            {{ session('success') }}
-                        </div>
-
-                        <button @click="show = false"
-                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
-                            ✕
-                        </button>
-                    </div>
-                    @endif
-
-
-                    {{-- ERROR --}}
-                    @if(session('error'))
-                    <div
-                        x-data="{ show: true }"
-                        x-show="show"
-                        x-init="setTimeout(() => show = false, 3000)"
-                        @click.outside="show = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 -translate-y-3"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0 -translate-y-2"
-                        class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
-                            bg-gradient-to-t from-[var(--danger)] to-red-400 
-                            bg-opacity-80 backdrop-blur-sm">
-
-                        <div class="text-sm font-semibold ms-2">
-                            {{ session('error') }}
-                        </div>
-
-                        <button @click="show = false"
-                            class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
-                            ✕
-                        </button>
-                    </div>
-                    @endif
-
-                </div>
-
-            </div>
 
             {{-- EMPTY --}}
             @if($subject->materials->isEmpty())

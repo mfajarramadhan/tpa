@@ -11,6 +11,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\SubmissionController;
@@ -93,7 +94,7 @@ Route::middleware('auth')->group(function () {
     // Khusus Superadmin
     Route::middleware('role:superadmin')->group(function () {
         // Approval Siswa Baru
-        Route::get('/approval/students', [ApprovalController::class, 'students'])->name('approval.students');
+        Route::get('/approval/students', [ApprovalController::class, 'show'])->name('approval.show');
         Route::post('/approval/students/{student}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');
         
         Route::post('/approval/students/{student}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
@@ -121,6 +122,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{user}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
 
 
+        // Kenaikan Kelas 
+        Route::get('/promotions',[PromotionController::class,'index'])->name('promotions.index');
+        Route::get('/promotions/{classroom}',[PromotionController::class,'show'])->name('promotions.show');
+        Route::post('/promotions/{classroom}',[PromotionController::class,'process'])->name('promotions.process');
+
+        
         // Pengaturan Biaya
         Route::get('/fees', [FeeController::class, 'index'])->name('fees.index');
         // Fees = Kenaikan biaya
@@ -130,7 +137,7 @@ Route::middleware('auth')->group(function () {
 
 
         // Route Tahun Akademik
-        Route::resource('academic-years', AcademicYearController::class);
+        Route::resource('academic-years', AcademicYearController::class)->except('destroy');
         Route::post('/academic-years/{academicYear}/set-active', [AcademicYearController::class, 'setActive'])->name('academic-years.setActive');
     });
 

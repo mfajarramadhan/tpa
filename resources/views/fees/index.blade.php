@@ -6,7 +6,7 @@
     <div class="flex flex-col py-6 overflow-hidden shadow-sm card-panel md:py-0">
 
         {{-- HEADER --}}
-        <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
+        <div class="flex items-center gap-3 px-6 py-5 border-b border-custom">
 
             <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
 
@@ -19,7 +19,7 @@
 
             <div>
 
-                <h2 class="text-xl font-bold text-slate-800">
+                <h2 class="text-xl font-bold text-[var(--text-main)]">
                     Biaya Default
                 </h2>
 
