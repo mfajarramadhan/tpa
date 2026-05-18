@@ -264,11 +264,18 @@
                                         {{-- APPROVE --}}
                                         <form method="POST"
                                             action="{{ route('payments.approve', $payment->id) }}"
-                                            onsubmit="return confirm('Yakin ingin menyetujui pembayaran ini?')">
+                                            onsubmit="confirmAction(
+                                                event,
+                                                'Setujui Pembayaran?',
+                                                'Pembayaran akan ditandai lunas',
+                                                'Ya, Setujui',
+                                                'success'
+                                            )">
 
                                             @csrf
 
-                                            <button class="btn-icon group bg-[var(--success-light)] border border-[var(--success)] hover:bg-[var(--success)]"
+                                            <button type="submit" 
+                                                    class="btn-icon group bg-[var(--success-light)] border border-[var(--success)] hover:bg-[var(--success)]"
                                                     title="Approve">
 
                                                 <iconify-icon icon="lets-icons:check-fill"
@@ -308,7 +315,14 @@
                                             </h3>
 
                                             <form method="POST"
-                                                action="{{ route('payments.reject', $payment->id) }}">
+                                                action="{{ route('payments.reject', $payment->id) }}"
+                                                onsubmit="confirmAction(
+                                                    event,
+                                                    'Tolak Pembayaran?',
+                                                    'Pembayaran akan ditolak',
+                                                    'Ya, Tolak',
+                                                    'warning'
+                                                )">
 
                                                 @csrf
 
@@ -326,7 +340,8 @@
                                                         Batal
                                                     </button>
 
-                                                    <button class="btn-primary bg-[var(--danger)] hover:bg-red-700">
+                                                    <button type="submit" 
+                                                            class="btn-primary bg-[var(--danger)] hover:bg-red-700">
                                                         Kirim
                                                     </button>
 
@@ -378,6 +393,93 @@
                 </tbody>
 
             </table>
+            {{-- Pagination --}}
+            @if($payments->hasPages())
+
+                <div class="flex items-center justify-between p-5 border-t border-[var(--border-light)] bg-[var(--surface)]">
+
+                    {{-- Info --}}
+                    <div class="text-sm font-medium text-[var(--text-tertiary)]">
+
+                        Menampilkan
+                        {{ $payments->firstItem() ?? 0 }}
+                        -
+                        {{ $payments->lastItem() ?? 0 }}
+
+                        dari
+
+                        {{ $payments->total() }}
+
+                        data
+
+                    </div>
+
+                    {{-- Button --}}
+                    <div class="flex gap-2">
+
+                        {{-- Prev --}}
+                        @if($payments->onFirstPage())
+
+                            <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                &laquo; Prev
+                            </span>
+
+                        @else
+
+                            <a href="{{ $payments->previousPageUrl() }}"
+                            class="px-3 py-1.5 text-sm border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                &laquo; Prev
+
+                            </a>
+
+                        @endif
+
+                        {{-- Number --}}
+                        @foreach($payments->getUrlRange(1, $payments->lastPage()) as $page => $url)
+
+                            @if($page == $payments->currentPage())
+
+                                <span class="px-3.5 py-1.5 text-sm shadow-md btn-primary">
+                                    {{ $page }}
+                                </span>
+
+                            @else
+
+                                <a href="{{ $url }}"
+                                class="px-3.5 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                    {{ $page }}
+
+                                </a>
+
+                            @endif
+
+                        @endforeach
+
+                        {{-- Next --}}
+                        @if($payments->hasMorePages())
+
+                            <a href="{{ $payments->nextPageUrl() }}"
+                            class="px-3 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                Next &raquo;
+
+                            </a>
+
+                        @else
+
+                            <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                Next &raquo;
+                            </span>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+            @endif
         </div>
 
     </div>

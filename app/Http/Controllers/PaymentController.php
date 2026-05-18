@@ -10,6 +10,8 @@ use App\Notifications\PaymentApprovedNotification;
 use App\Notifications\PaymentRejectedNotification;
 use App\Notifications\PaymentUploadedNotification;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;  
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -55,47 +57,61 @@ class PaymentController extends Controller
             });
         }
 
-        // AMBIL DATA
-        $payments = $query->orderBy('month', 'asc')->get();
         // KHUSUS ORANG TUA → ambil daftar anak
         $students = collect();
         $selectedStudent = null;
 
         if ($user->hasRole('orang_tua')) {
 
-            $students = Student::where('parent_id', $user->id)->where('status', 'aktif')->get();
+            $students = Student::where('parent_id', $user->id)
+                ->where('status', 'aktif')
+                ->get();
 
             // pilih anak dari query (?student_id=)
-            $selectedStudent = $students->firstWhere('id', request('student_id'));
+            $selectedStudent = $students->firstWhere(
+                'id',
+                request('student_id')
+            );
 
             // default pilih anak pertama
             if (!$selectedStudent && $students->count()) {
+
                 $selectedStudent = $students->first();
             }
 
-            // filter payment berdasarkan anak terpilih
+            // FILTER QUERY
             if ($selectedStudent) {
-                $payments = $payments->where('student_id', $selectedStudent->id)->values();
+
+                $query->where(
+                    'student_id',
+                    $selectedStudent->id
+                );
             }
         }
+
+        // AMBIL DATA
+        $payments = $query->latest('month')->paginate(10)->withQueryString();
 
         // KHUSUS SUPERADMIN CEK KESELURUHAN TAGIHAN
         $studentsSummary = collect();
 
         if ($user->hasRole('superadmin')) {
 
-            $studentsSummary = Student::with(['parent', 'classroom'])
+            $studentsSummary = Student::with([
+                    'parent',
+                    'classroom'
+                ])
                 ->where('status', 'aktif')
                 ->get()
                 ->map(function ($student) {
 
-                    $payments = $student->payments()
+                    $studentPayments = $student->payments()
                         ->where('type', 'monthly')
                         ->get();
 
-                    $totalTagihan = $payments->sum('original_amount');
+                    $totalTagihan = $studentPayments->sum('original_amount');
 
-                    $totalDibayar = $payments
+                    $totalDibayar = $studentPayments
                         ->where('status', 'paid')
                         ->sum('original_amount');
 
@@ -104,12 +120,12 @@ class PaymentController extends Controller
                     $status = 'Belum Bayar';
 
                     // cek kondisi penting
-                    $menungguKonfirmasi = $payments
+                    $menungguKonfirmasi = $studentPayments
                         ->where('status', '!=', 'paid')
                         ->whereNotNull('proof_file')
                         ->count() > 0;
 
-                    $belumBayar = $payments
+                    $belumBayar = $studentPayments
                         ->where('status', 'pending')
                         ->whereNull('proof_file')
                         ->count() > 0;
@@ -158,15 +174,44 @@ class PaymentController extends Controller
                     ['sisa_tagihan', 'desc']
                 ])
                 ->values();
+
+                $page = request()->get('summary_page', 1);
+
+                $perPage = 10;
+
+                $studentsSummary = new LengthAwarePaginator(
+
+                    $studentsSummary->forPage($page, $perPage),
+
+                    $studentsSummary->count(),
+
+                    $perPage,
+
+                    $page,
+
+                    [
+                        'path' => request()->url(),
+
+                        'pageName' => 'summary_page',
+
+                        'query' => request()->query()
+                    ]
+                );
         }
 
-        $totalTagihan = $payments->sum('original_amount');
+        $pagePayments = collect($payments->items());
 
-        $totalPaid = $payments
+        $totalTagihan = $pagePayments
+            ->sum('original_amount');
+
+        $totalPaid = $pagePayments
             ->where('status', 'paid')
             ->sum('original_amount');
 
-        $totalUnpaid = max(0, $totalTagihan - $totalPaid);
+        $totalUnpaid = max(
+            0,
+            $totalTagihan - $totalPaid
+        );
             
         $allPayments = Payment::where('type', 'monthly')->get();
 
@@ -186,7 +231,7 @@ class PaymentController extends Controller
             'studentsSummary',
             'totalTagihanAll',
             'totalDibayarAll',
-            'sisaTagihanAll'
+            'sisaTagihanAll',
         ));
     }
 
@@ -277,17 +322,21 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        //  hanya monthly (untuk iuran)
+        // hanya monthly (untuk iuran)
         $payments = Payment::where('student_id', $id)
-        ->where('type', 'monthly')
-        ->orderBy('month', 'asc')
-        ->get();
+            ->where('type', 'monthly')
+            ->latest('month')
+            ->paginate(10)
+            ->withQueryString();
 
-        // TOTAL TAGIHAN (SEMUA)
-        $totalTagihan = $payments->sum('original_amount');
+        $pagePayments = collect($payments->items());
+
+        // TOTAL TAGIHAN
+        $totalTagihan = $pagePayments
+            ->sum('original_amount');
 
         // TOTAL DIBAYAR
-        $totalPaid = $payments
+        $totalPaid = $pagePayments
             ->where('status', 'paid')
             ->sum('original_amount');
 

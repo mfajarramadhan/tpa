@@ -40,7 +40,7 @@ class SubmissionUploadedNotification extends Notification
 
                 ' - '  .
 
-                $this->submission->material->class->name .
+                $this->submission->material->subject->classroom->name .
 
                 ' telah mengumpulkan tugas "' .
 

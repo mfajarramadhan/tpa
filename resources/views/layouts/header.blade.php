@@ -50,7 +50,7 @@
                 class="text-[var(--text-main)]"></iconify-icon>
 
             {{-- badge --}}
-            @if(auth()->user()->unreadNotifications->count())
+            @if(auth()->user()->unreadNotifications()->count())
 
                 <span class="absolute top-1 right-1
                     min-w-[18px] h-[18px]
@@ -58,7 +58,7 @@
                     rounded-full bg-red-500 text-white
                     border-2 border-surface
                     flex items-center justify-center">
-                    {{ auth()->user()->unreadNotifications->count() }}
+                    {{ auth()->user()->unreadNotifications()->count() }}
                 </span>
 
             @endif

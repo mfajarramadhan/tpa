@@ -187,12 +187,19 @@
                             {{-- DELETE --}}
                             <form method="POST"
                                 action="{{ route('learning.classroom.destroy', $classroom->id) }}"
-                                @click.stop>
+                                @click.stop
+                                onsubmit="confirmAction(
+                                    event,
+                                    'Hapus Kelas?',
+                                    'Data kelas akan dihapus permanen',
+                                    'Ya, Hapus',
+                                    'error'
+                                )">
 
                                 @csrf
                                 @method('DELETE')
 
-                                <button onclick="return confirm('Yakin hapus kelas ini?')"
+                                <button type="submit"
                                         class="flex items-center w-full gap-2 px-4 py-3 text-sm text-left text-red-500 transition hover:bg-red-500/10">
 
                                     <iconify-icon

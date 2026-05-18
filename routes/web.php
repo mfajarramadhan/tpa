@@ -37,11 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
 
-    // Route daftar ulang
-    Route::get('/students/rejected', [ApprovalController::class, 'rejected'])->name('students.rejected');
     // Route Siswa
     Route::resource('students', StudentController::class);
-    // Route Approval
+    // Route daftar ulang
     Route::get('/students/{student}/reapply', [StudentController::class, 'reapply'])->name('students.reapply');
     Route::post('/students/{student}/reapply', [StudentController::class, 'submitReapply'])->name('students.reapply.submit');
 
@@ -93,12 +91,15 @@ Route::middleware('auth')->group(function () {
 
     // Khusus Superadmin
     Route::middleware('role:superadmin')->group(function () {
-        // Approval Siswa Baru
-        Route::get('/approval/students', [ApprovalController::class, 'show'])->name('approval.show');
-        Route::post('/approval/students/{student}/approve', [ApprovalController::class, 'approveStudent'])->name('approval.students.approve');
+        // Rejected
+        Route::get('/approval/students/rejected',[ApprovalController::class,'rejected'])->name('approval.students.rejected');
+        Route::get('/approval/students/rejected/{student}',[ApprovalController::class,'showRejected'])->name('approval.students.rejected.show');
+        // Approval siswa baru
+        Route::get('/approval/students',[ApprovalController::class,'index'])->name('approval.students.index');
+        Route::get('/approval/students/{student}',[ApprovalController::class,'show'])->name('approval.students.show');
+        Route::post('/approval/students/{student}/approve',[ApprovalController::class,'approveStudent'])->name('approval.students.approve');
+        Route::post('/approval/students/{student}/reject',[ApprovalController::class,'rejectStudent'])->name('approval.students.reject');
         
-        Route::post('/approval/students/{student}/reject', [ApprovalController::class, 'rejectStudent'])->name('approval.students.reject');
-
 
         // Detail pembayaran per siswa
         Route::get('/students/{student}/payments', [PaymentController::class, 'show'])->name('payments.student.show');
@@ -127,7 +128,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/promotions/{classroom}',[PromotionController::class,'show'])->name('promotions.show');
         Route::post('/promotions/{classroom}',[PromotionController::class,'process'])->name('promotions.process');
 
-        
+
         // Pengaturan Biaya
         Route::get('/fees', [FeeController::class, 'index'])->name('fees.index');
         // Fees = Kenaikan biaya

@@ -7,6 +7,22 @@
     </x-slot>
 
     <div class="py-6 md:py-0">
+
+        {{-- BACK BUTTON --}}
+        <div class="mb-6">
+            <a href="{{ route('promotions.index') }}"
+            class="flex items-center gap-2 shadow-sm btn-primary">
+
+                <iconify-icon
+                    icon="heroicons:arrow-left-20-solid"
+                    width="20">
+                </iconify-icon>
+
+                Kembali
+
+            </a>
+        </div> 
+        
         <div class="mx-auto max-w-7xl">
 
             {{-- INFO --}}
@@ -94,7 +110,14 @@
             @if($students->count() > 0)
 
             <form method="POST"
-                action="{{ route('promotions.process', $classroom->id) }}">
+                action="{{ route('promotions.process', $classroom->id) }}"
+                onsubmit="confirmAction(
+                    event,
+                    'Proses Kenaikan Kelas?',
+                    'Data kenaikan kelas siswa akan diproses',
+                    'Ya, Proses',
+                    'question'
+                )">
 
                 @csrf
 
@@ -194,7 +217,7 @@
                 {{-- SUBMIT --}}
                 <div class="mt-4">
 
-                    <button class="btn-primary">
+                    <button type="submit" class="btn-primary">
 
                         @if($nextClass == 'Alumni')
 

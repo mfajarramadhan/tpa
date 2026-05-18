@@ -45,7 +45,7 @@ class PaymentApprovedNotification extends Notification
 
                     . $this->payment->student->name .
 
-                    ' berhasil disetujui.',
+                    ' berhasil disetujui!',
 
                 'payment_id' => $this->payment->id
 

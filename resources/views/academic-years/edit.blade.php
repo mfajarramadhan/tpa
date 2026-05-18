@@ -31,7 +31,14 @@
             <div class="p-6 border shadow-sm bg-surface border-custom rounded-2xl">
 
                 <form method="POST"
-                    action="{{ route('academic-years.update', $academicYear->id) }}">
+                    action="{{ route('academic-years.update', $academicYear->id) }}"
+                    onsubmit="confirmAction(
+                        event,
+                        'Update Tahun Akademik?',
+                        'Perubahan tahun akademik akan disimpan',
+                        'Ya, Update',
+                        'question'
+                    )">
                     @csrf
                     @method('PUT')
 
@@ -88,7 +95,8 @@
                     {{-- BUTTON --}}
                     <div class="mt-6">
 
-                        <button class="shadow-sm btn-primary">
+                        <button type="submit"
+                                class="shadow-sm btn-primary">
                             Update
                         </button>
 

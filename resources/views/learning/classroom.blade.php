@@ -220,12 +220,19 @@
                         {{-- DELETE --}}
                         <form method="POST"
                             action="{{ route('learning.subject.destroy', $subject->id) }}"
-                            @click.stop>
+                            @click.stop
+                            onsubmit="confirmAction(
+                                event,
+                                'Hapus Mata Pelajaran?',
+                                'Data mata pelajaran akan dihapus permanen',
+                                'Ya, Hapus',
+                                'error'
+                            )">
 
                             @csrf
                             @method('DELETE')
 
-                            <button onclick="return confirm('Yakin hapus mapel ini?')"
+                            <button type="submit"
                                     class="flex items-center w-full gap-2 px-4 py-3 text-sm text-left text-red-500 transition hover:bg-red-500/10">
 
                                 <iconify-icon

@@ -24,7 +24,17 @@
         
         <div class="p-6 mx-auto max-w-7xl card-panel">
 
-            <form method="POST" action="{{ route('students.store') }}" enctype="multipart/form-data">
+            <form method="POST"
+                action="{{ route('students.store') }}"
+                enctype="multipart/form-data"
+                onsubmit="confirmAction(
+                    event,
+                    'Tambah Anak?',
+                    'Data pendaftaran akan diverifikasi oleh admin',
+                    'Ya, Tambah',
+                    'question'
+                )">
+                
                 @csrf
 
                 {{-- HEADER --}}
@@ -46,7 +56,7 @@
                         </h2>
 
                         <p class="text-sm text-[var(--text-tertiary)]">
-                            Daftarkan anak baru
+                            Daftarkan anak anda sebagai siswa
                         </p>
 
                     </div>
@@ -297,7 +307,8 @@
 
                 {{-- BUTTON --}}
                 <div class="mt-6">
-                    <button class="shadow-sm btn-primary">
+                    <button type="submit"
+                            class="shadow-sm btn-primary">
                         Simpan
                     </button>
                 </div>

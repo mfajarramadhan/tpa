@@ -26,7 +26,15 @@
 
             <form method="POST"
                 action="{{ route('materials.update', $material->id) }}"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data"
+                onsubmit="confirmAction(
+                    event,
+                    'Update Materi/Tugas?',
+                    'Perubahan materi atau tugas akan disimpan',
+                    'Ya, Update',
+                    'question'
+                )">
+                
                 @csrf
                 @method('PUT')
 
@@ -288,7 +296,8 @@
                 </div>
 
                 {{-- BUTTON --}}
-                <button class="shadow-sm btn-primary">
+                <button type="submit"
+                        class="shadow-sm btn-primary">
 
                     <iconify-icon
                         icon="solar:diskette-bold-duotone"

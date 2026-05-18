@@ -26,7 +26,15 @@
 
             <form method="POST"
                 action="{{ route('materials.store') }}"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data"
+                onsubmit="confirmAction(
+                    event,
+                    'Tambah Materi/Tugas?',
+                    'Materi atau tugas baru akan ditambahkan',
+                    'Ya, Tambah',
+                    'question'
+                )">
+                
                 @csrf
 
                 {{-- HEADER --}}
@@ -193,7 +201,8 @@
                 </div>
 
                 {{-- BUTTON --}}
-                <button class="shadow-sm btn-primary">
+                <button type="submit"
+                        class="shadow-sm btn-primary">
 
                     <iconify-icon
                         icon="solar:diskette-bold-duotone"

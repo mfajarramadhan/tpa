@@ -24,13 +24,15 @@
 
         </div>
 
-        {{-- ALERT --}}
+        {{-- Alasan Penolakan --}}
         @if($student->reject_reason)
-            <div class="p-4 mb-6 border border-red-200 rounded-xl bg-red-50">
-                <p class="mb-1 text-sm font-semibold text-red-600">
+            <div class="p-4 mb-6 border rounded-xl bg-red-500/15 border-red-500/20">
+                <p class="mb-1 text-sm font-semibold text-red-500">
                     Alasan Penolakan
                 </p>
-                {{ $student->reject_reason }}
+                <div class="text-sm text-[var(--text-main)]">
+                    {{ $student->reject_reason }}
+                </div>
             </div>
         @endif
 
@@ -38,9 +40,42 @@
 
             <form method="POST"
                 action="{{ route('students.reapply.submit', $student->id) }}"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data"
+                onsubmit="confirmAction(
+                    event,
+                    'Kirim Daftar Ulang?',
+                    'Data pendaftaran akan diverifikasi oleh admin',
+                    'Ya, Kirim',
+                    'question'
+                )">
 
                 @csrf
+
+                {{-- HEADER --}}
+                <div class="flex items-center gap-3 px-0 pb-5 mb-6 border-b border-custom">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:user-plus-bold-duotone"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-[var(--text-main)]">
+                            Daftar Ulang
+                        </h2>
+
+                        <p class="text-sm text-[var(--text-tertiary)]">
+                            Perbaiki data & daftar ulang
+                        </p>
+
+                    </div>
+
+                </div>
 
                 {{-- NAMA --}}
                 <div class="mb-3">
@@ -420,7 +455,8 @@
                     @enderror
                 </div>
                 
-                <button class="flex items-center gap-2 mt-4 shadow-sm btn-primary">
+                <button type="submit"
+                        class="flex items-center gap-2 mt-4 shadow-sm btn-primary">
                     <iconify-icon
                         icon="solar:refresh-bold-duotone"
                         width="20">

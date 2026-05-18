@@ -81,7 +81,14 @@
             <div class="p-5 mb-6 border shadow-sm bg-surface border-custom rounded-2xl">
 
                 <form method="POST"
-                    action="{{ route('academic-years.store') }}">
+                    action="{{ route('academic-years.store') }}"
+                    onsubmit="confirmAction(
+                        event,
+                        'Tambah Tahun Akademik?',
+                        'Tahun akademik baru akan ditambahkan',
+                        'Ya, Tambah',
+                        'question'
+                    )">
 
                     @csrf
 
@@ -129,7 +136,8 @@
                                     ? 'border-red-500'
                                     : 'border-[var(--border)] focus:border-[var(--primary)]' }}">
 
-                            <button class="shadow-sm btn-primary">
+                            <button type="submit" 
+                                    class="shadow-sm btn-primary">
 
                                 <iconify-icon
                                     icon="solar:add-circle-bold-duotone"
@@ -234,11 +242,19 @@
                                         @if(!$year->is_active)
 
                                             <form method="POST"
-                                                action="{{ route('academic-years.setActive', $year->id) }}">
+                                                action="{{ route('academic-years.setActive', $year->id) }}"
+                                                onsubmit="confirmAction(
+                                                    event,
+                                                    'Aktifkan Tahun Akademik?',
+                                                    'Tahun akademik aktif sebelumnya akan diganti',
+                                                    'Ya, Aktifkan',
+                                                    'question'
+                                                )">
 
                                                 @csrf
 
-                                                <button class="flex items-center gap-1 px-3 py-2 text-xs shadow-sm rounded-lg transition bg-[var(--primary-light)] border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white">
+                                                <button type="submit"
+                                                        class="flex items-center gap-1 px-3 py-2 text-xs shadow-sm rounded-lg transition bg-[var(--primary-light)] border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white">
 
                                                     <iconify-icon
                                                         icon="solar:check-circle-bold-duotone"

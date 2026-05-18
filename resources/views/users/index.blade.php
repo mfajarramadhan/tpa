@@ -283,11 +283,19 @@
                                             </a>
 
                                             {{-- DELETE --}}
-                                            <form method="POST" action="{{ route('users.destroy', $user->id) }}">
+                                            <form method="POST" 
+                                                action="{{ route('users.destroy', $user->id) }}" 
+                                                onsubmit="confirmAction(
+                                                    event,
+                                                    'Hapus User?',
+                                                    'Data user akan dihapus permanen',
+                                                    'Ya, Hapus',
+                                                    'warning'
+                                                )">
                                                 @csrf
                                                 @method('DELETE')
 
-                                                <button onclick="return confirm('Yakin hapus user?')"
+                                                <button type="submit"
                                                         title="Hapus" class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]">
                                                     <iconify-icon icon="heroicons:trash"
                                                                   class="text-[var(--danger)] group-hover:text-white"></iconify-icon>
@@ -296,22 +304,40 @@
 
                                         @else
 
-                                            {{-- RESTORE --}}
-                                            <form method="POST" action="{{ route('users.restore', $user->id) }}">
+                                            <form method="POST"
+                                                action="{{ route('users.restore', $user->id) }}"
+                                                onsubmit="confirmAction(
+                                                    event,
+                                                    'Pulihkan User?',
+                                                    'User akan diaktifkan kembali',
+                                                    'Ya, Pulihkan',
+                                                    'question'
+                                                )">
+
                                                 @csrf
 
-                                                <button class="group btn-icon bg-[var(--info-light)] border border-[var(--info)] hover:bg-[var(--info)]">
+                                                <button type="submit"
+                                                    class="group btn-icon bg-[var(--info-light)] border border-[var(--info)] hover:bg-[var(--info)]">
                                                     <iconify-icon icon="solar:restart-bold"
                                                                   class="text-[var(--info)] group-hover:text-white"></iconify-icon>
                                                 </button>
                                             </form>
 
                                             {{-- FORCE DELETE --}}
-                                            <form method="POST" action="{{ route('users.forceDelete', $user->id) }}">
-                                                @csrf
-                                                @method('DELETE')
+                                            <form method="POST"
+                                                    action="{{ route('users.forceDelete', $user->id) }}"
+                                                    onsubmit="confirmAction(
+                                                        event,
+                                                        'Hapus Permanen?',
+                                                        'Data tidak dapat dikembalikan setelah dihapus',
+                                                        'Ya, Hapus',
+                                                        'error'
+                                                    )">
 
-                                                <button onclick="return confirm('Hapus permanen?')"
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit"
                                                         class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]">
                                                     <iconify-icon icon="heroicons:trash"
                                                                   class="text-[var(--danger)] group-hover:text-white"></iconify-icon>
@@ -334,6 +360,93 @@
                     </tbody>
 
                 </table>
+                {{-- Pagination --}}
+                @if($users->hasPages())
+
+                    <div class="flex items-center justify-between p-5 border-t border-[var(--border-light)] bg-[var(--surface)]">
+
+                        {{-- Info --}}
+                        <div class="text-sm font-medium text-[var(--text-tertiary)]">
+
+                            Menampilkan
+                            {{ $users->firstItem() ?? 0 }}
+                            -
+                            {{ $users->lastItem() ?? 0 }}
+
+                            dari
+
+                            {{ $users->total() }}
+
+                            data
+
+                        </div>
+
+                        {{-- Button --}}
+                        <div class="flex gap-2">
+
+                            {{-- Prev --}}
+                            @if($users->onFirstPage())
+
+                                <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                    &laquo; Prev
+                                </span>
+
+                            @else
+
+                                <a href="{{ $users->previousPageUrl() }}"
+                                class="px-3 py-1.5 text-sm border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                    &laquo; Prev
+
+                                </a>
+
+                            @endif
+
+                            {{-- Number --}}
+                            @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+
+                                @if($page == $users->currentPage())
+
+                                    <span class="px-3.5 py-1.5 text-sm shadow-md btn-primary">
+                                        {{ $page }}
+                                    </span>
+
+                                @else
+
+                                    <a href="{{ $url }}"
+                                    class="px-3.5 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                        {{ $page }}
+
+                                    </a>
+
+                                @endif
+
+                            @endforeach
+
+                            {{-- Next --}}
+                            @if($users->hasMorePages())
+
+                                <a href="{{ $users->nextPageUrl() }}"
+                                class="px-3 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                    Next &raquo;
+
+                                </a>
+
+                            @else
+
+                                <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                    Next &raquo;
+                                </span>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                @endif
             </div>
 
         </div>

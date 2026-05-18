@@ -77,16 +77,16 @@
             {{-- Cek ada tagihan atau tidak --}}
             @if($selectedStudent)
                 @php
-                    $payments = $selectedStudent->payments->where('type', 'monthly');
+                    $studentPayments = $selectedStudent->payments->where('type', 'monthly');
 
                     // tagihan normal (belum bayar)
-                    $hasUnpaidNormal = $payments
+                    $hasUnpaidNormal = $studentPayments
                         ->where('status', 'pending')
                         ->whereNull('proof_file')
                         ->count() > 0;
 
                     // ada yang ditolak
-                    $hasRejected = $payments
+                    $hasRejected = $studentPayments
                         ->where('status', 'rejected')
                         ->count() > 0;
                 @endphp
@@ -419,6 +419,93 @@
                             @endforeach
                         </tbody>
                     </table>
+                    {{-- Pagination --}}
+                    @if($studentsSummary->hasPages())
+
+                        <div class="flex items-center justify-between p-5 border-t border-[var(--border-light)] bg-[var(--surface)]">
+
+                            {{-- Info --}}
+                            <div class="text-sm font-medium text-[var(--text-tertiary)]">
+
+                                Menampilkan
+                                {{ $studentsSummary->firstItem() ?? 0 }}
+                                -
+                                {{ $studentsSummary->lastItem() ?? 0 }}
+
+                                dari
+
+                                {{ $studentsSummary->total() }}
+
+                                data
+
+                            </div>
+
+                            {{-- Button --}}
+                            <div class="flex gap-2">
+
+                                {{-- Prev --}}
+                                @if($studentsSummary->onFirstPage())
+
+                                    <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                        &laquo; Prev
+                                    </span>
+
+                                @else
+
+                                    <a href="{{ $studentsSummary->previousPageUrl() }}"
+                                    class="px-3 py-1.5 text-sm border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                        &laquo; Prev
+
+                                    </a>
+
+                                @endif
+
+                                {{-- Number --}}
+                                @foreach($studentsSummary->getUrlRange(1, $studentsSummary->lastPage()) as $page => $url)
+
+                                    @if($page == $studentsSummary->currentPage())
+
+                                        <span class="px-3.5 py-1.5 text-sm shadow-md btn-primary">
+                                            {{ $page }}
+                                        </span>
+
+                                    @else
+
+                                        <a href="{{ $url }}"
+                                        class="px-3.5 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                            {{ $page }}
+
+                                        </a>
+
+                                    @endif
+
+                                @endforeach
+
+                                {{-- Next --}}
+                                @if($studentsSummary->hasMorePages())
+
+                                    <a href="{{ $studentsSummary->nextPageUrl() }}"
+                                    class="px-3 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                        Next &raquo;
+
+                                    </a>
+
+                                @else
+
+                                    <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                        Next &raquo;
+                                    </span>
+
+                                @endif
+
+                            </div>
+
+                        </div>
+
+                    @endif
                 </div>
             </div>
 
@@ -441,7 +528,7 @@
 
                             <th class="w-[22%]">Tanggal Bayar</th>
 
-                            <th class="w-[14%] text-center">Aksi</th>
+                            <th class="w-[14%] !text-center">Aksi</th>
                         </tr>
                     </thead>
 
@@ -593,14 +680,21 @@
                             <td class="text-right">
                                 <div class="text-small">Tagihan</div>
                                 <div class="font-semibold text-[var(--text-main)]">
-                                    Rp {{ number_format($payments->sum('original_amount')) }}
+                                    Rp {{ number_format(
+                                        $payments->getCollection()
+                                            ->sum('original_amount')
+                                    ) }}
                                 </div>
                             </td>
 
                             <td>
                                 <div class="text-small text-[var(--success)]">Dibayar</div>
                                 <div class="font-semibold text-[var(--success)]">
-                                    Rp {{ number_format($payments->where('status','paid')->sum('original_amount')) }}
+                                    Rp {{ number_format(
+                                        $payments->getCollection()
+                                            ->where('status', 'paid')
+                                            ->sum('original_amount')
+                                    ) }}
                                 </div>
                             </td>
 
@@ -610,6 +704,93 @@
                     </tfoot>
 
                 </table>
+                {{-- Pagination --}}
+                @if($payments->hasPages())
+
+                    <div class="flex items-center justify-between p-5 border-t border-[var(--border-light)] bg-[var(--surface)]">
+
+                        {{-- Info --}}
+                        <div class="text-sm font-medium text-[var(--text-tertiary)]">
+
+                            Menampilkan
+                            {{ $payments->firstItem() ?? 0 }}
+                            -
+                            {{ $payments->lastItem() ?? 0 }}
+
+                            dari
+
+                            {{ $payments->total() }}
+
+                            data
+
+                        </div>
+
+                        {{-- Button --}}
+                        <div class="flex gap-2">
+
+                            {{-- Prev --}}
+                            @if($payments->onFirstPage())
+
+                                <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                    &laquo; Prev
+                                </span>
+
+                            @else
+
+                                <a href="{{ $payments->previousPageUrl() }}"
+                                class="px-3 py-1.5 text-sm border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                    &laquo; Prev
+
+                                </a>
+
+                            @endif
+
+                            {{-- Number --}}
+                            @foreach($payments->getUrlRange(1, $payments->lastPage()) as $page => $url)
+
+                                @if($page == $payments->currentPage())
+
+                                    <span class="px-3.5 py-1.5 text-sm shadow-md btn-primary">
+                                        {{ $page }}
+                                    </span>
+
+                                @else
+
+                                    <a href="{{ $url }}"
+                                    class="px-3.5 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                        {{ $page }}
+
+                                    </a>
+
+                                @endif
+
+                            @endforeach
+
+                            {{-- Next --}}
+                            @if($payments->hasMorePages())
+
+                                <a href="{{ $payments->nextPageUrl() }}"
+                                class="px-3 py-1.5 text-sm font-medium border-transparent btn-outline hover:bg-[var(--border-light)]">
+
+                                    Next &raquo;
+
+                                </a>
+
+                            @else
+
+                                <span class="px-3 py-1.5 text-sm opacity-50 cursor-not-allowed btn-outline">
+                                    Next &raquo;
+                                </span>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                @endif
                 @endrole("orang_tua")
             </div>
 

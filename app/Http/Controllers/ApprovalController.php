@@ -9,18 +9,35 @@ use App\Models\Student;
 use App\Notifications\PaymentApprovedNotification;
 use App\Notifications\PaymentRejectedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class ApprovalController extends Controller
 {
-    public function show()
+    public function index()
     {
         $students = Student::where('status', 'nonaktif')
             ->with(['parent', 'user'])
-            ->get();
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
 
         $classrooms = Classroom::withCount('students')->get();
 
-        return view('approval.show', compact('students', 'classrooms'));
+        return view('approval.index', compact('students', 'classrooms'));
+    }
+
+
+    public function show(Student $student)
+    {
+        $classrooms = Classroom::withCount('students')->get();
+
+        return view(
+            'approval.show',
+            compact(
+                'student',
+                'classrooms'
+            )
+        );
     }
 
 
@@ -68,7 +85,7 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Pendaftaran berhasil disetujui! Siswa terdaftar kedalam kelas');
+        return redirect()->route('approval.students.index')->with('success', 'Pendaftaran berhasil disetujui! Siswa terdaftar kedalam kelas');
     }
 
 
@@ -113,16 +130,32 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Pendaftaran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
+        return redirect()->route('approval.students.index')->with('success', 'Pendaftaran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
     }
 
     public function rejected()
     {
         $students = Student::where('status', 'ditolak')
-            ->with('parent')
+            ->with(['parent', 'user'])
             ->latest()
             ->get();
 
-        return view('students.rejected', compact('students'));
+        return view(
+            'approval.rejected',
+            compact('students')
+        );
+    }
+
+    public function showRejected(Student $student)
+    {
+        $classrooms = Classroom::withCount('students')->get();
+
+        return view(
+            'approval.show-rejected',
+            compact(
+                'student',
+                'classrooms'
+            )
+        );
     }
 }

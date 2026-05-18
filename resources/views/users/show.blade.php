@@ -7,7 +7,7 @@
 
     <div class="py-6 md:py-0">
 
-        {{-- BUTTON --}}
+        {{-- BACK BUTTON --}}
         <div class="mb-6">
 
             <a href="{{ route('users.index') }}"

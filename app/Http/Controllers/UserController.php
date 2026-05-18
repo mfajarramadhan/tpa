@@ -31,15 +31,7 @@ class UserController extends Controller
             });
         }
 
-        // 🔥 filter status
-        // if ($status === 'deleted') {
-        //     $query->onlyTrashed();
-        // } elseif ($status === 'active') {
-        //     $query->whereNull('deleted_at');
-        // }
-        // kalau kosong "" → semua
-
-        $status = request('status', 'aktif'); // 🔥 DEFAULT AKTIF
+        $status = request('status', 'aktif'); // DEFAULT AKTIF
 
         if ($status === 'deleted') {
             $query->onlyTrashed();
@@ -49,7 +41,7 @@ class UserController extends Controller
             $query->where('status', 'nonaktif')->whereNull('deleted_at');
         }
 
-        $users = $query->with('roles')->latest()->get();
+        $users = $query->with('roles')->latest()->paginate(10)->withQueryString();
 
         return view('users.index', compact('users', 'status'));
     }
@@ -306,7 +298,7 @@ class UserController extends Controller
 
         return back()->with(
             'success',
-            'User berhasil dikembalikan'
+            'User berhasil dipulihkan!'
         );
     }
 }

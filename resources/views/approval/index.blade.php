@@ -1,6 +1,9 @@
 <x-app-layout>
+
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">Kelola Anak</h2>
+        <h2 class="text-xl font-semibold">
+            Approval Siswa Baru
+        </h2>
     </x-slot>
 
     <div class="py-6 md:py-0">
@@ -73,111 +76,146 @@
 
             </div>
 
-            <div class="flex justify-end mb-6">
-                <a href="{{ route('students.create') }}"
-                class="flex items-center gap-2 shadow-sm btn-primary">
-                    <iconify-icon icon="solar:user-plus-bold-duotone" width="20"></iconify-icon>
-                    Tambah Anak
-                </a>
-            </div>
-
             <div class="overflow-x-auto card-panel">
+
                 <table class="w-full text-sm table-custom">
 
                     <thead>
+
                         <tr>
-                            <th class="w-[36%]">Nama</th>
-                            <th class="w-[36%]">Email</th>
-                            <th class="w-[14%]">Status</th>
-                            <th class="w-[14%] !text-center">Aksi</th>
+
+                            <th class="w-[32%]">
+                                Nama
+                            </th>
+
+                            <th class="w-[24%]">
+                                Asal Sekolah
+                            </th>
+
+                            <th class="w-[20%]">
+                                Tanggal Lahir
+                            </th>
+
+                            <th class="w-[14%]">
+                                Status
+                            </th>
+
+                            <th class="w-[10%] !text-center">
+                                Aksi
+                            </th>
+
                         </tr>
+
                     </thead>
 
                     <tbody>
+
                         @forelse($students as $student)
+
                             <tr>
 
                                 @php
                                     $initial = strtoupper(substr($student->name, 0, 2));
                                 @endphp
 
+                                {{-- NAMA --}}
                                 <td>
+
                                     <div class="flex items-center gap-4">
 
-                                        {{-- Avatar Inisial --}}
+                                        {{-- AVATAR --}}
                                         <div class="w-10 h-10 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center font-bold text-sm border border-[var(--primary-light)]">
+
                                             {{ $initial }}
+
                                         </div>
 
-                                        {{-- Nama + Info kecil --}}
+                                        {{-- INFO --}}
                                         <div>
+
                                             <div class="font-semibold text-[var(--text-main)]">
                                                 {{ $student->name }}
                                             </div>
+
                                             <div class="text-xs text-[var(--text-tertiary)] mt-0.5">
-                                                {{ $student->classroom->name ?? '-' }}
+
+                                                {{ $student->school_grade }}
+
                                             </div>
+
                                         </div>
 
                                     </div>
+
                                 </td>
 
-                                {{-- Asal Sekolah --}}
+                                {{-- ASAL SEKOLAH --}}
                                 <td class="text-small">
-                                    {{ $student->user->email ?? '-' }}
+
+                                    {{ $student->school_origin }}
+
                                 </td>
 
-                                {{-- Status --}}
+                                {{-- TANGGAL LAHIR --}}
+                                <td class="text-small">
+
+                                    {{ \Carbon\Carbon::parse($student->birth_date)->translatedFormat('d F Y') }}
+
+                                </td>
+
+                                {{-- STATUS --}}
                                 <td>
-                                    <span class="badge {{ $student->status == 'aktif' ? 'badge-success' : 'badge-info' }}">
-                                        <iconify-icon icon="{{ $student->status == 'aktif' ? 'solar:check-circle-bold-duotone' : 'solar:info-circle-bold-duotone' }}"></iconify-icon>
-                                        {{ $student->status }}
+
+                                    <span class="badge badge-warning">
+
+                                        <iconify-icon
+                                            icon="solar:clock-circle-bold-duotone">
+                                        </iconify-icon>
+
+                                        Pending
+
                                     </span>
+
                                 </td>
 
-                                {{-- Aksi --}}
+                                {{-- AKSI --}}
                                 <td>
-                                    <div class="flex justify-center gap-2">
-                                        
-                                        {{-- Detail --}}
-                                        <a href="{{ route('students.show', $student->id) }}"
-                                        class="btn-icon border border-[var(--primary)] hover:border-[var(--primary)]"
-                                        title="Detail">
-                                            <iconify-icon icon="solar:eye-bold-duotone" width="18" class="text-[var(--primary)]"></iconify-icon>
+
+                                    <div class="flex justify-center">
+
+                                        <a href="{{ route('approval.students.show', $student->id) }}"
+                                            class="btn-icon border border-[var(--primary)] hover:border-[var(--primary)]"
+                                            title="Detail">
+
+                                            <iconify-icon
+                                                icon="solar:eye-bold-duotone"
+                                                width="18"
+                                                class="text-[var(--primary)]">
+                                            </iconify-icon>
+
                                         </a>
 
-                                        {{-- Edit --}}
-                                        <a href="{{ route('students.edit', $student->id) }}"
-                                        class="btn-icon group bg-[var(--warning-light)] border border-[var(--warning-dark)] hover:bg-[var(--warning-dark)]"
-                                        title="Edit">
-                                            <iconify-icon icon="heroicons:pencil-square" width="18" class="text-[var(--warning-dark)] group-hover:text-white transition"></iconify-icon>                                        
-                                        </a>
-
-                                        {{-- Daftar Ulang (Hanya Jika Ditolak) --}}
-                                        @if($student->status == 'ditolak')
-
-                                            <a href="{{ route('students.reapply', $student->id) }}"
-                                                class="flex items-center gap-2 px-3 text-sm font-medium transition border rounded-lg py-2 justify-center bg-[var(--danger-light)] border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)] hover:text-white group"
-                                                title="Daftar Ulang">
-
-                                                <iconify-icon icon="solar:restart-bold-duotone"
-                                                            width="18"
-                                                            class="text-[var(--danger)] group-hover:text-white transition">
-                                                </iconify-icon>
-                                            </a>
-
-                                        @endif
                                     </div>
+
                                 </td>
 
                             </tr>
+
                         @empty
+
                             <tr>
-                                <td colspan="4" class="py-6 text-center text-small">
-                                    Belum ada data
+
+                                <td colspan="5"
+                                    class="py-6 text-center text-small">
+
+                                    Belum ada pendaftaran siswa baru
+
                                 </td>
+
                             </tr>
+
                         @endforelse
+
                     </tbody>
 
                 </table>
@@ -272,4 +310,5 @@
 
         </div>
     </div>
+
 </x-app-layout>

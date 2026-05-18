@@ -53,7 +53,15 @@
 
             </div>
 
-            <form method="POST" action="{{ route('users.update', $user->id) }}">
+            <form method="POST"
+                action="{{ route('users.update', $user->id) }}"
+                onsubmit="confirmAction(
+                    event,
+                    'Update User?',
+                    'Perubahan data user akan disimpan',
+                    'Ya, Update',
+                    'question'
+                )">
                 @csrf
                 @method('PUT')
 
@@ -587,7 +595,8 @@
                 {{-- BUTTON --}}
                 <div class="mt-8">
 
-                    <button class="shadow-sm btn-primary">
+                    <button type="submit" 
+                            class="shadow-sm btn-primary">
                         Update
                     </button>
 

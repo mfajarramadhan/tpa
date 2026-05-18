@@ -15,6 +15,7 @@
     <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="flex h-screen overflow-x-hidden text-body">
@@ -41,5 +42,46 @@
     </main>
 
 </body>
+
+<script>
+
+    function confirmAction(
+        event,
+        title = 'Yakin?',
+        text = 'Aksi ini tidak dapat dibatalkan',
+        confirmText = 'Ya',
+        icon = 'warning'
+    ) {
+
+        event.preventDefault();
+
+        Swal.fire({
+
+            title: title,
+
+            text: text,
+
+            icon: icon,
+
+            showCancelButton: true,
+
+            confirmButtonText: confirmText,
+
+            cancelButtonText: 'Batal',
+
+            reverseButtons: true
+
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                event.target.submit();
+
+            }
+
+        });
+    }
+
+</script>
 </html>
 

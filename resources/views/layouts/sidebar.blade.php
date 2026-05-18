@@ -78,13 +78,13 @@
             <div class="px-4 mt-6 mb-3 text-caption">Pendaftaran</div>
             
             <a href="/approval/students"
-            class="nav-item {{ request()->is('approval/*') ? 'active' : '' }}">
+            class="nav-item {{ request()->is('approval/students') || request()->is('approval/students/*') && !request()->is('approval/students/rejected*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:user-check-bold-duotone"></iconify-icon>
                 Approval
             </a>
 
-            <a href="/students/rejected"
-            class="nav-item {{ request()->is('students/rejected') ? 'active' : '' }}">
+            <a href="/approval/students/rejected"
+            class="nav-item {{ request()->is('approval/students/rejected*') ? 'active' : '' }}">
                 <iconify-icon icon="solar:user-cross-bold-duotone"></iconify-icon>
                 Ditolak
             </a>

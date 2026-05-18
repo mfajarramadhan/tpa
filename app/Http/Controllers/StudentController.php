@@ -23,7 +23,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Auth::user()->students()->with('classroom')->latest()->get();
+        $students = Auth::user()->students()->with('classroom')->latest()->paginate(10)->withQueryString();
 
         return view('students.index', compact('students'));
     }
@@ -126,7 +126,7 @@ class StudentController extends Controller
             );
         }
 
-        return redirect()->route('students.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Anak berhasil didaftarkan! Menunggu persetujuan admin.');
     }
 

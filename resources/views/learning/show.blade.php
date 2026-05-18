@@ -141,7 +141,13 @@
                         {{-- DELETE --}}
                         <form method="POST"
                             action="{{ route('materials.destroy', $material->id) }}"
-                            onsubmit="return confirm('Yakin hapus materi?')">
+                            onsubmit="confirmAction(
+                                event,
+                                'Hapus Materi?',
+                                'Materi atau tugas akan dihapus permanen',
+                                'Ya, Hapus',
+                                'error'
+                            )">
 
                             @csrf
                             @method('DELETE')
@@ -389,7 +395,26 @@
                                         <div class="mt-4">
 
                                             {{-- CLICKABLE CARD --}}
-                                            <div onclick="window.open('{{ $fileUrl }}')"
+                                            <div
+
+                                                @if($mySubmission->file_path)
+
+                                                    @if(in_array($ext, ['jpg','jpeg','png']))
+
+                                                        onclick="openPreviewModal('image', '{{ $fileUrl }}')"
+
+                                                    @elseif($ext == 'pdf')
+
+                                                        onclick="openPreviewModal('pdf', '{{ $fileUrl }}')"
+
+                                                    @endif
+
+                                                @elseif($mySubmission->link)
+
+                                                    onclick="window.open('{{ $mySubmission->link }}', '_blank')"
+
+                                                @endif
+
                                                 class="flex items-center justify-between p-3 transition cursor-pointer rounded-xl border border-custom bg-[var(--bg)] hover:bg-[var(--primary-light)]">
 
                                                 <div class="flex items-center gap-3">
@@ -503,7 +528,12 @@
 
                                             <a href="{{ route('materials.submissions', $material->id) }}"
                                             onclick="event.stopPropagation()"
-                                            class="px-3 py-1 text-xs text-white transition rounded-lg shadow-sm bg-[var(--primary)] hover:opacity-90">
+                                            class="flex items-center gap-2 shadow-sm btn-primary">
+
+                                                <iconify-icon
+                                                    icon="solar:clipboard-check-bold-duotone"
+                                                    width="20">
+                                                </iconify-icon>
 
                                                 Lihat Tugas
 
@@ -526,7 +556,8 @@
     
     {{-- ================= UNIVERSAL PREVIEW MODAL ================= --}}
     <div id="previewModal"
-        class="fixed inset-0 z-50 items-center justify-center hidden bg-black/80 backdrop-blur-sm">
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm">
 
         {{-- CLOSE --}}
         <button onclick="closePreviewModal()"
@@ -543,7 +574,7 @@
 
             {{-- PDF --}}
             <iframe id="previewPdf"
-                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+                class="hidden w-full bg-surface rounded-lg h-[90vh] shadow-2xl">
             </iframe>
 
             {{-- YOUTUBE --}}
@@ -580,44 +611,58 @@
 
         // IMAGE
         if (type === 'image') {
+
             image.src = src;
             image.classList.remove('hidden');
+
         }
 
         // PDF
         if (type === 'pdf') {
+
             pdf.src = src;
             pdf.classList.remove('hidden');
+
         }
 
         // YOUTUBE
         if (type === 'youtube') {
+
             yt.src = `https://www.youtube.com/embed/${src}?autoplay=1`;
+
             ytWrap.classList.remove('hidden');
+
         }
 
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.style.display = 'flex';
+
     }
 
     function closePreviewModal() {
 
         const modal = document.getElementById('previewModal');
 
+        // reset youtube
         document.getElementById('previewYoutube').src = '';
 
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        // reset pdf
+        document.getElementById('previewPdf').src = '';
+
+        modal.style.display = 'none';
+
     }
 
     // klik backdrop
-    document.getElementById('previewModal').addEventListener('click', function(e) {
+    document.getElementById('previewModal')
+        .addEventListener('click', function(e) {
 
-        if (e.target.id === 'previewModal') {
-            closePreviewModal();
-        }
+            if (e.target.id === 'previewModal') {
 
-    });
+                closePreviewModal();
+
+            }
+
+        });
 
     function toggleMaterial(id) {
 

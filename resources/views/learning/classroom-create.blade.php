@@ -29,7 +29,15 @@
         <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST"
-                  action="{{ route('learning.classroom.store') }}">
+                action="{{ route('learning.classroom.store') }}"
+                onsubmit="confirmAction(
+                    event,
+                    'Tambah Kelas?',
+                    'Kelas baru akan ditambahkan ke sistem',
+                    'Ya, Tambah',
+                    'question'
+                )">
+                
                 @csrf
 
                 {{-- HEADER --}}
@@ -84,7 +92,8 @@
                 {{-- BUTTON --}}
                 <div class="mt-6">
 
-                    <button class="shadow-sm btn-primary">
+                    <button type="submit"
+                            class="shadow-sm btn-primary">
 
                         <div class="flex items-center gap-2">
 

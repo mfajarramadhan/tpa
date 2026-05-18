@@ -28,7 +28,15 @@
         <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST"
-                  action="{{ route('learning.subject.update', $subject->id) }}">
+                action="{{ route('learning.subject.update', $subject->id) }}"
+                onsubmit="confirmAction(
+                    event,
+                    'Update Mata Pelajaran?',
+                    'Perubahan mata pelajaran akan disimpan',
+                    'Ya, Update',
+                    'question'
+                )">
+                
                 @csrf
                 @method('PUT')
 
@@ -122,7 +130,8 @@
                 {{-- BUTTON --}}
                 <div class="mt-6">
 
-                    <button class="shadow-sm btn-primary">
+                    <button type="submit"
+                            class="shadow-sm btn-primary">
                         Update
                     </button>
 

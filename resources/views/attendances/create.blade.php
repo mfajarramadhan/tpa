@@ -119,7 +119,15 @@
 
             {{-- FORM ABSENSI --}}
             @if($classroom->students->count() > 0)
-            <form method="POST" action="{{ route('attendances.store') }}">
+            <form method="POST"
+                action="{{ route('attendances.store') }}"
+                onsubmit="confirmAction(
+                    event,
+                    'Simpan Absensi?',
+                    'Data absensi siswa akan disimpan',
+                    'Ya, Simpan',
+                    'success'
+                )">
                 @csrf
 
                 <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
@@ -217,7 +225,8 @@
 
                 {{-- SUBMIT --}}
                 <div class="mt-4">
-                    <button class="btn-primary" type="submit">
+                    <button type="submit"
+                            class="btn-primary">
                         Simpan Absensi
                     </button>
                 </div>

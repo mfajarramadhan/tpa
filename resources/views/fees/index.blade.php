@@ -30,7 +30,15 @@
         <!-- Form -->
         <div class="p-5 space-y-4">
 
-            <form method="POST" action="{{ route('fees.update') }}">
+            <form method="POST"
+                action="{{ route('fees.update') }}"
+                onsubmit="confirmAction(
+                    event,
+                    'Update Biaya?',
+                    'Perubahan biaya akan disimpan',
+                    'Ya, Update',
+                    'question'
+                )">
                 @csrf
 
                 <!-- Biaya Pendaftaran -->

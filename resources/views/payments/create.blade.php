@@ -21,12 +21,31 @@
             </a>
 
         </div>
+
+        {{-- Alasan Penolakan --}}
+        @if($payment->status == 'rejected' && $payment->reject_reason)
+            <div class="p-4 mb-6 border rounded-xl bg-red-500/15 border-red-500/20">
+                <p class="mb-1 text-sm font-semibold text-red-500">
+                    Alasan Penolakan
+                </p>
+                <div class="text-sm text-[var(--text-main)]">
+                    {{ $payment->reject_reason }}
+                </div>
+            </div>
+        @endif
         
         <div class="p-6 mx-auto max-w-7xl card-panel">
 
             <form method="POST"
                 action="{{ route('payments.store') }}"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data"
+                onsubmit="confirmAction(
+                    event,
+                    'Kirim Pembayaran?',
+                    'Bukti pembayaran akan diverifikasi admin!',
+                    'Ya, Kirim',
+                    'question'
+                )">
 
                 @csrf
 
@@ -169,23 +188,6 @@
 
                         </div>
 
-                        {{-- REJECT NOTE --}}
-                        @if($payment->status == 'rejected' && $payment->reject_reason)
-
-                            <div class="p-3 mt-4 border rounded-xl border-[var(--danger)]/30 bg-[var(--danger-light)]">
-
-                                <p class="text-xs font-semibold text-red-600">
-                                    Alasan Penolakan
-                                </p>
-
-                                <p class="mt-1 text-sm text-red-500">
-                                    {{ $payment->reject_reason }}
-                                </p>
-
-                            </div>
-
-                        @endif
-
                     </div>
 
                 @endif
@@ -253,7 +255,8 @@
                 {{-- BUTTON --}}
                 <div class="mt-6">
 
-                    <button class="shadow-sm btn-primary">
+                    <button type="submit" 
+                            class="shadow-sm btn-primary">
                         Upload Bukti
                     </button>
 
