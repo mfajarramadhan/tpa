@@ -2,7 +2,7 @@
 
     <x-slot name="header">
         <h2 class="text-xl font-semibold">
-            Approval Siswa Baru
+            Approval Pendaftaran
         </h2>
     </x-slot>
 

@@ -41,7 +41,7 @@ class ApprovalController extends Controller
     }
 
 
-    // Pendaftaran disetujui
+    // pendaftaran disetujui
     public function approveStudent(Request $request, Student $student)
     {
          $request->validate([
@@ -53,17 +53,17 @@ class ApprovalController extends Controller
             ->where('type', 'registration')
             ->first();
 
-        // kalau belum upload bukti
+        // error kalau belum upload bukti
         if (!$payment || !$payment->proof_file) {
             return back()->with('error', 'Bukti pembayaran belum diupload');
         }
 
-        // SET PAYMENT JADI PAID
+        // set status payment jadi paid
         $payment->update([
             'status' => 'paid'
         ]);
 
-        // Kirim notifikasi ke orangtua siswa
+        // kirim notifikasi ke orangtua siswa
         $parent = $student->parent;
 
         if ($parent) {
@@ -72,13 +72,13 @@ class ApprovalController extends Controller
             );
         }
 
-        // update siswa di table student
+        // update status siswa di table student
         $student->update([
             'status' => 'aktif',
             'classroom_id' => $request->classroom_id
         ]);
 
-        // update user siswa juga di table user
+        // update status siswa di table user juga 
         if ($student->user) {
             $student->user->update([
                 'status' => 'aktif'

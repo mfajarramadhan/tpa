@@ -38,13 +38,38 @@ class LoginRequest extends FormRequest
      *
      * @throws ValidationException
      */
+    // public function authenticate(): void
+    // {
+    //     $this->ensureIsNotRateLimited();
+
+    //     $login = $this->input('login');
+
+    //     // Cek apakah email atau phone
+    //     $field = filter_var($login, FILTER_VALIDATE_EMAIL)
+    //         ? 'email'
+    //         : 'phone';
+
+    //     if (!Auth::attempt([
+    //         $field => $login,
+    //         'password' => $this->password,
+    //     ], $this->boolean('remember'))) {
+
+    //         RateLimiter::hit($this->throttleKey());
+
+    //         throw ValidationException::withMessages([
+    //             'login' => trans('auth.failed'),
+    //         ]);
+    //     }
+
+    //     RateLimiter::clear($this->throttleKey());
+    // }
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
         $login = $this->input('login');
 
-        // Cek apakah email atau phone
+        // cek email atau phone
         $field = filter_var($login, FILTER_VALIDATE_EMAIL)
             ? 'email'
             : 'phone';
@@ -54,10 +79,10 @@ class LoginRequest extends FormRequest
             'password' => $this->password,
         ], $this->boolean('remember'))) {
 
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), 180);
 
             throw ValidationException::withMessages([
-                'login' => trans('auth.failed'),
+                'login' => 'email/nomor telepon/password salah!',
             ]);
         }
 

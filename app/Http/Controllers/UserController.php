@@ -55,7 +55,6 @@ class UserController extends Controller
     // 🔷 SIMPAN USER
     public function store(Request $request)
     {
-        // dd($request);
         $request->validate([
             'name' => 'required',
             'phone' => ['required', 'regex:/^08[0-9]{8,11}$/', 'unique:users,phone'],
@@ -65,9 +64,9 @@ class UserController extends Controller
             'role' => 'required'
         ]);
 
-        // \larang buat siswa manual
+        // larang siswa buat akun manual
         if ($request->role == 'siswa') {
-            return back()->with('error', 'Akun siswa dibuat otomatis dari data anak');
+            return back()->with('error', 'Akun siswa dibuat otomatis dari akun orangtua!');
         }
 
         $user = User::create([
@@ -83,7 +82,7 @@ class UserController extends Controller
 
         $user->assignRole($request->role);
 
-        return redirect()->route('users.index')->with('success', 'User berhasil dibuat');
+        return redirect()->route('users.index')->with('success', 'Berhasil menambahkan user baru!');
     }
 
     // 🔷 DETAIL USER
@@ -204,7 +203,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('users.index')
-            ->with('success', 'User berhasil diupdate');
+            ->with('success', 'Data user berhasil diperbarui');
     }
 
     // 🔷 UPDATE ROLE (CEPAT - DROPDOWN)

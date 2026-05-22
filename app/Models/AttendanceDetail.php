@@ -10,7 +10,8 @@ class AttendanceDetail extends Model
         'attendance_id',
         'student_id',
         'status',
-        'note'
+        'note',
+        'updated_by'
     ];
 
     public function attendance()

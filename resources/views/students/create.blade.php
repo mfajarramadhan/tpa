@@ -67,7 +67,7 @@
                 <div class="mb-4">
                     <label class="block mb-1 text-sm font-semibold">Nama</label>
                     <input type="text" name="name" value="{{ old('name') }}"
-                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
+                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200" required>
                     @error('name')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror

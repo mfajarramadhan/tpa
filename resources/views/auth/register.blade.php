@@ -75,7 +75,7 @@
                     <!-- ADDRESS -->
                     <textarea name="address"
                         placeholder="Alamat"
-                        class="w-full px-4 py-4 mb-4 text-lg border-b text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                        class="w-full px-4 py-4 mb-4 text-lg border-b text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">{{ old('address') }}</textarea>
                     <x-input-error :messages="$errors->get('address')" class="mb-3"/>
 
                     <!-- PASSWORD -->

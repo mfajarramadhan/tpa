@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
                 Auth::logout();
 
                 return back()->withErrors([
-                    'login' => 'Akun anda tidak aktif'
+                    'login' => 'Akun anda tidak aktif!'
                 ]);
             }
         }

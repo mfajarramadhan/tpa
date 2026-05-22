@@ -47,7 +47,8 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'status' => 'aktif',
             'approval_status' => 'approved',
-            'address' => $request->address
+            'address' => $request->address,
+            'role' => 'orang_tua',
         ]);
 
         $user->assignRole('orang_tua');
