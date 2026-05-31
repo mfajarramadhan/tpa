@@ -57,7 +57,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/', 'unique:users,phone'],
+            'phone' => ['required', 'regex:/^08[0-9]{8,11}$/', 'unique:users,phone'], //diawali 08, setelah 08 hanya boleh angka, jumlah angka setelah 08 antara 8 sampai 11 digit (total 10-13 digit)
             'email' => ['required', 'email', 'unique:users,email'],
             'address' => 'nullable|string',
             'password' => 'required|min:6',
@@ -117,7 +117,7 @@ class UserController extends Controller
 
         'phone' => [
             'required',
-            'regex:/^08[0-9]{8,11}$/',
+            'regex:/^08[0-9]{8,11}$/', //diawali 08, setelah 08 hanya boleh angka, jumlah angka setelah 08 antara 8 sampai 11 digit (total 10-13 digit)
             'unique:users,phone,' . $user->id
         ],
 

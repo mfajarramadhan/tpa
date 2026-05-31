@@ -8,10 +8,8 @@ use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class StudentSeeder extends Seeder
 {
@@ -20,52 +18,76 @@ class StudentSeeder extends Seeder
      */
     public function run(): void
     {
-        // 🔹 ORANG TUA (REZA)
-        $parent = User::where('email', 'reza@gmail.com')->first();
-
-        if (!$parent) {
-            $parent = User::create([
-                'name' => 'Reza',
-                'email' => 'reza@gmail.com',
-                'phone' => '0895333530959',
-                'password' => Hash::make('reza12345'),
+        // orang tua (reza)
+        $parent = User::firstOrCreate(
+            ['email' => 'sarah@gmail.com'],
+            [
+                'name' => 'Sarah Kartini',
+                'phone' => '0895629370698',
+                'password' => Hash::make('sarah12345'),
                 'status' => 'aktif',
                 'approval_status' => 'approved',
-                'address' => 'Karawang'
-            ]);
-        }
+                'address' => 'Karawang',
+                'role' => 'orang_tua',
+            ]
+        );
+
+        // orang tua (riska)
+        $parent2 = User::firstOrCreate(
+            ['email' => 'rini@gmail.com'],
+            [
+                'name' => 'Rini Sotyaningsih',
+                'phone' => '082258667392',
+                'password' => Hash::make('rini12345'),
+                'status' => 'aktif',
+                'approval_status' => 'approved',
+                'address' => 'Karawang',
+                'role' => 'orang_tua',
+            ]
+        );
 
         $parent->assignRole('orang_tua');
+        $parent2->assignRole('orang_tua');
 
-        // 🔹 AMBIL KELAS 2
+        // ambil kelas 2
         $classroom = Classroom::where('name', 'like', '%2%')->first();
 
-        // 🔥 DATA ANAK (BISA DITAMBAH TERUS)
+        // data anak
         $studentsData = [
             [
                 'name' => 'Rama',
                 'email' => 'rama01012018@gmail.com',
                 'nisn' => '3275061210',
+                'parent_id' => $parent->id,
             ],
             [
                 'name' => 'Vito',
                 'email' => 'vito01012018@gmail.com',
                 'nisn' => '3275061211',
+                'parent_id' => $parent->id,
             ],
             [
                 'name' => 'Yasin',
                 'email' => 'yasin01012018@gmail.com',
                 'nisn' => '3275061212',
+                'parent_id' => $parent2->id,
+            ],
+            [
+                'name' => 'Faris',
+                'email' => 'faris01012018@gmail.com',
+                'nisn' => '3275061213',
+                'parent_id' => $parent2->id,
             ],
         ];
 
         foreach ($studentsData as $data) {
 
-            // 🔹 USER SISWA
+            // user siswa
             $studentUser = User::where('email', $data['email'])->first();
             $birthDate = Carbon::parse('2018-01-01')->format('dmY');
 
             if (!$studentUser) {
+
                 $studentUser = User::create([
                     'name' => $data['name'],
                     'email' => $data['email'],
@@ -79,13 +101,14 @@ class StudentSeeder extends Seeder
 
             $studentUser->assignRole('siswa');
 
-            // 🔹 CEK STUDENT BIAR GA DUPLICATE
+            // cek student biar ga duplicate
             $student = Student::where('user_id', $studentUser->id)->first();
 
             if (!$student) {
+
                 $student = Student::create([
                     'user_id' => $studentUser->id,
-                    'parent_id' => $parent->id,
+                    'parent_id' => $data['parent_id'],
                     'classroom_id' => $classroom?->id,
                     'academic_year_id' => AcademicYear::where('is_active', true)->first()->id,
                     'name' => $data['name'],
@@ -101,12 +124,13 @@ class StudentSeeder extends Seeder
                 ]);
             }
 
-            // 🔹 PAYMENT (CEK BIAR GA DOUBLE)
+            // payment (cek biar ga double)
             $existingPayment = Payment::where('student_id', $student->id)
                 ->where('type', 'registration')
                 ->first();
 
             if (!$existingPayment) {
+
                 Payment::create([
                     'student_id' => $student->id,
                     'academic_year_id' => AcademicYear::where('is_active', true)->first()->id,
@@ -123,4 +147,3 @@ class StudentSeeder extends Seeder
         }
     }
 }
-

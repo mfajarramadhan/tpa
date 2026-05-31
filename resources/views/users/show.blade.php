@@ -69,6 +69,19 @@
 
                 </div>
 
+                {{-- ORANG TUA --}}
+                <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+
+                    <p class="text-sm font-semibold text-slate-500">
+                        Orang Tua
+                    </p>
+
+                    <p class="text-sm font-bold text-right text-slate-800">
+                        {{ $user->student->parent->name }}
+                    </p>
+
+                </div>
+
                 {{-- EMAIL --}}
                 <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
 
@@ -280,7 +293,7 @@
                             </p>
 
                             <p class="text-sm font-bold text-right text-slate-800">
-                                {{ $student->school_grade ?? '-' }}
+                                {{ $user->student->school_grade ?? '-' }}
                             </p>
 
                         </div>

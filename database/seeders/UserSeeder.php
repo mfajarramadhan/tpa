@@ -11,10 +11,21 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $user = User::create([
-            'name' => 'Reza',
-            'phone' => '0895333530955',
-            'email' => 'reza@gmail.com',
-            'password' => Hash::make('reza12345'),
+            'name' => 'Sarah Kartini',
+            'phone' => '0895629370698',
+            'email' => 'sarah@gmail.com',
+            'password' => Hash::make('sarah12345'),
+            'status' => 'aktif',
+            'approval_status' => 'approved',
+            'address' => 'Karawang',
+            'role' => 'orang_tua',
+        ]);
+
+        $user2 = User::create([
+            'name' => 'Rini Sotyaningsih',
+            'phone' => '082258667392',
+            'email' => 'rini@gmail.com',
+            'password' => Hash::make('rini12345'),
             'status' => 'aktif',
             'approval_status' => 'approved',
             'address' => 'Karawang',
@@ -23,16 +34,10 @@ class UserSeeder extends Seeder
 
         // assign role orang tua
         $user->assignRole('orang_tua');
+        $user2->assignRole('orang_tua');
 
 
         $teachers = [
-            [
-                'name' => 'Sarah Kartini',
-                'email' => 'sarah@gmail.com',
-                'phone' => '0895333530956',
-                'password' => 'sarah12345',
-            ],
-
             [
                 'name' => 'Mariati',
                 'email' => 'mariati@gmail.com',

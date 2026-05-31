@@ -284,5 +284,8 @@ return [
         'winner'                   => 'pemenang',
         'work'                     => 'pekerjaan',
         'year'                     => 'tahun',
+        'birth_certificate_file'   => 'file akta kelahiran',
+        'kk_file'                  => 'file kartu keluarga',
+        'proof_file'               => 'file bukti pembayaran',
     ],
 ];

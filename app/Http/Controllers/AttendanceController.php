@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendAttendanceWhatsAppJob;
 use App\Models\Attendance;
 use App\Models\AttendanceDetail;
 use App\Models\Classroom;
@@ -86,6 +87,36 @@ class AttendanceController extends Controller
             'details',
             'lockedStudents'
         ));
+    }
+
+
+    private function shouldSendAttendanceWhatsApp(
+        string $status,
+        string $session,
+        ?string $oldStatus = null,
+        ?int $oldAttendanceId = null,
+        ?int $newAttendanceId = null
+    ): bool {
+        // jika status dan attendance_id tidak berubah, jangan kirim WA ulang
+        if (
+            $oldStatus === $status &&
+            $oldAttendanceId === $newAttendanceId
+        ) {
+            return false;
+        }
+
+        // hadir, izin, sakit bersifat final pada sesi pagi maupun sore
+        if (in_array($status, ['hadir', 'izin', 'sakit'])) {
+            return true;
+        }
+
+        // alpha pada sesi pagi belum final karena masih mungkin hadir di sesi sore
+        // alpha baru dikirim saat sesi sore
+        if ($status === 'alpha' && $session === 'sore') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -197,17 +228,38 @@ class AttendanceController extends Controller
                 }
             }
 
-            AttendanceDetail::updateOrCreate(
+            $existingDetail = AttendanceDetail::where([
+                'attendance_id' => $attendance->id,
+                'student_id' => $studentId,
+            ])->first();
+
+            $oldStatus = $existingDetail?->status;
+            $oldAttendanceId = $existingDetail?->attendance_id;
+
+            $detail = AttendanceDetail::updateOrCreate(
                 [
                     'attendance_id' => $attendance->id,
-                    'student_id' => $studentId
+                    'student_id' => $studentId,
                 ],
                 [
                     'status' => $status,
-                    'note' => $note,
+                    'note' => $status === 'hadir' ? null : $note,
                     'updated_by' => auth()->id(),
                 ]
             );
+
+            if (
+                $this->shouldSendAttendanceWhatsApp(
+                    status: $status,
+                    session: $request->session,
+                    oldStatus: $oldStatus,
+                    oldAttendanceId: $oldAttendanceId,
+                    newAttendanceId: $detail->attendance_id
+                )
+            ) {
+                SendAttendanceWhatsAppJob::dispatch($detail)
+                    ->delay(now()->addSeconds(2));
+            }
         }
 
         return redirect()->route('attendances.create', [
@@ -256,35 +308,6 @@ class AttendanceController extends Controller
         //
     }
 
-    // public function studentRecap($id)
-    // {
-    //     $student = Student::findOrFail($id);
-
-    //     $attendances = Attendance::where('student_id', $id)->get();
-
-    //     $hadir = $attendances->where('status', 'hadir')->count();
-    //     $izin  = $attendances->where('status', 'izin')->count();
-    //     $alpha = $attendances->where('status', 'alpha')->count();
-
-    //     return view('attendances.recap_student', compact(
-    //         'student',
-    //         'hadir',
-    //         'izin',
-    //         'alpha',
-    //         'attendances'
-    //     ));
-    // }
-
-    // public function student($studentId)
-    // {
-    //     $student = Student::with('classroom')->findOrFail($studentId);
-
-    //     $attendances = Attendance::where('student_id', $studentId)
-    //         ->latest()
-    //         ->get();
-
-    //     return view('attendances.student', compact('student', 'attendances'));
-    // }
 
     public function recap(Request $request)
     {
@@ -624,28 +647,6 @@ class AttendanceController extends Controller
         ));
     }
 
-    // public function updateRecap(Request $request, AttendanceDetail $detail)
-    // {
-    //     $request->validate([
-    //         'status' => 'required|in:hadir,izin,sakit,alpha',
-    //         'note' => 'nullable|string|max:255',
-    //         'session' => 'required|in:pagi,sore',
-    //     ]);
-
-    //     $detail->update([
-    //         'status' => $request->status,
-    //         'note' => $request->note,
-    //         'updated_by' => auth()->id(),
-    //     ]);
-
-    //     // update attendances
-    //     $detail->attendance->update([
-    //         'session' => $request->session,
-    //     ]);
-
-    //     return back()->with('success', 'Absensi berhasil diperbarui!');
-    // }
-
     public function updateRecap(Request $request, AttendanceDetail $detail)
     {
         $request->validate([
@@ -654,12 +655,14 @@ class AttendanceController extends Controller
             'session' => 'required|in:pagi,sore',
         ]);
 
+        $oldStatus = $detail->status;
+        $oldAttendanceId = $detail->attendance_id;
+
         // ambil header absensi saat ini
         $attendance = $detail->attendance;
 
-        // Cari header absensi tujuan, jika belum ada maka buat dahulu
-        // Contoh case: Guru salah input ke sesi pagi lalu dipindahkan ke sesi sore.
-        // Jika header absensi sesi sore belum ada, sistem akan membuatnya terlebih dahulu.
+        // cari header absensi tujuan
+        // jika belum ada, sistem membuat header baru
         $targetAttendance = Attendance::firstOrCreate(
             [
                 'classroom_id' => $attendance->classroom_id,
@@ -672,13 +675,27 @@ class AttendanceController extends Controller
             ]
         );
 
-        // Update attendance detail siswa
+        // update detail absensi siswa
+        // yang dipindahkan adalah attendance_id pada attendance_details
         $detail->update([
             'attendance_id' => $targetAttendance->id,
             'status' => $request->status,
             'note' => $request->status === 'hadir' ? null : $request->note,
             'updated_by' => auth()->id(),
         ]);
+
+        if (
+            $this->shouldSendAttendanceWhatsApp(
+                status: $request->status,
+                session: $request->session,
+                oldStatus: $oldStatus,
+                oldAttendanceId: $oldAttendanceId,
+                newAttendanceId: $targetAttendance->id
+            )
+        ) {
+            SendAttendanceWhatsAppJob::dispatch($detail->fresh())
+                ->delay(now()->addSeconds(2));
+        }
 
         return back()->with('success', 'Absensi berhasil diperbarui!');
     }
