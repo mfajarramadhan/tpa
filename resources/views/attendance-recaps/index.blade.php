@@ -8,6 +8,73 @@
 
     <div class="py-6 md:py-0">
 
+        {{-- Alert --}}
+        <div class="relative">
+
+            {{-- FLOATING ALERT WRAPPER --}}
+            <div class="absolute top-0 left-0 z-50 w-full pointer-events-none">
+
+                {{-- SUCCESS --}}
+                @if(session('success'))
+                <div
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-init="setTimeout(() => show = false, 3000)"
+                    @click.outside="show = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 -translate-y-3"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0 -translate-y-2"
+                    class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                        bg-gradient-to-t from-[var(--primary-dark)] to-[var(--primary)] 
+                        bg-opacity-80 backdrop-blur-sm">
+
+                    <div class="text-sm font-semibold ms-2">
+                        {{ session('success') }}
+                    </div>
+
+                    <button @click="show = false"
+                        class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                        ✕
+                    </button>
+                </div>
+                @endif
+
+
+                {{-- ERROR --}}
+                @if(session('error'))
+                <div
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-init="setTimeout(() => show = false, 3000)"
+                    @click.outside="show = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 -translate-y-3"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0 -translate-y-2"
+                    class="pointer-events-auto flex items-center p-3 text-white rounded-xl shadow-md 
+                        bg-gradient-to-t from-[var(--danger)] to-red-400 
+                        bg-opacity-80 backdrop-blur-sm">
+
+                    <div class="text-sm font-semibold ms-2">
+                        {{ session('error') }}
+                    </div>
+
+                    <button @click="show = false"
+                        class="flex items-center justify-center w-8 h-8 font-bold text-black transition rounded-md ms-auto bg-white/80 hover:bg-white">
+                        ✕
+                    </button>
+                </div>
+                @endif
+
+            </div>
+
+        </div>
+
         <div class="mx-auto space-y-6 max-w-7xl">
 
             {{-- TAB --}}
@@ -109,17 +176,15 @@
                 <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
                     <form method="GET"
-                        action="{{ route('attendance.recap') }}">
+                        action="{{ route('attendance.recap') }}"
+                        x-data="{ classroomId: '{{ $classroomId }}' }">
 
-                        <input type="hidden"
-                            name="tab"
-                            value="daily">
+                        <input type="hidden" name="tab" value="daily">
 
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
                             {{-- TANGGAL --}}
                             <div>
-
                                 <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Tanggal
                                 </label>
@@ -127,73 +192,55 @@
                                 <input type="date"
                                     name="date"
                                     value="{{ $date }}"
-                                    class="input-solid w-full
-                                    bg-[var(--surface)]
-                                    border-2 border-[var(--border)]
-                                    shadow-sm rounded-xl">
-
+                                    class="input-solid w-full bg-[var(--surface)] border-2 border-[var(--border)] shadow-sm rounded-xl">
                             </div>
 
-                            {{-- BUTTON --}}
-                            <div class="flex items-end">
+                            {{-- KELAS --}}
+                            @role('guru')
+                                <div>
+                                    <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
+                                        Kelas
+                                    </label>
 
-                                <button class="w-full shadow-sm btn-primary">
+                                    <select name="classroom_id"
+                                            x-model="classroomId"
+                                            required
+                                            class="input-solid w-full bg-[var(--surface)] border-2 border-[var(--border)] shadow-sm rounded-xl">
 
-                                    <iconify-icon
-                                        icon="solar:chart-bold-duotone"
-                                        width="20">
-                                    </iconify-icon>
+                                        <option value="">----------</option>
 
-                                    Tampilkan
+                                        @foreach($classrooms as $classroom)
+                                            <option value="{{ $classroom->id }}">
+                                                {{ $classroom->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
 
-                                </button>
+                                    <p x-show="!classroomId"
+                                    class="mt-1 text-sm text-red-500">
+                                        Pilih kelas!
+                                    </p>
+                                </div>
+                            @else
+                                <input type="hidden" name="classroom_id" value="{{ $classroomId }}">
+                            @endrole
 
-                            </div>
 
                         </div>
+                        {{-- BUTTON --}}
+                        <div class="flex items-end mt-8">
+                            <button type="submit"
+                                    :disabled="!classroomId"
+                                    :class="!classroomId ? 'opacity-50 cursor-not-allowed' : ''"
+                                    class="w-full shadow-sm btn-primary">
 
-                        {{-- KELAS --}}
-                        @role('guru')
+                                <iconify-icon icon="solar:chart-bold-duotone" width="20"></iconify-icon>
 
-                            <div class="mt-4">
+                                Tampilkan
+                            </button>
+                        </div>
 
-                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
-                                    Kelas
-                                </label>
-
-                                <select name="classroom_id"
-                                        class="input-solid w-full
-                                        bg-[var(--surface)]
-                                        border-2 border-[var(--border)]
-                                        shadow-sm rounded-xl">
-
-                                    <option value="">
-                                        Pilih Kelas
-                                    </option>
-
-                                    @foreach($classrooms as $classroom)
-
-                                        <option value="{{ $classroom->id }}"
-                                            {{ $classroomId == $classroom->id ? 'selected' : '' }}>
-
-                                            {{ $classroom->name }}
-
-                                        </option>
-
-                                    @endforeach
-
-                                </select>
-
-                            </div>
-
-                        @else
-
-                            <input type="hidden"
-                                name="classroom_id"
-                                value="{{ $classroomId }}">
-
-                        @endrole
-
+                        
                     </form>
 
                 </div>
@@ -206,7 +253,8 @@
                 <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
                     <form method="GET"
-                        action="{{ route('attendance.recap') }}">
+                        action="{{ route('attendance.recap') }}"
+                        x-data="{ classroomId: '{{ request('classroom_id', $classroomId) }}' }">
 
                         <input type="hidden"
                             name="tab"
@@ -217,7 +265,6 @@
 
                             {{-- BULAN --}}
                             <div>
-
                                 <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Bulan
                                 </label>
@@ -229,23 +276,17 @@
                                         shadow-sm rounded-xl">
 
                                     @foreach(range(1,12) as $monthLoop)
-
                                         <option value="{{ $monthLoop }}"
                                             {{ request('month', now()->month) == $monthLoop ? 'selected' : '' }}>
-
                                             {{ \Carbon\Carbon::create()->month($monthLoop)->translatedFormat('F') }}
-
                                         </option>
-
                                     @endforeach
 
                                 </select>
-
                             </div>
 
                             {{-- TAHUN --}}
                             <div>
-
                                 <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
                                     Tahun
                                 </label>
@@ -257,79 +298,72 @@
                                         shadow-sm rounded-xl">
 
                                     @foreach(range(now()->year, now()->year - 5) as $yearLoop)
-
                                         <option value="{{ $yearLoop }}"
                                             {{ request('year', now()->year) == $yearLoop ? 'selected' : '' }}>
-
                                             {{ $yearLoop }}
-
                                         </option>
-
                                     @endforeach
 
                                 </select>
-
                             </div>
 
-                            {{-- BUTTON --}}
-                            <div class="flex items-end">
+                            {{-- KELAS --}}
+                            @role('guru')
+                                <div>
+                                    <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
+                                        Kelas
+                                    </label>
 
-                                <button class="w-full shadow-sm btn-primary">
+                                    <select name="classroom_id"
+                                            x-model="classroomId"
+                                            required
+                                            class="input-solid w-full
+                                            bg-[var(--surface)]
+                                            border-2 border-[var(--border)]
+                                            shadow-sm rounded-xl">
 
-                                    <iconify-icon
-                                        icon="solar:chart-bold-duotone"
-                                        width="20">
-                                    </iconify-icon>
+                                        <option value="">
+                                            ----------
+                                        </option>
 
-                                    Tampilkan
+                                        @foreach($classrooms as $classroom)
+                                            <option value="{{ $classroom->id }}">
+                                                {{ $classroom->name }}
+                                            </option>
+                                        @endforeach
 
-                                </button>
+                                    </select>
 
-                            </div>
+                                    <p x-show="!classroomId"
+                                    class="mt-1 text-sm text-red-500">
+                                        Pilih kelas!
+                                    </p>
+                                </div>
+                            @else
+                                <input type="hidden"
+                                    name="classroom_id"
+                                    value="{{ $classroomId }}">
+                            @endrole
+
+                            
 
                         </div>
 
-                        {{-- KELAS --}}
-                        @role('superadmin|guru')
+                        {{-- BUTTON --}}
+                        <div class="flex items-end mt-8">
+                            <button type="submit"
+                                    :disabled="!classroomId"
+                                    :class="!classroomId ? 'opacity-50 cursor-not-allowed' : ''"
+                                    class="w-full shadow-sm btn-primary">
 
-                            <div class="mt-4">
+                                <iconify-icon
+                                    icon="solar:chart-bold-duotone"
+                                    width="20">
+                                </iconify-icon>
 
-                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
-                                    Kelas
-                                </label>
-
-                                <select name="classroom_id"
-                                        class="input-solid w-full
-                                        bg-[var(--surface)]
-                                        border-2 border-[var(--border)]
-                                        shadow-sm rounded-xl">
-
-                                    <option value="">
-                                        Pilih Kelas
-                                    </option>
-
-                                    @foreach($classrooms as $classroom)
-
-                                        <option value="{{ $classroom->id }}"
-                                            {{ request('classroom_id') == $classroom->id ? 'selected' : '' }}>
-
-                                            {{ $classroom->name }}
-
-                                        </option>
-
-                                    @endforeach
-
-                                </select>
-
-                            </div>
-
-                        @else
-
-                            <input type="hidden"
-                                name="classroom_id"
-                                value="{{ $classroomId }}">
-
-                        @endrole
+                                Tampilkan
+                            </button>
+                        </div>
 
                     </form>
 
@@ -343,7 +377,8 @@
                 <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
                     <form method="GET"
-                        action="{{ route('attendance.recap') }}">
+                        action="{{ route('attendance.recap') }}"
+                        x-data="{ classroomId: '{{ request('classroom_id', $classroomId) }}' }">
 
                         <input type="hidden"
                             name="tab"
@@ -380,65 +415,81 @@
 
                             </div>
 
-                            {{-- BUTTON --}}
-                            <div class="flex items-end">
+                            {{-- ROW 2 --}}
+                            @role('guru')
 
-                                <button class="w-full shadow-sm btn-primary">
+                                <div>
 
-                                    <iconify-icon
-                                        icon="solar:chart-bold-duotone"
-                                        width="20">
-                                    </iconify-icon>
+                                    <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
+                                        Kelas
+                                    </label>
 
-                                    Tampilkan
+                                    <select name="classroom_id"
+                                            x-model="classroomId"
+                                            required
+                                            class="input-solid w-full
+                                            bg-[var(--surface)]
+                                            border-2 border-[var(--border)]
+                                            shadow-sm rounded-xl">
 
-                                </button>
+                                        <option value="">
+                                            ----------
+                                        </option>
 
-                            </div>
+                                        @foreach($classrooms as $classroom)
+
+                                            <option value="{{ $classroom->id }}"
+                                                {{ request('classroom_id') == $classroom->id ? 'selected' : '' }}>
+
+                                                {{ $classroom->name }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </select>
+
+                                    <p x-show="!classroomId"
+                                    class="mt-1 text-sm text-red-500">
+
+                                        Pilih kelas!
+
+                                    </p>
+
+                                </div>
+
+                            @else
+
+                                <input type="hidden"
+                                    name="classroom_id"
+                                    value="{{ $classroomId }}">
+
+                            @endrole
+
+                            
 
                         </div>
 
-                        {{-- ROW 2 --}}
-                        @role('guru')
+                        {{-- BUTTON --}}
+                        <div class="flex items-end mt-8">
 
-                            <div class="mt-4">
+                            <button type="submit"
+                                    :disabled="!classroomId"
+                                    :class="!classroomId
+                                        ? 'opacity-50 cursor-not-allowed'
+                                        : ''"
+                                    class="w-full shadow-sm btn-primary">
 
-                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
-                                    Kelas
-                                </label>
+                                <iconify-icon
+                                    icon="solar:chart-bold-duotone"
+                                    width="20">
+                                </iconify-icon>
 
-                                <select name="classroom_id"
-                                        class="input-solid w-full
-                                        bg-[var(--surface)]
-                                        border-2 border-[var(--border)]
-                                        shadow-sm rounded-xl">
+                                Tampilkan
 
-                                    <option value="">
-                                        Pilih Kelas
-                                    </option>
+                            </button>
 
-                                    @foreach($classrooms as $classroom)
-
-                                        <option value="{{ $classroom->id }}"
-                                            {{ request('classroom_id') == $classroom->id ? 'selected' : '' }}>
-
-                                            {{ $classroom->name }}
-
-                                        </option>
-
-                                    @endforeach
-
-                                </select>
-
-                            </div>
-
-                        @else
-
-                            <input type="hidden"
-                                name="classroom_id"
-                                value="{{ $classroomId }}">
-
-                        @endrole
+                        </div>
 
                     </form>
 
@@ -476,7 +527,7 @@
                                         Sesi
                                     </th>
 
-                                    @role('superadmin|guru')
+                                    @role('guru')
                                     <th class="p-3 text-center">
                                         Aksi
                                     </th>
@@ -537,14 +588,18 @@
                                             </td>
 
                                             {{-- AKSI --}}
-                                            @role('superadmin|guru')
+                                            @role('guru')
                                             <td class="p-3 text-center">
 
                                                 <button
                                                     onclick="toggleEdit({{ $detail->id }})"
-                                                    class="px-3 py-1 text-xs text-white rounded bg-[var(--primary)] hover:opacity-90">
+                                                    title="Edit"
+                                                    class="btn-icon group bg-[var(--warning-light)] border border-[var(--warning-dark)] hover:bg-[var(--warning-dark)]">
 
-                                                    Edit
+                                                    <iconify-icon
+                                                        icon="heroicons:pencil-square"
+                                                        class="text-[var(--warning-dark)] group-hover:text-white">
+                                                    </iconify-icon>
 
                                                 </button>
 
@@ -554,7 +609,7 @@
                                         </tr>
 
                                         {{-- ================= INLINE EDIT ================= --}}
-                                        @role('superadmin|guru')
+                                        @role('guru')
                                         <tr id="edit-row-{{ $detail->id }}"
                                             class="hidden bg-gray-50">
 
@@ -605,7 +660,7 @@
                                                         </div>
 
                                                         {{-- NOTE --}}
-                                                        <div class="md:col-span-2">
+                                                        <div>
 
                                                             <label class="block mb-1 text-sm">
                                                                 Keterangan
@@ -621,12 +676,36 @@
 
                                                         </div>
 
+                                                        {{-- STATUS --}}
+                                                        <div>
+
+                                                            <label class="block mb-1 text-sm">
+                                                                Sesi
+                                                            </label>
+
+                                                            <select name="session"
+                                                                class="w-full border-gray-300 rounded-lg">
+
+                                                                <option value="pagi"
+                                                                    {{ $detail->session == 'pagi' ? 'selected' : '' }}>
+                                                                    Pagi
+                                                                </option>
+
+                                                                <option value="sore"
+                                                                    {{ $detail->session == 'sore' ? 'selected' : '' }}>
+                                                                    Sore
+                                                                </option>
+
+                                                            </select>
+
+                                                        </div>
+
                                                         {{-- BUTTON --}}
                                                         <div class="flex items-end">
 
                                                             <button class="w-full btn-primary">
 
-                                                                Simpan Perubahan
+                                                                Simpan
 
                                                             </button>
 
@@ -887,9 +966,19 @@
 
     function toggleEdit(id)
     {
-        const row = document.getElementById('edit-row-' + id);
+        const currentRow = document.getElementById('edit-row-' + id);
 
-        row.classList.toggle('hidden');
+        // tutup semua row edit
+        document.querySelectorAll('[id^="edit-row-"]').forEach(row => {
+
+            if (row.id !== 'edit-row-' + id) {
+                row.classList.add('hidden');
+            }
+
+        });
+
+        // toggle row yang dipilih
+        currentRow.classList.toggle('hidden');
     }
 
     function toggleNote(id)

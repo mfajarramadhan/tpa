@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer('registration_fee')->default(100000);
             $table->integer('monthly_fee')->default(50000);
+            $table->string('bank_name', 100)->default('BCA');
+            $table->string('account_name', 100)->default('YAYASAN AL-BAROKAH');
+            $table->string('account_number', 20)->default('1234567890');
             $table->timestamps();
         });
     }
@@ -24,6 +27,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fees');
+        Schema::table('fees', function (Blueprint $table) {
+
+            $table->dropColumn([
+                'bank_name',
+                'account_name',
+                'account_number'
+            ]);
+
+        });
     }
 };

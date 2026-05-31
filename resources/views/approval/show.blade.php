@@ -344,16 +344,11 @@
                     <div class="flex items-center justify-between pt-5 mt-5 border-t border-gray-100">
 
                         {{-- REJECT --}}
-                        <form method="POST"
-                            action="{{ route('approval.students.reject', $student->id) }}"
-                            class="flex items-center gap-2"
-                            onsubmit="return confirm('Yakin ingin menolak siswa ini?')">
-                            @csrf
-
-                            <div x-data="{ openReject: false }" class="flex items-center gap-2">
+                        <div x-data="{ openReject: false }" class="flex items-center gap-2">
 
                             {{-- BUTTON OPEN MODAL --}}
-                            <button @click="openReject = true"
+                            <button type="button"
+                                    @click="openReject = true"
                                     class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
                                 Reject
                             </button>
@@ -366,14 +361,17 @@
                                 <div @click.outside="openReject = false"
                                     class="w-full max-w-md p-5 bg-white shadow-xl rounded-xl">
 
-                                    <h2 class="mb-3 text-lg font-semibold">Alasan Penolakan</h2>
+                                    <h2 class="mb-3 text-lg font-semibold">
+                                        Alasan Penolakan
+                                    </h2>
 
                                     <form method="POST"
                                         action="{{ route('approval.students.reject', $student->id) }}"
+                                        class="space-y-4"
                                         onsubmit="confirmAction(
                                             event,
                                             'Tolak Siswa?',
-                                            'Pendaftaran siswa akan ditolak',
+                                            'Status pendaftaran siswa akan ditolak',
                                             'Ya, Tolak',
                                             'warning'
                                         )">
@@ -381,107 +379,119 @@
                                         @csrf
 
                                         <textarea name="reject_reason"
-                                                        rows="3"
-                                                        class="input-solid"
-                                                        placeholder="Tulis alasan..."
-                                                        required></textarea>
+                                                rows="3"
+                                                class="input-solid"
+                                                placeholder="Tulis alasan..."
+                                                required></textarea>
 
                                         <div class="flex justify-end gap-2 mt-4">
+
                                             <button type="button"
                                                     @click="openReject = false"
                                                     class="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300">
                                                 Batal
                                             </button>
 
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700">
                                                 Kirim
                                             </button>
+
                                         </div>
+
                                     </form>
 
                                 </div>
                             </div>
 
                         </div>
-                        </form>
 
                         {{-- APPROVE --}}
-                        <form method="POST"
-                            action="{{ route('approval.students.approve', $student->id) }}"
-                            class="flex items-center gap-2" 
-                            onsubmit="return confirm('Yakin ingin menyetujui siswa ini?')">
-                            @csrf
+                        <div x-data="{ openApprove: false }" class="flex items-center gap-2">
 
-                            {{-- APPROVE MODAL --}}
-                            <div x-data="{ openApprove: false }" class="flex items-center gap-2">
+                            {{-- BUTTON --}}
+                            @if($payment && $payment->proof_file)
 
-                                {{-- BUTTON --}}
-                                @if($payment && $payment->proof_file)
-                                    <button @click="openApprove = true"
-                                            class="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
-                                        Approve
-                                    </button>
-                                @else
-                                    <button class="px-4 py-2 text-sm text-white bg-gray-400 rounded-lg cursor-not-allowed" disabled>
-                                        Menunggu Pembayaran
-                                    </button>
-                                @endif
+                                <button type="button"
+                                        @click="openApprove = true"
+                                        class="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
+                                    Approve
+                                </button>
 
-                                {{-- MODAL --}}
-                                <div x-show="openApprove"
-                                    x-transition
-                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                            @else
 
-                                    <div @click.outside="openApprove = false"
-                                        class="w-full max-w-md p-5 bg-white shadow-xl rounded-xl">
+                                <button class="px-4 py-2 text-sm text-white bg-gray-400 rounded-lg cursor-not-allowed"
+                                        disabled>
+                                    Menunggu Pembayaran
+                                </button>
 
-                                        <h2 class="mb-3 text-lg font-semibold">Pilih Kelas</h2>
+                            @endif
 
-                                        <form method="POST"
-                                            action="{{ route('approval.students.approve', $student->id) }}"
-                                            onsubmit="confirmAction(
-                                                event,
-                                                'Setujui Siswa?',
-                                                'Siswa akan diaktifkan dan masuk ke kelas',
-                                                'Ya, Setujui',
-                                                'success'
-                                            )">
+                            {{-- MODAL --}}
+                            <div x-show="openApprove"
+                                x-transition
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
 
-                                            @csrf
+                                <div @click.outside="openApprove = false"
+                                    class="w-full max-w-md p-5 bg-white shadow-xl rounded-xl">
 
-                                            <select name="classroom_id"
-                                                    class="w-full p-2 text-sm border rounded-lg focus:ring focus:ring-blue-200"
-                                                    required>
-                                                <option value="">-- Pilih Kelas --</option>
-                                                @foreach($classrooms as $class)
-                                                    <option value="{{ $class->id }}">{{ $class->name }} - ({{ $class->students_count }} Siswa)</option>
-                                                @endforeach
-                                            </select>
+                                    <h2 class="mb-3 text-lg font-semibold">
+                                        Pilih Kelas
+                                    </h2>
 
-                                            <div class="flex justify-end gap-2 mt-4">
-                                                <button type="button"
-                                                        @click="openApprove = false"
-                                                        class="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300">
-                                                    Batal
-                                                </button>
+                                    <form method="POST"
+                                        action="{{ route('approval.students.approve', $student->id) }}"
+                                        class="space-y-4"
+                                        onsubmit="confirmAction(
+                                            event,
+                                            'Setujui Siswa?',
+                                            'Status diaktifkan dan siswa terdaftar dalam kelas',
+                                            'Ya, Setujui',
+                                            'success'
+                                        )">
 
-                                                <button type="submit" 
-                                                        class="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
-                                                    Approve
-                                                </button>
-                                            </div>
-                                        </form>
+                                        @csrf
 
-                                    </div>
+                                        <select name="classroom_id"
+                                                class="w-full p-2 text-sm border rounded-lg focus:ring focus:ring-blue-200"
+                                                required>
+
+                                            <option value="">
+                                                -- Pilih Kelas --
+                                            </option>
+
+                                            @foreach($classrooms as $class)
+                                                <option value="{{ $class->id }}">
+                                                    {{ $class->name }} - ({{ $class->students_count }} Siswa)
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+
+                                        <div class="flex justify-end gap-2 mt-4">
+
+                                            <button type="button"
+                                                    @click="openApprove = false"
+                                                    class="px-4 py-2 text-sm bg-gray-200 rounded-lg hover:bg-gray-300">
+                                                Batal
+                                            </button>
+
+                                            <button type="submit"
+                                                    class="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
+                                                Approve
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
                                 </div>
-
                             </div>
-                        </form>
-                        
+
+                        </div>
+
                     </div>
                 </div>
-            
         </div>
     </div>
 

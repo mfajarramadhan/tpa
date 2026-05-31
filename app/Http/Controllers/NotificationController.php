@@ -40,7 +40,7 @@ class NotificationController extends Controller
 
         return back()->with(
             'success',
-            'Notifikasi dihapus!'
+            'Notifikasi berhasil dihapus!'
         );
     }
 }

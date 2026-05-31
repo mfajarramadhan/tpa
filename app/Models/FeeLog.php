@@ -13,6 +13,12 @@ class FeeLog extends Model
         'new_registration_fee',
         'old_monthly_fee',
         'new_monthly_fee',
+        'old_bank_name',
+        'new_bank_name',
+        'old_account_name',
+        'new_account_name',
+        'old_account_number',
+        'new_account_number',
     ];
 
     

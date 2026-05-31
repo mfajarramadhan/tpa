@@ -55,7 +55,10 @@ class ApprovalController extends Controller
 
         // error kalau belum upload bukti
         if (!$payment || !$payment->proof_file) {
-            return back()->with('error', 'Bukti pembayaran belum diupload');
+            return back()->with(
+                'error', 
+                'Bukti pembayaran belum diupload'
+            );
         }
 
         // set status payment jadi paid
@@ -85,7 +88,10 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return redirect()->route('approval.students.index')->with('success', 'Pendaftaran berhasil disetujui! Siswa terdaftar kedalam kelas');
+        return redirect()->route('approval.students.index')->with(
+            'success', 
+            'Pendaftaran berhasil disetujui! Siswa terdaftar kedalam kelas'
+        );
     }
 
 
@@ -130,7 +136,9 @@ class ApprovalController extends Controller
             ]);
         }
 
-        return redirect()->route('approval.students.index')->with('success', 'Pendaftaran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
+        return redirect()->route('approval.students.rejected')->with(
+            'success', 
+            'Pendaftaran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
     }
 
     public function rejected()

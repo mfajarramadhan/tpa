@@ -92,12 +92,12 @@
                                 Asal Sekolah
                             </th>
 
-                            <th class="w-[20%]">
+                            <th class="w-[14%]">
                                 Tanggal Lahir
                             </th>
 
-                            <th class="w-[14%]">
-                                Status
+                            <th class="w-[20%]">
+                                Tanggal Pendaftaran 
                             </th>
 
                             <th class="w-[10%] !text-center">
@@ -163,18 +163,10 @@
 
                                 </td>
 
-                                {{-- STATUS --}}
-                                <td>
+                                {{-- TANGGAL PENDAFTARAN --}}
+                                <td class="text-small">
 
-                                    <span class="badge badge-warning">
-
-                                        <iconify-icon
-                                            icon="solar:clock-circle-bold-duotone">
-                                        </iconify-icon>
-
-                                        Pending
-
-                                    </span>
+                                    {{ \Carbon\Carbon::parse($student->created_at)->format('d-m-Y | H:i') }} WIB
 
                                 </td>
 

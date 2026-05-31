@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\PaymentApprovedNotification;
 use App\Notifications\PaymentRejectedNotification;
 use App\Notifications\PaymentUploadedNotification;
+use App\Services\MonthlyBillService;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;  
@@ -22,12 +23,12 @@ class PaymentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(MonthlyBillService $monthlyBillService)
     {
-        // AUTO GENERATE IURAN
-        $this->generateMonthlyBills();
+        // auto generate iuran dari app/Services/MonthlyBillService.php
+        $monthlyBillService->generate();
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         // QUERY DASAR (KHUSUS MONTHLY)
@@ -235,34 +236,51 @@ class PaymentController extends Controller
         ));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+ 
     public function create(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+        $fee = Fee::first();
+
         $studentId = $request->student_id;
+
+        // ambil data siswa
+        $student = Student::findOrFail($studentId);
+
+        // proteksi akses orang tua
+        if (
+            $user->hasRole('orang_tua')
+            && $student->parent_id != $user->id
+        ) {
+            abort(403);
+        }
 
         // cari tagihan yang belum dibayar + belum upload
         $payment = Payment::where('student_id', $studentId)
             ->where('type', 'monthly')
             ->where(function ($q) {
                 $q->whereNull('proof_file')
-                ->orWhere('status', 'rejected'); // belum upload
+                    ->orWhere('status', 'rejected');
             })
             ->orderBy('month', 'asc')
             ->first();
 
-        // HANDLE NULL
+        // handle null
         if (!$payment) {
-            return back()->with('error', 'Tidak ada tagihan yang harus dibayarkan!');
+            return back()->with(
+                'error',
+                'Tidak ada tagihan yang harus dibayarkan!'
+            );
         }
 
-        return view('payments.create', compact('payment'));
+        return view(
+            'payments.create',
+            compact('payment', 'fee')
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -270,13 +288,13 @@ class PaymentController extends Controller
             'proof_file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048'
         ]);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         // ambil payment
         $payment = Payment::with('student')->findOrFail($request->payment_id);
 
-        // SECURITY: pastikan milik orang tua yg login
+        // pastikan milik orang tua yg login
         if ($user->hasRole('orang_tua') && $payment->student->parent_id != $user->id) {
             abort(403, 'Tidak diizinkan');
         }
@@ -305,43 +323,61 @@ class PaymentController extends Controller
             );
         }
 
-        return redirect()->route('payments.index')->with('success', 'Bayar iuran berhasil! Menunggu verifikasi admin.');
+        return redirect()
+            ->route('payments.index', [
+                'student_id' => $payment->student_id
+            ])->with(
+                'success',
+                'Bayar iuran berhasil! Menunggu verifikasi admin.'
+            );
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function showStudentPayments(Student $student)
     {
+        /** @var User $user */
         $user = Auth::user();
 
-        $student = Student::with(['parent', 'classroom'])->findOrFail($id);
-
         // proteksi orang tua
-        if ($user->hasRole('orang_tua') && $student->parent_id != $user->id) {
+        if (
+            $user->hasRole('orang_tua')
+            && $student->parent_id != $user->id
+        ) {
             abort(403);
         }
 
-        // hanya monthly (untuk iuran)
-        $payments = Payment::where('student_id', $id)
+        // eager load relasi
+        $student->load([
+            'parent',
+            'classroom'
+        ]);
+
+        // ambil iuran bulanan
+        $payments = $student->payments()
             ->where('type', 'monthly')
             ->latest('month')
             ->paginate(10)
             ->withQueryString();
 
-        $pagePayments = collect($payments->items());
+        // ambil collection page sekarang
+        $pagePayments = $payments->getCollection();
 
-        // TOTAL TAGIHAN
+        // total tagihan
         $totalTagihan = $pagePayments
             ->sum('original_amount');
 
-        // TOTAL DIBAYAR
+        // total dibayar
         $totalPaid = $pagePayments
             ->where('status', 'paid')
             ->sum('original_amount');
 
-        // SISA TAGIHAN
-        $totalUnpaid = $totalTagihan - $totalPaid;
+        // sisa tagihan
+        $totalUnpaid = max(
+            0,
+            $totalTagihan - $totalPaid
+        );
 
         return view('payments.show', compact(
             'student',
@@ -351,24 +387,12 @@ class PaymentController extends Controller
         ));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Payment $payment)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, Payment $payment)
     {
         $request->validate([
             'original_amount' => 'required|integer|min:0'
         ]);
-
-        $payment = Payment::findOrFail($id);
 
         $payment->update([
             'original_amount' => $request->original_amount
@@ -378,30 +402,25 @@ class PaymentController extends Controller
             ->with('success', 'Nominal berhasil diupdate');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
-    {
-        //
-    }
-
 
     // Iuran bulanan disetujui
-    public function approve($id)
+    public function approve(Payment $payment)
     {
         if (!Auth::user()->hasRole('superadmin')) {
             abort(403);
         }
 
-        $payment = Payment::with('student')->findOrFail($id);
+        $payment->load([
+            'student.parent',
+            'student.user'
+        ]);
 
-        //  kalau sudah lunas
+        // kalau sudah lunas
         if ($payment->status == 'paid') {
             return back()->with('error', 'Sudah lunas');
         }
 
-        // totalUnpaid APPROVE REGISTRATION
+        // approve registration
         if ($payment->type == 'registration') {
 
             $student = $payment->student;
@@ -427,7 +446,7 @@ class PaymentController extends Controller
             return back()->with('success', 'Siswa berhasil di-approve');
         }
 
-        // APPROVE IURAN BULANAN
+        // approve iuran bulanan
         if ($payment->type == 'monthly') {
 
             $payment->update([
@@ -436,7 +455,7 @@ class PaymentController extends Controller
                 'approved_at' => now()
             ]);
 
-            // Kirim notifikasi ke orangtua siswa
+            // kirim notifikasi ke orang tua siswa
             $parent = $payment->student->parent;
 
             if ($parent) {
@@ -448,15 +467,13 @@ class PaymentController extends Controller
             return back()->with('success', 'Pembayaran iuran disetujui!');
         }
 
-        return back()->with('error', 'Pembayaran iuran tidak valid! ');
+        return back()->with('error', 'Pembayaran iuran tidak valid!');
     }
 
 
     // batalkan approve iuran bulanan (unapprove)
-    public function unapprove($id)
+    public function unapprove(Payment $payment)
     {
-        $payment = Payment::findOrFail($id);
-
         if (!Auth::user()->hasRole('superadmin')) {
             abort(403);
         }
@@ -471,78 +488,30 @@ class PaymentController extends Controller
     }
 
 
-    private function generateMonthlyBills()
-    {
-        $fee = Fee::first(); // ambil fee terbaru
-        $students = Student::where('status', 'aktif')->get();
-
-        foreach ($students as $student) {
-
-            // tanggal daftar
-            $createdAt = Carbon::parse($student->created_at);
-
-            // bulan pertama iuran
-            $firstBilling = $createdAt->copy()->addMonth()->startOfMonth();
-
-            // bulan sekarang
-            $now = Carbon::now()->startOfMonth();
-            // $now = Carbon::now()->addMonth()->startOfMonth(); // 🔥 maju 1 bulan
-
-            // looping dari bulan pertama sampai sekarang
-            $current = $firstBilling->copy();
-
-            while ($current <= $now) {
-
-                $month = $current->format('Y-m');
-
-                // cek apakah sudah ada tagihan
-                $exists = Payment::where('student_id', $student->id)
-                    ->where('type', 'monthly')
-                    ->where('month', $month)
-                    ->exists();
-
-                if (!$exists) {
-                    Payment::create([
-                        'student_id' => $student->id,
-                        'academic_year_id' => activeAcademicYear()->id,
-                        'type' => 'monthly',
-                        'month' => $month,
-                        'original_amount' => $fee->monthly_fee, //ubah nominal default di FeeSeeder
-                        'amount' => $fee->monthly_fee, //ubah nominal default di FeeSeeder
-                        'status' => 'pending'
-                    ]);
-                }
-
-                $current->addMonth();
-            }
-        }
-    }
-
-
     // Iuran bulanan ditolak
-    public function reject(Request $request, $id)
+    public function reject(Request $request, Payment $payment)
     {
         if (!Auth::user()->hasRole('superadmin')) {
             abort(403);
         }
 
-        $payment = Payment::findOrFail($id);
-
         $request->validate([
             'reject_reason' => 'required|string|max:255'
         ]);
+
+        $payment->load('student.parent');
 
         if ($payment->status == 'paid') {
             return back()->with('error', 'Tidak bisa reject, sudah lunas');
         }
 
+        // proof_file tetap
         $payment->update([
-            'status' => 'rejected', // tetap rejected
+            'status' => 'rejected',
             'reject_reason' => $request->reject_reason ?? 'Bukti tidak valid'
-            // proof_file tetap 
         ]);
 
-        // Kirim notifikasi ke orangtua
+        // kirim notifikasi ke orang tua
         $parent = $payment->student->parent;
 
         if ($parent) {
@@ -551,6 +520,9 @@ class PaymentController extends Controller
             );
         }
 
-        return back()->with('success', 'Pembayaran iuran ditolak! Notifikasi telah dikirim ke orang tua siswa.');
+        return back()->with(
+            'success',
+            'Pembayaran iuran ditolak! Notifikasi telah dikirim ke orang tua siswa.'
+        );
     }
 }

@@ -522,7 +522,7 @@
 
                             <th class="w-[16%]">Status</th>
 
-                            <th class="w-[16%] text-right">Nominal</th>
+                            <th class="w-[16%] !text-center">Nominal</th>
 
                             <th class="w-[14%]">Bukti</th>
 
@@ -624,7 +624,7 @@
                             {{-- TANGGAL --}}
                             <td class="text-small">
                                 @if($payment->paid_at)
-                                    {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y') }}
+                                    {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y | H:i') }} WIB
                                 @else
                                     -
                                 @endif

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('note')->nullable(); // alasan jika tidak hadir
 
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamps();
 
             $table->unique(['attendance_id', 'student_id']);
         });

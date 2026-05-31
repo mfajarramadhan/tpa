@@ -94,6 +94,16 @@
             </div>
             @endrole
 
+            @role('orang_tua')
+                @if(!Auth::user()->students()->exists())
+                    <div class="m-auto text-center">
+                        <p class="text-gray-500">
+                            Belum ada anak yang terdaftar!
+                        </p>
+                    </div>
+                @endif
+            @endrole
+
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
 
             @foreach($classrooms as $classroom)

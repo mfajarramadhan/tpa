@@ -129,10 +129,10 @@
                 <thead>
                     <tr>
                         <th class="w-[16%]">Bulan</th>
-                        <th class="w-[18%]">Tanggal Pembayaran</th>
-                        <th class="w-[18%] text-right">Nominal</th>
                         <th class="w-[12%]">Status</th>
+                        <th class="w-[16%] !text-center">Nominal</th>
                         <th class="w-[12%]">Bukti</th>
+                        <th class="w-[20%]">Tanggal Pembayaran</th>
                         <th class="w-[8%] !text-center">Aksi</th>
                         <th class="w-[16%]">Catatan</th>
                     </tr>
@@ -162,20 +162,6 @@
                             @else
                                 -
                             @endif
-                        </td>
-
-                        {{-- Tanggal --}}
-                        <td>
-                            @if($payment->paid_at)
-                                {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y') }}
-                            @else
-                                -
-                            @endif
-                        </td>
-
-                        {{-- Nominal --}}
-                        <td class="font-semibold text-[var(--danger)]">
-                            Rp {{ number_format($payment->amount) }}
                         </td>
 
                         {{-- Status --}}
@@ -212,6 +198,11 @@
                             @endif
                         </td>
 
+                        {{-- Nominal --}}
+                        <td class="text-right font-mono text-[var(--text-main)]">
+                            Rp {{ number_format($payment->amount) }}
+                        </td>
+                        
                         {{-- Bukti --}}
                         <td>
 
@@ -250,6 +241,15 @@
 
                             @endif
 
+                        </td>
+                        
+                        {{-- Tanggal --}}
+                        <td>
+                            @if($payment->paid_at)
+                                {{ \Carbon\Carbon::parse($payment->paid_at)->format('d-m-Y | H:i') }} WIB
+                            @else
+                                -
+                            @endif
                         </td>
 
                         {{-- AKSI --}}

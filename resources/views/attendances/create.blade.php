@@ -73,33 +73,63 @@
 
             </div>
 
+            {{-- BUTTON --}}
+            <div class="mb-6">
+
+                <a href="{{ route('attendances.index') }}"
+                class="flex items-center gap-2 shadow-sm btn-primary">
+
+                    <iconify-icon
+                        icon="heroicons:arrow-left-20-solid"
+                        width="20">
+                    </iconify-icon>
+
+                    Kembali
+
+                </a>
+
+            </div>
+
             {{-- 🔹 FILTER KELAS & SESI --}}
             <form method="GET" action="{{ route('attendances.create') }}" class="mb-6">
 
                 <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
 
-                <div class="grid items-center w-full grid-cols-2 gap-6 md:grid-cols-3">
+                <div class="grid items-start w-full grid-cols-2 gap-6 md:grid-cols-3">
+
+                    {{-- INFO KELAS --}}
+                    <div class="text-left">
+                        <label class="text-small">Kelas</label>
+
+                        <div class="flex items-center h-11 text-2xl font-semibold text-[var(--text-main)]">
+                            {{ $classroom->name }}
+                        </div>
+                    </div>
                     
                     {{-- TANGGAL --}}
                     <div>
                         <label class="text-small">Tanggal</label>
-                        <div class="text-lg font-semibold text-[var(--text-main)]">
-                            {{ now()->format('d M Y') }}
-                        </div>
-                    </div>
 
-                    {{-- INFO KELAS --}}
-                    <div class="text-right md:text-left">
-                        <label class="text-small">Kelas</label>
-                        <div class="text-lg font-semibold text-[var(--text-main)]">
-                            {{ $classroom->name }}
-                        </div>
+                        <input type="date"
+                            name="date"
+                            value="{{ old('date', request('date', $date ?? now()->toDateString())) }}"
+                            max="{{ now()->toDateString() }}"
+                            onchange="this.form.submit()"
+                            class="w-full p-2 mt-1 border rounded-lg bg-[var(--card-bg)] text-[var(--text-main)] border-[var(--border-color)] focus:ring focus:ring-blue-200">
+                            
+                        @error('date')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     {{-- PILIH SESI --}}
                     <div class="col-span-2 md:col-span-1">
+                        <label class="text-small">
+                            Sesi
+                        </label>
+
                         <select name="session"
-                                class="input-solid w-full bg-[var(--primary)] text-center rounded-xl py-2.5 text-sm"
+                                class="w-full p-2 mt-1 border rounded-lg bg-[var(--card-bg)] text-[var(--text-main)] border-[var(--border-color)] focus:ring focus:ring-[var(--primary-light)]"
                                 onchange="this.form.submit()">
 
                             <option value="pagi" {{ $session == 'pagi' ? 'selected' : '' }}>
@@ -132,7 +162,7 @@
 
                 <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
                 <input type="hidden" name="session" value="{{ $session }}">
-                <input type="hidden" name="date" value="{{ now()->toDateString() }}">
+                <input type="hidden" name="date" value="{{ $date }}">
 
                 {{-- TABLE --}}
                 <div class="mt-4 overflow-x-auto card-panel">

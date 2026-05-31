@@ -17,7 +17,33 @@
             </button> --}}
         </div>
 
-        <div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5 sm:gap-5">
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-3 sm:gap-5">
+
+            <!-- Total Guru -->
+            <div class="stat-card">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-caption">Total Guru</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                        <iconify-icon icon="solar:user-bold-duotone" width="18"></iconify-icon>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-data">{{ $totalTeachers }}</div>
+                </div>
+            </div>
+
+            <!-- Total Orang Tua -->
+            <div class="stat-card">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-caption">Total Orang Tua</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                        <iconify-icon icon="solar:people-nearby-bold-duotone" width="18"></iconify-icon>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-data">{{ $totalParents }}</div>
+                </div>
+            </div>
 
             <!-- Total Siswa -->
             <div class="stat-card">
@@ -32,55 +58,42 @@
                 </div>
             </div>
 
-            <!-- Total Guru -->
-            <div class="stat-card" style="border-left-color: var(--info);">
-                <div class="flex items-start justify-between mb-3">
-                    <span class="text-caption">Total Guru</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--info-light)] text-[var(--info)]">
-                        <iconify-icon icon="solar:user-bold-duotone" width="18"></iconify-icon>
-                    </div>
-                </div>
-                <div>
-                    <div class="text-data text-[var(--info)]">{{ $totalTeachers }}</div>
-                </div>
-            </div>
-
             <!-- Pending Approval -->
-            <div class="stat-card" style="border-left-color: var(--warning-dark);">
+            <div class="stat-card">
                 <div class="flex items-start justify-between mb-3">
                     <span class="text-caption">Pending Approval</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--warning-light)] text-[var(--warning-dark)]">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
                         <iconify-icon icon="solar:clock-circle-bold-duotone" width="18"></iconify-icon>
                     </div>
                 </div>
                 <div>
-                    <div class="text-data text-[var(--warning-dark)]">{{ $pendingStudents }}</div>
+                    <div class="text-data">{{ $pendingStudents }}</div>
                 </div>
             </div>
 
             <!-- Pending Iuran -->
-            <div class="stat-card" style="border-left-color: var(--danger);">
+            <div class="stat-card">
                 <div class="flex items-start justify-between mb-3">
                     <span class="text-caption">Pending Iuran</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--danger-light)] text-[var(--danger)]">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
                         <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
                     </div>
                 </div>
                 <div>
-                    <div class="text-data text-[var(--danger)]">{{ $pendingPayments }}</div>
+                    <div class="text-data">{{ $pendingPayments }}</div>
                 </div>
             </div>
 
             <!-- Ditolak -->
-            <div class="stat-card" style="border-left-color: var(--purple);">
+            <div class="stat-card">
                 <div class="flex items-start justify-between mb-3">
-                    <span class="text-caption">Ditolak</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--purple-light)] text-[var(--purple)]">
+                    <span class="text-caption">Pendaftaran Ditolak</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
                         <iconify-icon icon="solar:close-circle-bold-duotone" width="18"></iconify-icon>
                     </div>
                 </div>
                 <div>
-                    <div class="text-data text-[var(--purple)]">{{ $rejectedStudents }}</div>
+                    <div class="text-data">{{ $rejectedStudents }}</div>
                 </div>
             </div>
 

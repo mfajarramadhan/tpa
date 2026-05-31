@@ -141,10 +141,27 @@
                         Password
                     </label>
 
-                    <input type="password"
-                           name="password"
-                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200"
-                           required>
+                    <div class="relative">
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]"
+                            required>
+
+                        <button 
+                            type="button"
+                            onclick="togglePassword('password', 'eyeIcon')"
+                            class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-[var(--primary)]">
+
+                            <iconify-icon
+                                id="eyeIcon"
+                                icon="solar:eye-bold"
+                                class="text-2xl">
+                            </iconify-icon>
+
+                        </button>
+                    </div>
 
                     @error('password')
                         <p class="mt-1 text-sm text-red-500">
@@ -159,10 +176,27 @@
                         Konfirmasi Password
                     </label>
 
-                    <input type="password"
-                           name="password_confirmation"
-                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200"
-                           required>
+                    <div class="relative">
+                        <input
+                            id="password_confirmation"
+                            type="password"
+                            name="password_confirmation"
+                            class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]"
+                            required>
+
+                        <button 
+                            type="button"
+                            onclick="togglePassword('password_confirmation', 'eyeIconConfirm')"
+                            class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-[var(--primary)]">
+
+                            <iconify-icon
+                                id="eyeIconConfirm"
+                                icon="solar:eye-bold"
+                                class="text-2xl">
+                            </iconify-icon>
+
+                        </button>
+                    </div>
 
                     @error('password_confirmation')
                         <p class="mt-1 text-sm text-red-500">
@@ -216,3 +250,19 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+function togglePassword(inputId, iconId) {
+
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('icon', 'solar:eye-closed-bold');
+    } else {
+        input.type = 'password';
+        icon.setAttribute('icon', 'solar:eye-bold');
+    }
+}
+</script>

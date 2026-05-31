@@ -66,7 +66,9 @@ class UserController extends Controller
 
         // larang siswa buat akun manual
         if ($request->role == 'siswa') {
-            return back()->with('error', 'Akun siswa dibuat otomatis dari akun orangtua!');
+            return back()->with(
+                'error', 
+                'Akun siswa dibuat otomatis dari akun orangtua!');
         }
 
         $user = User::create([
@@ -82,7 +84,9 @@ class UserController extends Controller
 
         $user->assignRole($request->role);
 
-        return redirect()->route('users.index')->with('success', 'Berhasil menambahkan user baru!');
+        return redirect()->route('users.index')->with(
+            'success', 
+            'Berhasil menambahkan user baru!');
     }
 
     // 🔷 DETAIL USER
@@ -203,7 +207,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('users.index')
-            ->with('success', 'Data user berhasil diperbarui');
+            ->with('success', 'Data user berhasil diperbarui!');
     }
 
     // 🔷 UPDATE ROLE (CEPAT - DROPDOWN)
@@ -267,6 +271,12 @@ class UserController extends Controller
             );
         }
 
+        // ubah status jadi nonaktif
+        $user->update([
+            'status' => 'nonaktif'
+        ]);
+
+        // soft delete
         $user->delete();
 
         return back()->with(

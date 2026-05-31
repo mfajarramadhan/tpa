@@ -27,7 +27,7 @@
     <div class="flex items-center gap-3 sm:gap-5">
 
         {{-- Search --}}
-        <div class="relative items-center hidden md:flex">
+        {{-- <div class="relative items-center hidden md:flex">
             <iconify-icon icon="solar:magnifier-linear"
                 class="absolute left-3.5 text-[var(--text-tertiary)]"
                 width="20"></iconify-icon>
@@ -35,7 +35,7 @@
             <input type="text"
                 placeholder="Cari..."
                 class="input-solid pl-11 py-2 w-64 rounded-full border-transparent bg-[var(--bg)] focus:bg-surface">
-        </div>
+        </div> --}}
 
         {{-- Theme Toggle --}}
         <button onclick="toggleTheme()"

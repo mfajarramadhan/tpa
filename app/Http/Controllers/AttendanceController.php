@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
-{
+{   
     /**
      * Display a listing of the resource.
      */
@@ -31,23 +31,24 @@ class AttendanceController extends Controller
     {
         $classroomId = $request->classroom_id;
         $session = $request->session ?? 'pagi';
+        $date = $request->date ?? now()->toDateString();
 
         $classroom = Classroom::with('students')->findOrFail($classroomId);
 
-        // 🔹 ambil absensi sesi sekarang
         $attendance = Attendance::with('details')
             ->where([
                 'classroom_id' => $classroomId,
-                'date' => now()->toDateString(),
+                'academic_year_id' => activeAcademicYear()->id,
+                'date' => $date,
                 'session' => $session
             ])
             ->first();
 
-        // 🔹 ambil absensi pagi
         $attendancePagi = Attendance::with('details')
             ->where([
                 'classroom_id' => $classroomId,
-                'date' => now()->toDateString(),
+                'academic_year_id' => activeAcademicYear()->id,
+                'date' => $date,
                 'session' => 'pagi'
             ])
             ->first();
@@ -55,28 +56,22 @@ class AttendanceController extends Controller
         $details = [];
         $lockedStudents = [];
 
-        // 🔥 PRIORITAS 1: SESSION SAAT INI
         if ($attendance) {
             foreach ($attendance->details as $d) {
                 $details[$d->student_id] = $d;
 
-                // 🔒 LOCK HANYA JIKA BUKAN ALPHA
                 if ($d->status !== 'alpha') {
                     $lockedStudents[$d->student_id] = true;
                 }
             }
         }
 
-        // 🔥 PRIORITAS 2: FALLBACK PAGI (KHUSUS SORE)
         if ($session === 'sore' && $attendancePagi) {
             foreach ($attendancePagi->details as $d) {
-
-                // kalau belum ada di sore → ambil dari pagi
                 if (!isset($details[$d->student_id])) {
                     $details[$d->student_id] = $d;
                 }
 
-                // 🔒 LOCK HANYA JIKA BUKAN ALPHA
                 if ($d->status !== 'alpha') {
                     $lockedStudents[$d->student_id] = true;
                 }
@@ -87,6 +82,7 @@ class AttendanceController extends Controller
             'classroom',
             'attendance',
             'session',
+            'date',
             'details',
             'lockedStudents'
         ));
@@ -104,12 +100,14 @@ class AttendanceController extends Controller
             'students' => 'required|array'
         ]);
 
-        // 🔹 HEADER ABSENSI
+        $date = $request->date;
+
+        // header absensi di table attendances
         $attendance = Attendance::firstOrCreate(
             [
                 'classroom_id' => $request->classroom_id,
                 'academic_year_id' => activeAcademicYear()->id,
-                'date' => now()->toDateString(),
+                'date' => $date,
                 'session' => $request->session,
             ],
             [
@@ -117,16 +115,18 @@ class AttendanceController extends Controller
             ]
         );
 
-        // 🔹 AMBIL DATA PAGI (UNTUK LOCK)
+        // ambil data pagi (lock status)
+        // saat sore input absensi, sistem cek hasil pagi dulu
         $attendancePagi = Attendance::with('details')
             ->where([
                 'classroom_id' => $request->classroom_id,
                 'academic_year_id' => activeAcademicYear()->id,
-                'date' => now()->toDateString(),
+                'date' => $date,
                 'session' => 'pagi'
             ])
             ->first();
 
+        // ubah data pagi jadi array untuk opstimisasi pencarian
         $pagiDetails = [];
 
         if ($attendancePagi) {
@@ -135,16 +135,17 @@ class AttendanceController extends Controller
             }
         }
 
-        // 🔹 AMBIL DATA SORE (UNTUK PROTEKSI BALIK KE PAGI)
+        // ambil data sore (untuk proteksi balik ke pagi tidak boleh overwrite)
         $attendanceSore = Attendance::with('details')
             ->where([
                 'classroom_id' => $request->classroom_id,
                 'academic_year_id' => activeAcademicYear()->id,
-                'date' => now()->toDateString(),
+                'date' => $date,
                 'session' => 'sore'
             ])
             ->first();
 
+        // ubah data sore jadi array untuk opstimisasi pencarian
         $soreDetails = [];
 
         if ($attendanceSore) {
@@ -153,44 +154,40 @@ class AttendanceController extends Controller
             }
         }
 
-        // 🔹 LOOP SEMUA SISWA (UPSERT, NO DELETE)
+        // loop semua siswa (upsert, no delete)
         foreach ($request->students as $studentId => $data) {
 
-            // =========================================
-            // 🌆 SESI SORE
-            // =========================================
+            // sesi sore
             if ($request->session === 'sore') {
-
                 $pagi = $pagiDetails[$studentId] ?? null;
 
                 if ($pagi && $pagi->status !== 'alpha') {
-                    // 🔒 LOCK TOTAL (hadir, izin, sakit)
+                    // lock status (hadir, izin, sakit)
                     $status = $pagi->status;
                     $note = $pagi->note;
-
+                    
+                // jika pagi alpha/belum ada status absensi = boleh diubah
                 } else {
-                    // ✔ alpha / belum ada → boleh diubah
+                    // jika checkbox hadir dicentang
                     if (isset($data['hadir'])) {
                         $status = 'hadir';
                         $note = null;
                     } else {
+                        // jika tidak dicentang, ambil status
                         $status = $data['status'] ?? 'alpha';
                         $note = $data['note'] ?? null;
                     }
                 }
 
-            // =========================================
-            // 🌞 SESI PAGI
-            // =========================================
+            // sesi pagi
             } else {
-
+                // cek apakah sore sudah pernah diisi.
                 $sore = $soreDetails[$studentId] ?? null;
 
-                // 🔒 JANGAN OVERWRITE HASIL SORE
+                // jangan overwrite hasil sore
                 if ($sore && $sore->status !== 'alpha') {
                     continue;
                 }
-
                 if (isset($data['hadir'])) {
                     $status = 'hadir';
                     $note = null;
@@ -200,7 +197,6 @@ class AttendanceController extends Controller
                 }
             }
 
-            // 🔥 UPSERT (AMAN)
             AttendanceDetail::updateOrCreate(
                 [
                     'attendance_id' => $attendance->id,
@@ -208,14 +204,16 @@ class AttendanceController extends Controller
                 ],
                 [
                     'status' => $status,
-                    'note' => $note
+                    'note' => $note,
+                    'updated_by' => auth()->id(),
                 ]
             );
         }
 
         return redirect()->route('attendances.create', [
             'classroom_id' => $request->classroom_id,
-            'session' => $request->session
+            'session' => $request->session,
+            'date' => $request->date,
         ])->with('success', 'Absensi berhasil disimpan!');
     }
 
@@ -307,13 +305,13 @@ class AttendanceController extends Controller
 
         /*
         =====================================================
-        SUPERADMIN & GURU
+        GURU
         =====================================================
         */
-        if ($user->hasAnyRole(['superadmin', 'guru'])) {
+        if ($user->hasAnyRole('guru')) {
 
             // dropdown semua kelas
-            $classrooms = Classroom::orderBy('name')->get();
+            $classrooms = Classroom::orderBy('id', 'asc')->get();
 
         /*
         =====================================================
@@ -326,7 +324,7 @@ class AttendanceController extends Controller
             $classrooms = Classroom::whereIn(
                 'id',
                 $user->students->pluck('classroom_id')
-            )->get();
+            )->orderBy('id', 'asc')->get();
 
             // auto pilih kelas pertama jika belum dipilih
             if (!$classroomId && $classrooms->count()) {
@@ -626,18 +624,62 @@ class AttendanceController extends Controller
         ));
     }
 
+    // public function updateRecap(Request $request, AttendanceDetail $detail)
+    // {
+    //     $request->validate([
+    //         'status' => 'required|in:hadir,izin,sakit,alpha',
+    //         'note' => 'nullable|string|max:255',
+    //         'session' => 'required|in:pagi,sore',
+    //     ]);
+
+    //     $detail->update([
+    //         'status' => $request->status,
+    //         'note' => $request->note,
+    //         'updated_by' => auth()->id(),
+    //     ]);
+
+    //     // update attendances
+    //     $detail->attendance->update([
+    //         'session' => $request->session,
+    //     ]);
+
+    //     return back()->with('success', 'Absensi berhasil diperbarui!');
+    // }
+
     public function updateRecap(Request $request, AttendanceDetail $detail)
     {
         $request->validate([
             'status' => 'required|in:hadir,izin,sakit,alpha',
-            'note' => 'nullable|string|max:255'
+            'note' => 'nullable|string|max:255',
+            'session' => 'required|in:pagi,sore',
         ]);
 
+        // ambil header absensi saat ini
+        $attendance = $detail->attendance;
+
+        // Cari header absensi tujuan, jika belum ada maka buat dahulu
+        // Contoh case: Guru salah input ke sesi pagi lalu dipindahkan ke sesi sore.
+        // Jika header absensi sesi sore belum ada, sistem akan membuatnya terlebih dahulu.
+        $targetAttendance = Attendance::firstOrCreate(
+            [
+                'classroom_id' => $attendance->classroom_id,
+                'academic_year_id' => $attendance->academic_year_id,
+                'date' => $attendance->date,
+                'session' => $request->session,
+            ],
+            [
+                'created_by' => auth()->id(),
+            ]
+        );
+
+        // Update attendance detail siswa
         $detail->update([
+            'attendance_id' => $targetAttendance->id,
             'status' => $request->status,
-            'note' => $request->note
+            'note' => $request->status === 'hadir' ? null : $request->note,
+            'updated_by' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Absensi berhasil diperbarui');
+        return back()->with('success', 'Absensi berhasil diperbarui!');
     }
 }

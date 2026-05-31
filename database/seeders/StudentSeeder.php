@@ -27,6 +27,7 @@ class StudentSeeder extends Seeder
             $parent = User::create([
                 'name' => 'Reza',
                 'email' => 'reza@gmail.com',
+                'phone' => '0895333530959',
                 'password' => Hash::make('reza12345'),
                 'status' => 'aktif',
                 'approval_status' => 'approved',

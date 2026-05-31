@@ -18,11 +18,12 @@ class AdminSeeder extends Seeder
             [
                 'email' => 'fajar@gmail.com',
                 'phone' => '0895333530959',
-                'name' => 'Fajar',
+                'name' => 'Muhammad Fajar Ramadhan',
                 'address' => 'Karawang',
                 'password' => Hash::make('fajar12345'),
                 'approval_status' => 'approved',
                 'status' => 'aktif',
+                'role' => 'superadmin',
             ]
         );
 

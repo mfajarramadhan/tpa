@@ -294,12 +294,16 @@
             {{-- BUTTON --}}
             <div class="flex flex-wrap gap-3 mt-8">
 
-                <a href="{{ route('users.edit', $user->id) }}"
-                   class="shadow-sm btn-primary">
+                @if(!$user->trashed())
 
-                    Edit
+                    <a href="{{ route('users.edit', $user->id) }}"
+                    class="shadow-sm btn-primary">
 
-                </a>
+                        Edit
+
+                    </a>
+
+                @endif
 
             </div>
 

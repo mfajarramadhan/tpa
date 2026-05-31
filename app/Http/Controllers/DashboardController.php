@@ -9,12 +9,16 @@ use App\Models\Payment;
 use App\Models\Assignment;
 use App\Models\Material;
 use App\Models\Submission;
+use App\Services\MonthlyBillService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(MonthlyBillService $monthlyBillService)
     {
+        // auto generate iuran dari app/Services/MonthlyBillService.php
+        $monthlyBillService->generate();
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
@@ -23,13 +27,19 @@ class DashboardController extends Controller
 
             $totalStudents = Student::count();
             $totalTeachers = User::role('guru')->count();
+            $totalParents = User::role('orang_tua')->count();
+
             $pendingStudents = Student::where('status', 'nonaktif')->count();
-            $pendingPayments = Payment::where('status', 'pending')->where('type', 'monthly')->count();            
+            $pendingPayments = Payment::where('status', 'pending')
+                ->where('type', 'monthly')
+                ->count();
+
             $rejectedStudents = Student::where('status', 'ditolak')->count();
 
             return view('dashboard.superadmin', compact(
                 'totalStudents',
                 'totalTeachers',
+                'totalParents',
                 'pendingStudents',
                 'pendingPayments',
                 'rejectedStudents'

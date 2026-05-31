@@ -13,6 +13,7 @@ class Payment extends Model
 
     protected $fillable = [
         'student_id',
+        'academic_year_id',
         'type',
         'month',
         'original_amount',
@@ -20,7 +21,6 @@ class Payment extends Model
         'proof_file',
         'status',
         'paid_at',
-        'academic_year_id',
         'approved_by',
         'approved_at',
         'reject_reason'

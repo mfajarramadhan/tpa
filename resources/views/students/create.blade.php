@@ -256,9 +256,16 @@
                 </div>
 
                 {{-- INFO BIAYA --}}
-                <div class="p-3 mt-4 text-sm bg-yellow-100 rounded-lg">
-                    <strong>Biaya Pendaftaran:</strong>
-                    Rp {{ number_format($fee->registration_fee) }}
+                <div class="p-3 mt-4 border shadow-sm rounded-2xl border-yellow-300/40 bg-yellow-500/10">
+
+                    <p class="text-sm text-[var(--text-tertiary)]">
+                        Biaya Pendaftaran:
+                    </p>
+
+                    <p class="text-lg font-bold text-yellow-700">
+                        Rp {{ number_format($fee->registration_fee) }}
+                    </p>
+
                 </div>
 
                 {{-- BUKTI PEMBAYARAN --}}

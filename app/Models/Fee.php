@@ -9,6 +9,9 @@ class Fee extends Model
     protected $fillable = [
         'registration_fee',
         'monthly_fee',
+        'bank_name',
+        'account_name',
+        'account_number',
     ];
 
     public function logs()

@@ -65,6 +65,10 @@ class PaymentRejectedNotification extends Notification
                 'Pembayaran iuran atas nama '
 
                 . $this->payment->student->name .
+                
+                ' - '  .
+
+                $this->payment->student->classroom->name .
 
                 ' ditolak! '
 

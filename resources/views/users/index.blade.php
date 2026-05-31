@@ -288,7 +288,7 @@
                                                 onsubmit="confirmAction(
                                                     event,
                                                     'Hapus User?',
-                                                    'Data user akan dihapus permanen',
+                                                    'Data user akan dihapus!',
                                                     'Ya, Hapus',
                                                     'warning'
                                                 )">

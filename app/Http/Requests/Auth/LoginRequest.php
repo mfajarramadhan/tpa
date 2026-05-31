@@ -82,7 +82,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey(), 180);
 
             throw ValidationException::withMessages([
-                'login' => 'email/nomor telepon/password salah!',
+                'login' => trans('auth.failed'),
             ]);
         }
 

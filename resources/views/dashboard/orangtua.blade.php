@@ -80,7 +80,7 @@
                     <p class="text-body mt-1 font-medium text-[var(--text-tertiary)]">
                         @if(Auth::user()->students()->exists())
 
-                            Berikut ringkasan informasi anak secara real-time!
+                            Berikut ringkasan informasi anak anda di TPA/DTA Al-Barokah secara real-time!
 
                         @else
 

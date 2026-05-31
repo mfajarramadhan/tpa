@@ -5,10 +5,10 @@
 
     <div class="py-6 md:py-0">
 
-        {{-- BUTTON --}}
+        {{-- BACK BUTTON --}}
         <div class="mb-6">
 
-            <a href="{{ route('payments.index') }}"
+            <a href="{{ route('payments.index', ['student_id' => $payment->student_id]) }}"
                 class="flex items-center gap-2 shadow-sm btn-primary">
 
                 <iconify-icon
@@ -78,10 +78,69 @@
 
                 </div>
 
-                {{-- INFO --}}
+                {{-- INFO PEMBAYARAN --}}
                 <div class="p-5 mb-6 border border-custom rounded-2xl bg-[var(--bg)]">
 
-                    <div class="grid gap-4 md:text-center md:grid-cols-3">
+                    {{-- REKENING --}}
+                    <div class="flex flex-col gap-4 p-4 border rounded-2xl border-custom bg-[var(--surface)] md:flex-row md:items-center md:justify-between">
+
+                        {{-- BANK + NAMA --}}
+                        <div>
+
+                            <div class="mt-1">
+
+                                <p class="text-sm text-[var(--text-secondary)]">
+                                    {{ $fee->bank_name }}
+                                </p>
+
+                                <p class="text-lg font-bold text-[var(--text-main)]">
+                                    a.n {{ $fee->account_name }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        {{-- NOMOR REKENING --}}
+                        <div class="md:text-right">
+
+                            <div class="flex items-center justify-between gap-2 md:justify-end">
+
+                                <p class="text-xs font-semibold tracking-wide uppercase text-[var(--text-tertiary)]">
+                                    Nomor Rekening
+                                </p>
+
+                                {{-- COPY BUTTON --}}
+                                <button type="button"
+                                    onclick="copyAccountNumber('{{ $fee->account_number }}')"
+                                    class="flex items-center justify-center w-7 h-7 rounded-lg transition
+                                    hover:bg-[var(--primary-light)] text-[var(--primary)]"
+                                    title="Salin nomor rekening">
+
+                                    <iconify-icon
+                                        icon="solar:copy-bold-duotone"
+                                        width="18">
+                                    </iconify-icon>
+
+                                </button>
+
+                            </div>
+
+                            {{-- ACCOUNT NUMBER --}}
+                            <button type="button"
+                                onclick="copyAccountNumber('{{ $fee->account_number }}')"
+                                class="mt-1 text-xl font-bold tracking-wider font-mono text-[var(--primary)] hover:opacity-80 transition">
+
+                                {{ $fee->account_number }}
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    {{-- DETAIL PEMBAYARAN --}}
+                    <div class="grid gap-4 mt-5 md:grid-cols-3 md:text-center">
 
                         {{-- NAMA --}}
                         <div>
@@ -116,7 +175,7 @@
                                 Nominal
                             </p>
 
-                            <p class="font-bold text-[var(--text-main)]">
+                            <p class="font-bold text-[var(--danger)] text-lg">
                                 Rp {{ number_format($payment->original_amount) }}
                             </p>
 
@@ -384,5 +443,18 @@
 
     }
 
+    function copyAccountNumber(number) {
+
+        navigator.clipboard.writeText(number);
+
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Berhasil disalin',
+            showConfirmButton: false,
+            timer: 1000
+        });
+    }
 
 </script>

@@ -70,7 +70,7 @@
             </a>
 
             <a href="/payments"
-            class="nav-item {{ request()->is('payments*') ? 'active' : '' }}">
+                class="nav-item {{ request()->is('payments*') || request()->is('students/*/payments') ? 'active' : '' }}">
                 <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
                 Iuran Bulanan
             </a>

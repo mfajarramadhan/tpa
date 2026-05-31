@@ -86,8 +86,10 @@ Route::middleware('auth')->group(function () {
 
 
     // Detail Pembayaran
-    Route::resource('payments', PaymentController::class);
-
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+    Route::put('/payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');
 
     // Khusus Superadmin
     Route::middleware('role:superadmin')->group(function () {
@@ -102,8 +104,7 @@ Route::middleware('auth')->group(function () {
         
 
         // Detail pembayaran per siswa
-        Route::get('/students/{student}/payments', [PaymentController::class, 'show'])->name('payments.student.show');
-        Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
+        Route::get('/students/{student}/payments', [PaymentController::class, 'showStudentPayments'])->name('payments.student.show');        Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
         Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
         // batalkan approve iuran bulanan (unapprove)
         Route::post('/payments/{payment}/unapprove', [PaymentController::class, 'unapprove'])->name('payments.unapprove');
@@ -115,7 +116,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
-        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show')->withTrashed();
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
