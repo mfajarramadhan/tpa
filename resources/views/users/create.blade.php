@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-6 md:py-0">
-
+        
         {{-- BUTTON --}}
         <div class="mb-6">
 

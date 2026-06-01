@@ -147,7 +147,7 @@
                                 @if($student->status == 'nonaktif')
 
                                     <span class="px-3 py-1 text-xs font-semibold text-yellow-700 bg-yellow-100 rounded-full dark:bg-yellow-500/15 dark:text-yellow-400">
-                                        Menunggu
+                                        Pending
                                     </span>
 
                                 @elseif($student->status == 'aktif')

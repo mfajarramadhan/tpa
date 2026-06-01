@@ -40,9 +40,17 @@
                 </div>
 
                 <div>
+                    @php
+                        $roleLabels = [
+                            'siswa' => 'Siswa',
+                            'guru' => 'Guru',
+                            'orang_tua' => 'Orang Tua',
+                            'superadmin' => 'Superadmin',
+                        ];
+                    @endphp
 
                     <h2 class="text-xl font-bold text-[var(--text-main)]">
-                        Detail User
+                        Detail User - {{ $roleLabels[$user->roles->first()->name ?? ''] ?? '-' }}
                     </h2>
 
                     <p class="text-sm text-[var(--text-tertiary)]">
@@ -69,18 +77,20 @@
 
                 </div>
 
-                {{-- ORANG TUA --}}
-                <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+                @if($user->student)
+                    {{-- ORANG TUA --}}
+                    <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
 
-                    <p class="text-sm font-semibold text-slate-500">
-                        Orang Tua
-                    </p>
+                        <p class="text-sm font-semibold text-slate-500">
+                            Orang Tua
+                        </p>
 
-                    <p class="text-sm font-bold text-right text-slate-800">
-                        {{ $user->student->parent->name }}
-                    </p>
+                        <p class="text-sm font-bold text-right text-slate-800">
+                            {{ $user->student->parent->name }}
+                        </p>
 
-                </div>
+                    </div>
+                @endif
 
                 {{-- EMAIL --}}
                 <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
@@ -103,7 +113,7 @@
                     </p>
 
                     <p class="text-sm font-bold text-right break-words text-slate-800">
-                        {{ $user->address ?? '-' }}
+                        {{ $user->student ? ($user->student->parent->address ?? '-') : ($user->address ?? '-') }}
                     </p>
 
                 </div>

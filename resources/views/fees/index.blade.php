@@ -141,6 +141,30 @@
                     <span class="font-bold">Catatan:</span> Perubahan biaya iuran bulanan mulai berlaku di bulan berikutnya
                 </p>
 
+                <hr class="my-6 border-custom">
+
+                {{-- HEADER BANK --}}
+                <div class="flex items-center gap-3 px-2 mb-6">
+
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:wallet-money-bold-duotone"
+                            class="text-xl text-[var(--primary)]">
+                        </iconify-icon>
+
+                    </div>
+
+                    <div>
+
+                        <h2 class="text-xl font-bold text-[var(--text-main)]">
+                            Informasi Bank
+                        </h2>
+
+                    </div>
+
+                </div>
+
                 <!-- Nama Bank -->
                 <div>
                     <label class="font-semibold text-[var(--text-main)] mb-1 mt-2 block">

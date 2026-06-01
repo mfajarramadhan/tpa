@@ -19,9 +19,23 @@ class UserController extends Controller
         $query = User::withTrashed()
             ->where('id', '!=', auth()->id());
 
-        // 🔍 filter nama
+        // filter nama, email, role, kelas
         if ($request->name) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+            $search = $request->name;
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%')
+                    ->orWhereHas('roles', function ($roleQuery) use ($search) {
+                        $roleQuery->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('student.classroom', function ($classQuery) use ($search) {
+                        $classQuery->where('name', 'like', '%' . $search . '%');
+                    });
+
+            });
         }
 
         // 🔍 filter role
@@ -41,7 +55,7 @@ class UserController extends Controller
             $query->where('status', 'nonaktif')->whereNull('deleted_at');
         }
 
-        $users = $query->with('roles')->latest()->paginate(10)->withQueryString();
+        $users = $query->with(['roles', 'student.classroom'])->latest()->paginate(10)->withQueryString();
 
         return view('users.index', compact('users', 'status'));
     }
@@ -112,55 +126,57 @@ class UserController extends Controller
     {
         $request->validate([
 
-        // USER
-        'name' => 'required|string|max:255',
+            // USER
+            'name' => 'required|string|max:255',
 
-        'phone' => [
-            'required',
-            'regex:/^08[0-9]{8,11}$/', //diawali 08, setelah 08 hanya boleh angka, jumlah angka setelah 08 antara 8 sampai 11 digit (total 10-13 digit)
-            'unique:users,phone,' . $user->id
-        ],
+            'phone' => $user->student ? [
+                'nullable',
+            ] : [
+                'required',
+                'regex:/^08[0-9]{8,11}$/', //diawali 08, setelah 08 hanya boleh angka, jumlah angka setelah 08 antara 8 sampai 11 digit (total 10-13 digit)
+                'unique:users,phone,' . $user->id
+            ],
 
-        'email' => [
-            'required',
-            'email',
-            'unique:users,email,' . $user->id
-        ],
+            'email' => [
+                'required',
+                'email',
+                'unique:users,email,' . $user->id
+            ],
 
-        'address' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
 
-        'password' => 'nullable|min:6',
+            'password' => 'nullable|min:6|confirmed',
 
-        // STUDENT
-        'classroom_id' => 'nullable|exists:classrooms,id',
+            // STUDENT
+            'classroom_id' => 'nullable|exists:classrooms,id',
 
-        'nisn' => [
-            'nullable',
-            'digits:10',
-            'unique:students,nisn,' . optional($user->student)->id
-        ],
+            'nisn' => [
+                'nullable',
+                'digits:10',
+                'unique:students,nisn,' . optional($user->student)->id
+            ],
 
-        'birth_date' => [
-            'nullable',
-            'date',
-            function ($attribute, $value, $fail) {
+            'birth_date' => [
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) {
 
-                if ($value && Carbon::parse($value)->age < 8) {
+                    if ($value && Carbon::parse($value)->age < 8) {
 
-                    $fail('Usia anak minimal 8 tahun!');
+                        $fail('Usia anak minimal 8 tahun!');
+
+                    }
 
                 }
+            ],
 
-            }
-        ],
+            'gender' => 'nullable|in:L,P',
 
-        'gender' => 'nullable|in:L,P',
+            'school_origin' => 'nullable|string|max:255',
 
-        'school_origin' => 'nullable|string|max:255',
+            'school_grade' => 'nullable|string|max:20',
 
-        'school_grade' => 'nullable|string|max:20',
-
-    ]);
+        ]);
 
         // PROTEKSI SUPERADMIN
         if ($user->hasRole('superadmin') && auth()->id() != $user->id) {
@@ -173,10 +189,13 @@ class UserController extends Controller
 
         $data = [
             'name' => $request->name,
-            'phone' => $request->phone,
             'email' => $request->email,
             'address' => $request->address,
         ];
+
+        if (!$user->student) {
+            $data['phone'] = $request->phone;
+        }
 
         // PASSWORD OPTIONAL
         if ($request->filled('password')) {
@@ -195,6 +214,7 @@ class UserController extends Controller
 
             $user->student->update([
 
+                'name' => $request->name,
                 'classroom_id' => $request->classroom_id,
                 'nisn' => $request->nisn,
                 'birth_date' => $request->birth_date,
@@ -304,6 +324,10 @@ class UserController extends Controller
             ->findOrFail($id);
 
         $user->restore();
+
+        $user->update([
+            'status' => 'aktif',
+        ]);
 
         return back()->with(
             'success',

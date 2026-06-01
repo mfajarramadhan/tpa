@@ -95,7 +95,7 @@
                         <input type="text"
                             name="name"
                             value="{{ request('name') }}"
-                            placeholder="Cari nama..."
+                            placeholder="Cari..."
                             class="input-solid flex-1 md:flex-none md:w-fit md:max-w-40
                             bg-[var(--surface)]
                             rounded-xl
@@ -216,9 +216,33 @@
                     <tbody>
                         @forelse($users as $user)
                             <tr class="{{ $user->trashed() ? 'opacity-75' : '' }}">
+
+                                @php
+                                    $initial = strtoupper(substr($user->name, 0, 2));
+                                @endphp
+                                
                                 {{-- NAMA --}}
                                 <td class="font-semibold text-[var(--text-main)]">
-                                    {{ $user->name }}
+                                    <div class="flex items-center gap-4">
+
+                                        {{-- Avatar Inisial --}}
+                                        <div class="w-10 h-10 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center font-bold text-sm border border-[var(--primary-light)]">
+                                            {{ $initial }}
+                                        </div>
+
+                                        {{-- Nama + Info kecil --}}
+                                        <div>
+                                            <div class="font-semibold text-[var(--text-main)]">
+                                                {{ $user->name }}
+                                            </div>
+                                            @if($user->hasRole('siswa') && $user->student)
+                                            <div class="text-xs text-[var(--text-tertiary)] mt-0.5">
+                                                {{ $user->student->classroom->name ?? '-' }}
+                                            </div>
+                                            @endif
+                                        </div>
+
+                                    </div>
                                 </td>
 
                                 {{-- EMAIL --}}

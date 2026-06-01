@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold">
-            Pilih Kelas
+            Daftar Kelas
         </h2>
     </x-slot>
 

@@ -93,13 +93,13 @@
 
             <a href="/learning"
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:notebook-bold-duotone"></iconify-icon>
+                <iconify-icon icon="solar:book-bookmark-bold-duotone"></iconify-icon>
                 Pembelajaran
             </a>
             
             <a href="{{ route('promotions.index') }}"
                 class="nav-item {{ request()->is('promotions*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:calendar-bold-duotone"></iconify-icon>
+                <iconify-icon icon="solar:medal-ribbons-star-bold-duotone"></iconify-icon>
                 Kenaikan Kelas
             </a>
 

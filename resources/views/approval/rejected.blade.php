@@ -208,7 +208,7 @@
                                 <td colspan="5"
                                     class="py-6 text-center text-small">
 
-                                    Belum ada pendaftaran siswa baru
+                                    Belum ada pendaftaran siswa ditolak!
 
                                 </td>
 

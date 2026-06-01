@@ -40,9 +40,17 @@
                 </div>
 
                 <div>
+                    @php
+                        $roleLabels = [
+                            'siswa' => 'Siswa',
+                            'guru' => 'Guru',
+                            'orang_tua' => 'Orang Tua',
+                            'superadmin' => 'Superadmin',
+                        ];
+                    @endphp
 
                     <h2 class="text-xl font-bold text-[var(--text-main)]">
-                        Edit User
+                        Edit User - {{ $roleLabels[$user->roles->first()->name ?? ''] ?? '-' }}
                     </h2>
 
                     <p class="text-sm text-[var(--text-tertiary)]">
@@ -152,59 +160,8 @@
 
                 @endif
 
-                {{-- PASSWORD --}}
-                <div class="mb-4">
-
-                    <label class="block mb-1 text-sm font-semibold">
-                        Password Baru
-                    </label>
-
-                    <input type="text"
-                           name="password"
-                           class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200">
-
-                    <p class="mt-1 text-xs text-gray-500">
-                        Kosongkan jika tidak ingin mengubah password
-                    </p>
-
-                    @error('password')
-                        <p class="mt-1 text-sm text-red-500">
-                            {{ $message }}
-                        </p>
-                    @enderror
-
-                </div>
-
                 {{-- DATA SISWA --}}
                 @if($user->student)
-
-                    <div class="p-5 mt-8 border border-gray-100 rounded-2xl bg-gray-50">
-
-                        {{-- HEADER --}}
-                        <div class="flex items-center gap-3 mb-5">
-
-                            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-
-                                <iconify-icon
-                                    icon="heroicons:academic-cap-solid"
-                                    class="text-xl text-blue-600">
-                                </iconify-icon>
-
-                            </div>
-
-                            <div>
-
-                                <h3 class="font-bold text-slate-800">
-                                    Edit Siswa
-                                </h3>
-
-                                <p class="text-sm text-slate-500">
-                                    Perbarui informasi detail siswa
-                                </p>
-
-                            </div>
-
-                        </div>
 
                         {{-- KELAS --}}
                         <div class="mb-4">
@@ -588,9 +545,99 @@
 
                         </div>
 
+                @endif
+
+                <hr class="my-6 border-custom">
+
+                {{-- PASSWORD HEADER --}}
+                <div class="flex items-center gap-3 mb-4">
+
+                    <div class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--primary-light)]">
+
+                        <iconify-icon
+                            icon="solar:lock-password-bold-duotone"
+                            class="text-lg text-[var(--primary)]">
+                        </iconify-icon>
+
                     </div>
 
-                @endif
+                    <div class="mb-4">
+
+                        <h3 class="text-base font-bold text-[var(--text-main)]">
+                            Ganti Password
+                        </h3>
+
+                        <p class="text-sm text-[var(--text-tertiary)]">
+                            Kosongkan jika tidak ingin mengganti password
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div x-data="{ showPassword: false, showConfirm: false }">
+
+                    {{-- PASSWORD --}}
+                    <div class="relative mb-4">
+                        <input
+                            :type="showPassword ? 'text' : 'password'"
+                            name="password"
+                            placeholder="Password baru"
+                            autocomplete="new-password"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+
+                        <button type="button"
+                                @click="showPassword = !showPassword"
+                                class="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-[var(--primary)]">
+
+                            <iconify-icon
+                                :icon="showPassword ? 'solar:eye-closed-bold' : 'solar:eye-bold'"
+                                class="text-2xl">
+                            </iconify-icon>
+
+                        </button>
+                    </div>
+
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
+                    {{-- CONFIRM PASSWORD --}}
+                    <div class="relative mt-4 mb-4">
+                        <input
+                            :type="showConfirm ? 'text' : 'password'"
+                            name="password_confirmation"
+                            placeholder="Konfirmasi password"
+                            autocomplete="new-password"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+
+                        <button type="button"
+                                @click="showConfirm = !showConfirm"
+                                class="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-[var(--primary)]">
+
+                            <iconify-icon
+                                :icon="showConfirm ? 'solar:eye-closed-bold' : 'solar:eye-bold'"
+                                class="text-2xl">
+                            </iconify-icon>
+
+                        </button>
+                    </div>
+
+                    @error('password_confirmation')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
+                </div>
 
                 {{-- BUTTON --}}
                 <div class="mt-8">
