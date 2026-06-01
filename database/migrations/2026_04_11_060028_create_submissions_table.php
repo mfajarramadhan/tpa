@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('file_path')->nullable();
             $table->text('link')->nullable();
             $table->text('note')->nullable();
-            $table->timestamps();
             // 1 siswa hanya 1 submission per tugas
             $table->unique(['material_id', 'student_id']);
+            $table->timestamps();
         });
     }
 

@@ -121,8 +121,12 @@ class PaymentController extends Controller
                     $status = 'Belum Bayar';
 
                     // cek kondisi penting
+                    $ditolak = $studentPayments
+                        ->where('status', 'rejected')
+                        ->count() > 0;
+
                     $menungguKonfirmasi = $studentPayments
-                        ->where('status', '!=', 'paid')
+                        ->where('status', 'pending')
                         ->whereNotNull('proof_file')
                         ->count() > 0;
 
@@ -131,11 +135,22 @@ class PaymentController extends Controller
                         ->whereNull('proof_file')
                         ->count() > 0;
 
-                    // PRIORITAS SESUAI URUTAN
-                    if ($menungguKonfirmasi) {
+                    $adaTunggakan = $studentPayments
+                        ->where('status', 'pending')
+                        ->whereNull('proof_file')
+                        ->filter(function ($payment) {
+                            return $payment->month < now()->format('Y-m');
+                        })
+                        ->count() > 0;
+
+                    // PRIORITAS FIFO
+                    if ($ditolak) {
+                        $status = 'Ditolak';
+
+                    } elseif ($menungguKonfirmasi) {
                         $status = 'Menunggu Konfirmasi';
 
-                    } elseif ($totalDibayar > 0 && $totalDibayar < $totalTagihan) {
+                    } elseif ($adaTunggakan || ($totalDibayar > 0 && $totalDibayar < $totalTagihan)) {
                         $status = 'Menunggak';
 
                     } elseif ($belumBayar) {
@@ -158,14 +173,15 @@ class PaymentController extends Controller
                         'sisa_tagihan' => $sisaTagihan,
                         'status' => $status,
 
-                        // URUTAN PRIORITAS
-                        // PAKAI PRIORITY KARENA $studentsSummary ADALAH COLLECTION, BUKAN QUERY DB
+                        // urutan prioritas
+                        // pakai priority karena $studentsSummary adalah collection, bukan query db
                         'priority' => match ($status) {
-                            'Menunggu Konfirmasi' => 1,
-                            'Menunggak' => 2,
-                            'Belum Bayar' => 3,
-                            'Lunas' => 4,
-                            'Tanpa tagihan' => 5,
+                            'Ditolak' => 1,
+                            'Menunggu Konfirmasi' => 2,
+                            'Menunggak' => 3,
+                            'Belum Bayar' => 4,
+                            'Lunas' => 5,
+                            'Tanpa tagihan' => 6,
                             default => 99,
                         }
                     ];

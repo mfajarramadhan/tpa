@@ -55,28 +55,32 @@ class StudentSeeder extends Seeder
         // data anak
         $studentsData = [
             [
+                'name' => 'Faris',
+                'email' => 'faris01012018@gmail.com',
+                'nisn' => '3275061213',
+                'parent_id' => $parent->id,
+                'status' => 'nonaktif',
+            ],
+            [
                 'name' => 'Rama',
                 'email' => 'rama01012018@gmail.com',
                 'nisn' => '3275061210',
                 'parent_id' => $parent->id,
+                'status' => 'aktif',
             ],
             [
                 'name' => 'Vito',
                 'email' => 'vito01012018@gmail.com',
                 'nisn' => '3275061211',
-                'parent_id' => $parent->id,
+                'parent_id' => $parent2->id,
+                'status' => 'nonaktif',
             ],
             [
                 'name' => 'Yasin',
                 'email' => 'yasin01012018@gmail.com',
                 'nisn' => '3275061212',
                 'parent_id' => $parent2->id,
-            ],
-            [
-                'name' => 'Faris',
-                'email' => 'faris01012018@gmail.com',
-                'nisn' => '3275061213',
-                'parent_id' => $parent2->id,
+                'status' => 'aktif',
             ],
         ];
 
@@ -92,12 +96,18 @@ class StudentSeeder extends Seeder
                     'name' => $data['name'],
                     'email' => $data['email'],
                     'password' => Hash::make($birthDate),
-                    'status' => 'aktif',
-                    'approval_status' => 'approved',
+                    'status' => $data['status'],
+                    'approval_status' => $data['status'] === 'aktif' ? 'approved' : 'pending',
                     'address' => 'Karawang',
                     'role' => 'siswa'
                 ]);
             }
+
+            // sinkronkan status user siswa dengan status student
+            $studentUser->update([
+                'status' => $data['status'],
+                'approval_status' => $data['status'] === 'aktif' ? 'approved' : 'pending',
+            ]);
 
             $studentUser->assignRole('siswa');
 
@@ -113,13 +123,14 @@ class StudentSeeder extends Seeder
                     'academic_year_id' => AcademicYear::where('is_active', true)->first()->id,
                     'name' => $data['name'],
                     'nisn' => $data['nisn'],
-                    'birth_date' => '2017-01-01',
+                    'birth_date' => '2018-01-01',
                     'gender' => 'L',
                     'school_origin' => 'SDN KALIBARU 1',
                     'school_grade' => '2 SD',
                     'kk_file' => 'kk/0TjlvsDxxZexqujklYBIwJgDHepzMc1H5FjFpAld.png',
                     'birth_certificate_file' => 'akta/s7hsfay5ZI8SOHZ6jv79BDp0byPYVpkParrecLUi.png',
-                    'status' => 'aktif',
+                    'status' => $data['status'],
+                    'approved_at' => $data['status'] === 'aktif' ? now()->subMonths(2) : null,
                     'reject_reason' => null,
                 ]);
             }

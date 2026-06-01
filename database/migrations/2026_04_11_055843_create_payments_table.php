@@ -16,23 +16,18 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->cascadeOnDelete();
             $table->foreignId('academic_year_id')->constrained()->cascadeOnDelete();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
-
             $table->enum('type', ['registration', 'monthly']); // jenis pembayaran
-
             $table->string('month', 7)->nullable(); // format: YYYY-MM
-
             $table->integer('original_amount'); // nominal awal
             $table->integer('adjustment')->default(0); // penyesuaian (+/-)
             $table->integer('amount'); // total akhir
-
             $table->string('proof_file', 255)->nullable(); // path bukti
             $table->enum('status', ['pending', 'approved', 'rejected', 'paid'])->default('pending');
-
             $table->timestamp('paid_at')->nullable();
-
             $table->timestamp('approved_at')->nullable();
-
             $table->text('reject_reason')->nullable();
+            // 1 siswa hanya 1 tipe pembayaran per bulan
+            $table->unique(['student_id', 'type', 'month']);
             $table->timestamps();
             $table->softDeletes();
         });

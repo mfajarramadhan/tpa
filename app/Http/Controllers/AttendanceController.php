@@ -244,33 +244,39 @@ class AttendanceController extends Controller
                         $note = $data['note'] ?? null;
                     }
                 }
-
             // sesi pagi
             } else {
-                // cek apakah sore sudah pernah diisi.
+                // cek apakah absensi sore sudah pernah diisi.
                 $sore = $soreDetails[$studentId] ?? null;
 
-                // jangan overwrite hasil sore
+                // jangan overwrite hasil absensi sore yang sudah final.
                 if ($sore && $sore->status !== 'alpha') {
                     continue;
                 }
+
+                // tentukan status absensi pagi.
                 if (isset($data['hadir'])) {
+
                     $status = 'hadir';
                     $note = null;
+
                 } else {
                     $status = $data['status'] ?? 'alpha';
                     $note = $data['note'] ?? null;
                 }
             }
 
+            // cek detail absensi yang sudah ada.
             $existingDetail = AttendanceDetail::where([
                 'attendance_id' => $attendance->id,
                 'student_id' => $studentId,
             ])->first();
 
+            // simpan status sebelumnya untuk kebutuhan notifikasi.
             $oldStatus = $existingDetail?->status;
             $oldAttendanceId = $existingDetail?->attendance_id;
 
+            // update atau buat detail absensi.
             $detail = AttendanceDetail::updateOrCreate(
                 [
                     'attendance_id' => $attendance->id,
@@ -283,6 +289,7 @@ class AttendanceController extends Controller
                 ]
             );
 
+            // kirim notifikasi whatsapp jika memenuhi kondisi.
             if (
                 $this->shouldSendAttendanceWhatsApp(
                     status: $status,
@@ -297,6 +304,7 @@ class AttendanceController extends Controller
             }
         }
 
+        // kembali ke halaman absensi dengan pesan berhasil.
         return redirect()->route('attendances.create', [
             'classroom_id' => $request->classroom_id,
             'session' => $request->session,

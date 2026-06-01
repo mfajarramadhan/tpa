@@ -341,15 +341,23 @@
                                     if ($status == 'Lunas') {
                                         $badge = 'badge-success';
                                         $icon = 'solar:check-circle-bold-duotone';
+
+                                    } elseif ($status == 'Ditolak') {
+                                        $badge = 'badge-danger';
+                                        $icon = 'solar:danger-triangle-bold-duotone';
+
                                     } elseif ($status == 'Menunggak') {
                                         $badge = 'badge-danger';
                                         $icon = 'solar:close-circle-bold-duotone';
+
                                     } elseif ($status == 'Menunggu Konfirmasi') {
                                         $badge = 'badge-warning';
                                         $icon = 'solar:clock-circle-bold-duotone';
+
                                     } elseif ($status == 'Tanpa tagihan') {
                                         $badge = 'badge-info';
                                         $icon = 'solar:info-circle-bold-duotone';
+
                                     } else {
                                         $badge = 'badge-purple';
                                         $icon = 'solar:question-circle-bold-duotone';

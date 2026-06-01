@@ -28,10 +28,11 @@ class Student extends Model
         'gender',
         'school_origin',
         'school_grade',
-        'reject_reason',
         'kk_file',
         'birth_certificate_file',
-        'status'
+        'status',
+        'reject_reason',
+        'approved_at',
     ];
 
     // 🔹 Relasi ke orang tua

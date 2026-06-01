@@ -365,6 +365,7 @@ class StudentController extends Controller
             'gender' => $request->gender,
             'school_origin' => $request->school_origin,
             'status' => 'nonaktif', // balik ke pending
+            'approved_at' => null,
             'kk_file' => $kkPath,
             'birth_certificate_file' => $aktaPath,
             'reject_reason' => null

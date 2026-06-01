@@ -78,7 +78,9 @@ class ApprovalController extends Controller
         // update status siswa di table student
         $student->update([
             'status' => 'aktif',
-            'classroom_id' => $request->classroom_id
+            'classroom_id' => $request->classroom_id,
+            'approved_at' => now(),
+            'reject_reason' => null,
         ]);
 
         // update status siswa di table user juga 
@@ -104,7 +106,8 @@ class ApprovalController extends Controller
 
         $student->update([
             'status' => 'ditolak',
-            'reject_reason' => $request->reject_reason
+            'reject_reason' => $request->reject_reason,
+            'approved_at' => null,
         ]);
 
 
