@@ -34,7 +34,11 @@ class AttendanceController extends Controller
         $session = $request->session ?? 'pagi';
         $date = $request->date ?? now()->toDateString();
 
-        $classroom = Classroom::with('students')->findOrFail($classroomId);
+        $classroom = Classroom::with([
+            'students' => function ($query) {
+                $query->orderBy('name', 'asc');
+            }
+        ])->findOrFail($classroomId);
 
         $attendance = Attendance::with('details')
             ->where([
@@ -53,6 +57,19 @@ class AttendanceController extends Controller
                 'session' => 'pagi'
             ])
             ->first();
+
+        $attendanceSore = Attendance::with('details')
+            ->where([
+                'classroom_id' => $classroomId,
+                'academic_year_id' => activeAcademicYear()->id,
+                'date' => $date,
+                'session' => 'sore'
+            ])
+            ->first();
+
+        $isPagiLockedBySore = $session === 'pagi'
+            && $attendanceSore
+            && $attendanceSore->details->count() > 0;
 
         $details = [];
         $lockedStudents = [];
@@ -85,7 +102,8 @@ class AttendanceController extends Controller
             'session',
             'date',
             'details',
-            'lockedStudents'
+            'lockedStudents',
+            'isPagiLockedBySore'
         ));
     }
 
@@ -132,6 +150,23 @@ class AttendanceController extends Controller
         ]);
 
         $date = $request->date;
+
+        if ($request->session === 'pagi') {
+            $attendanceSoreExists = Attendance::where([
+                'classroom_id' => $request->classroom_id,
+                'academic_year_id' => activeAcademicYear()->id,
+                'date' => $date,
+                'session' => 'sore'
+            ])->whereHas('details')
+            ->exists();
+
+            if ($attendanceSoreExists) {
+                return back()->with(
+                    'error',
+                    'Absensi sesi pagi tidak dapat disimpan karena absensi sesi sore sudah final.'
+                );
+            }
+        }
 
         // header absensi di table attendances
         $attendance = Attendance::firstOrCreate(

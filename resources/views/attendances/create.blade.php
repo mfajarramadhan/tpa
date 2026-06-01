@@ -114,7 +114,7 @@
                             name="date"
                             value="{{ old('date', request('date', $date ?? now()->toDateString())) }}"
                             max="{{ now()->toDateString() }}"
-                            onchange="this.form.submit()"
+                            onchange="resetSessionToPagiAndSubmit(this)"
                             class="w-full p-2 mt-1 border rounded-lg bg-[var(--card-bg)] text-[var(--text-main)] border-[var(--border-color)] focus:ring focus:ring-blue-200">
                             
                         @error('date')
@@ -163,6 +163,14 @@
                 <input type="hidden" name="classroom_id" value="{{ $classroom->id }}">
                 <input type="hidden" name="session" value="{{ $session }}">
                 <input type="hidden" name="date" value="{{ $date }}">
+
+                @if($isPagiLockedBySore ?? false)
+                    <div class="p-4 mb-6 border rounded-xl bg-red-500/15 border-red-500/20">
+                        <p class="mb-1 text-sm font-semibold text-red-500">
+                            Absensi sesi pagi tidak dapat diubah atau disimpan karena absensi sesi sore pada tanggal ini sudah final!
+                        </p>
+                    </div>
+                @endif
 
                 {{-- TABLE --}}
                 <div class="mt-4 overflow-x-auto card-panel">
@@ -254,9 +262,11 @@
                 </div>
 
                 {{-- SUBMIT --}}
-                <div class="mt-4">
+                <div class="flex justify-end mt-6">
                     <button type="submit"
-                            class="btn-primary">
+                            id="submitBtn"
+                            class="disabled:opacity-50 disabled:cursor-not-allowed btn-primary {{ ($isPagiLockedBySore ?? false) ? 'opacity-50 cursor-not-allowed' : '' }}"
+                            {{ ($isPagiLockedBySore ?? false) ? 'disabled' : '' }}>
                         Simpan Absensi
                     </button>
                 </div>
@@ -267,98 +277,128 @@
         </div>
     </div>
 
-    {{-- JS --}}
-    <script>
-        let allHadirActive = false;
+</x-app-layout> 
+<script>
+    let allHadirActive = false;
 
-        // 🔥 INIT SAAT LOAD
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.hadir-checkbox').forEach(cb => {
-                const id = cb.name.match(/\d+/)[0];
-                applyStatusUI(id);
-            });
-
-            checkAllState();
+    // init saat load
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.hadir-checkbox').forEach(cb => {
+            const id = cb.name.match(/\d+/)[0];
+            applyStatusUI(id);
         });
 
-        // 🔥 CORE FUNCTION (HANDLE UI)
-        function applyStatusUI(id) {
-            const checkbox = document.querySelector(`input[name="students[${id}][hadir]"]`);
-            const status = document.getElementById(`status-${id}`);
-            const note = document.getElementById(`note-${id}`);
+        checkAllState();
+    });
 
-            const isLocked = checkbox.dataset.locked === '1';
+    // handle UI (core function)
+    function applyStatusUI(id) {
+        const checkbox = document.querySelector(`input[name="students[${id}][hadir]"]`);
+        const status = document.getElementById(`status-${id}`);
+        const note = document.getElementById(`note-${id}`);
 
-            // 🔒 JIKA LOCK → JANGAN SENTUH
-            if (isLocked) {
-                status.disabled = true;
-                note.disabled = true;
-                return;
-            }
+        const isLocked = checkbox.dataset.locked === '1';
 
-            if (checkbox.checked) {
-                // ✔ HADIR
-                status.value = '';
-                note.value = '';
-
-                status.disabled = true;
-                note.disabled = true;
-            } else {
-                // ❌ TIDAK HADIR
-                status.disabled = false;
-                note.disabled = false;
-            }
+        // jika locked tidak bisa dirubah
+        if (isLocked) {
+            status.disabled = true;
+            note.disabled = true;
+            return;
         }
 
-        // 🔥 TOGGLE PER SISWA
-        function toggleStatus(id) {
+        if (checkbox.checked) {
+            // hadir
+            status.value = '';
+            note.value = '';
+
+            status.disabled = true;
+            note.disabled = true;
+        } else {
+            // tidak hadir
+            status.disabled = false;
+            note.disabled = false;
+        }
+    }
+
+    // toggle per siswa
+    function toggleStatus(id) {
+        applyStatusUI(id);
+        checkAllState();
+    }
+
+    // toggle semua hadir
+    function toggleAllHadir() {
+        const btn = document.getElementById('btn-toggle-hadir');
+
+        allHadirActive = !allHadirActive;
+
+        document.querySelectorAll('.hadir-checkbox').forEach(cb => {
+            const isLocked = cb.dataset.locked === '1';
+
+            if (isLocked) return; // skip siswa yang sudah diabsen pagi
+
+            cb.checked = allHadirActive;
+
+            const id = cb.name.match(/\d+/)[0];
             applyStatusUI(id);
-            checkAllState();
+        });
+
+        updateButtonText(btn);
+    }
+
+    // update button semua hadir
+    function updateButtonText(btn) {
+        btn.innerText = allHadirActive
+            ? '✖ Batal Semua Hadir'
+            : '✔ Semua Hadir';
+    }
+
+    // auto detect state/kondisi
+    function checkAllState() {
+        const all = document.querySelectorAll('.hadir-checkbox:not([data-locked="1"])');
+        const checked = document.querySelectorAll('.hadir-checkbox:not([data-locked="1"]):checked');
+        const btn = document.getElementById('btn-toggle-hadir');
+
+        if (!btn) return;
+
+        if (all.length > 0 && all.length === checked.length) {
+            allHadirActive = true;
+        } else {
+            allHadirActive = false;
         }
 
-        // 🔥 TOGGLE SEMUA HADIR
-        function toggleAllHadir() {
-            const btn = document.getElementById('btn-toggle-hadir');
+        updateButtonText(btn);
+    }
 
-            allHadirActive = !allHadirActive;
+    // disabled button saat submit
+    document.querySelector('form').addEventListener('submit', function () {
 
-            document.querySelectorAll('.hadir-checkbox').forEach(cb => {
-                const isLocked = cb.dataset.locked === '1';
+        const btn = document.getElementById('submitBtn');
 
-                if (isLocked) return; // 🔒 skip siswa yang sudah diabsen pagi
+        btn.disabled = true;
 
-                cb.checked = allHadirActive;
+        btn.innerHTML = `     
+            <span class="animate-pulse">
+                Menyimpan...
+            </span>
+        `;
+    });
 
-                const id = cb.name.match(/\d+/)[0];
-                applyStatusUI(id);
-            });
 
-            updateButtonText(btn);
+    // sesi kembali ke pagi saat ganti tanggal
+    function resetSessionToPagiAndSubmit(input) {
+
+        const form = input.form;
+
+        const sessionSelect = form.querySelector(
+            'select[name="session"]'
+        );
+
+        if (sessionSelect) {
+            sessionSelect.value = 'pagi';
         }
 
-        // 🔥 UPDATE TEXT BUTTON
-        function updateButtonText(btn) {
-            btn.innerText = allHadirActive
-                ? '✖ Batal Semua Hadir'
-                : '✔ Semua Hadir';
-        }
+        form.submit();
+    }
+</script>
 
-        // 🔥 AUTO DETECT STATE
-        function checkAllState() {
-            const all = document.querySelectorAll('.hadir-checkbox:not([data-locked="1"])');
-            const checked = document.querySelectorAll('.hadir-checkbox:not([data-locked="1"]):checked');
-            const btn = document.getElementById('btn-toggle-hadir');
-
-            if (!btn) return;
-
-            if (all.length > 0 && all.length === checked.length) {
-                allHadirActive = true;
-            } else {
-                allHadirActive = false;
-            }
-
-            updateButtonText(btn);
-        }
-        </script>
-
-</x-app-layout>
