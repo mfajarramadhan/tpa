@@ -22,7 +22,7 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // 🔷 SUPERADMIN
+        // superadmin
         if ($user->hasRole('superadmin')) {
 
             $totalStudents = Student::count();
@@ -46,11 +46,10 @@ class DashboardController extends Controller
             ));
         }
 
-        // 🔷 GURU
+        // guru
         if ($user->hasRole('guru')) {
 
             $today = now()->toDateString();
-
             $totalStudents = Student::where('status', 'aktif')->count();
             $todayAttendance = Attendance::where('date', $today)->count();
             $materials = Material::where('is_task', false)->count();
@@ -69,11 +68,10 @@ class DashboardController extends Controller
             return view('dashboard.nonaktif');
         }
 
-        // 🔷 ORANG TUA
+        // orangtua
         if ($user->hasRole('orang_tua')) {
 
             $students = $user->students()->with('classroom')->get();
-
             $payments = Payment::whereHas('student', function ($q) use ($user) {
                 $q->where('parent_id', $user->id);
             })->get();
@@ -81,7 +79,7 @@ class DashboardController extends Controller
             return view('dashboard.orangtua', compact('students', 'payments'));
         }
 
-        // 🔷 SISWA
+        // siswa
         if ($user->hasRole('siswa')) {
         $student = $user->student;
 
@@ -109,7 +107,6 @@ class DashboardController extends Controller
 
         return view('dashboard.siswa', compact('tasks', 'totalTasks', 'totalMaterials'));
     }
-
         abort(403);
     }
     

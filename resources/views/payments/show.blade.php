@@ -255,7 +255,7 @@
                         {{-- AKSI --}}
                         <td class="text-center">
 
-                            @if($payment->proof_file && $payment->status == 'pending')
+                            @if($payment->proof_file && in_array($payment->status, ['pending', 'rejected']))
 
                                 <div x-data="{ open: false }">
 
@@ -274,7 +274,7 @@
 
                                             @csrf
 
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="btn-icon group bg-[var(--success-light)] border border-[var(--success)] hover:bg-[var(--success)]"
                                                     title="Approve">
 
@@ -288,16 +288,20 @@
                                         </form>
 
                                         {{-- REJECT --}}
-                                        <button @click="open = true"
-                                            class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
-                                            title="Tolak">
+                                        @if($payment->status != 'rejected')
 
-                                            <iconify-icon icon="heroicons:x-circle"
-                                                        width="18"
-                                                        class="text-[var(--danger)] group-hover:text-white transition">
-                                            </iconify-icon>
+                                            <button @click="open = true"
+                                                class="btn-icon group bg-[var(--danger-light)] border border-[var(--danger)] hover:bg-[var(--danger)]"
+                                                title="Tolak">
 
-                                        </button>
+                                                <iconify-icon icon="heroicons:x-circle"
+                                                            width="18"
+                                                            class="text-[var(--danger)] group-hover:text-white transition">
+                                                </iconify-icon>
+
+                                            </button>
+
+                                        @endif
 
                                     </div>
 

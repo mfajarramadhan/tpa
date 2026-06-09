@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use App\Models\Fee;
 use App\Models\Payment;
 use App\Models\Student;
@@ -11,9 +12,9 @@ use App\Notifications\PaymentRejectedNotification;
 use App\Notifications\PaymentUploadedNotification;
 use App\Services\MonthlyBillService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;  
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -103,6 +104,12 @@ class PaymentController extends Controller
                     'classroom'
                 ])
                 ->where('status', 'aktif')
+
+                // filter kelas
+                ->when(request('classroom_id'), function ($q) {
+                    $q->where('classroom_id', request('classroom_id'));
+                })
+
                 ->get()
                 ->map(function ($student) {
 
@@ -186,6 +193,20 @@ class PaymentController extends Controller
                         }
                     ];
                 })
+                ->when(request('search'), function ($collection) {
+
+                    $search = strtolower(request('search'));
+
+                    return $collection->filter(function ($data) use ($search) {
+
+                        $student = $data['student'];
+
+                        return str_contains(strtolower($student->name), $search)
+                            || str_contains(strtolower($student->parent->name ?? ''), $search)
+                            || str_contains(strtolower($student->school_origin ?? ''), $search)
+                            || str_contains(strtolower($data['status']), $search);
+                    });
+                })
                 ->sortBy([
                     ['priority', 'asc'],
                     ['sisa_tagihan', 'desc']
@@ -239,6 +260,8 @@ class PaymentController extends Controller
 
         $sisaTagihanAll = $totalTagihanAll - $totalDibayarAll;
 
+        $classrooms = Classroom::orderBy('id', 'asc')->get();
+
         return view('payments.index', compact(
             'payments',
             'totalUnpaid',
@@ -249,6 +272,7 @@ class PaymentController extends Controller
             'totalTagihanAll',
             'totalDibayarAll',
             'sisaTagihanAll',
+            'classrooms',
         ));
     }
 

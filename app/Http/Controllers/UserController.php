@@ -11,7 +11,7 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    // 🔷 LIST USER + FILTER
+    // list user & filter
     public function index(Request $request)
     {
         $status = $request->has('status') ? $request->status : 'active';
@@ -38,7 +38,7 @@ class UserController extends Controller
             });
         }
 
-        // 🔍 filter role
+        // filter role
         if ($request->role) {
             $query->whereHas('roles', function ($q) use ($request) {
                 $q->where('name', $request->role);
@@ -60,13 +60,11 @@ class UserController extends Controller
         return view('users.index', compact('users', 'status'));
     }
 
-    // 🔷 BUAT USER
     public function create()
     {
         return view('users.create');
     }
 
-    // 🔷 SIMPAN USER
     public function store(Request $request)
     {
         $request->validate([
@@ -103,7 +101,6 @@ class UserController extends Controller
             'Berhasil menambahkan user baru!');
     }
 
-    // 🔷 DETAIL USER
     public function show(User $user)
     {
         $user->load(['student.classroom']);
@@ -111,7 +108,6 @@ class UserController extends Controller
         return view('users.show', compact('user'));
     }
 
-    // 🔷 FORM EDIT USER
     public function edit(User $user)
     {
         $user->load('student');
@@ -121,14 +117,10 @@ class UserController extends Controller
         return view('users.edit', compact('user', 'classrooms'));
     }
 
-    // 🔷 UPDATE DATA USER
     public function update(Request $request, User $user)
     {
         $request->validate([
-
-            // USER
             'name' => 'required|string|max:255',
-
             'phone' => $user->student ? [
                 'nullable',
             ] : [
@@ -136,7 +128,6 @@ class UserController extends Controller
                 'regex:/^08[0-9]{8,11}$/', //diawali 08, setelah 08 hanya boleh angka, jumlah angka setelah 08 antara 8 sampai 11 digit (total 10-13 digit)
                 'unique:users,phone,' . $user->id
             ],
-
             'email' => [
                 'required',
                 'email',
@@ -144,41 +135,29 @@ class UserController extends Controller
             ],
 
             'address' => 'nullable|string|max:255',
-
             'password' => 'nullable|min:6|confirmed',
-
-            // STUDENT
             'classroom_id' => 'nullable|exists:classrooms,id',
-
             'nisn' => [
                 'nullable',
                 'digits:10',
                 'unique:students,nisn,' . optional($user->student)->id
             ],
-
             'birth_date' => [
                 'nullable',
                 'date',
                 function ($attribute, $value, $fail) {
-
                     if ($value && Carbon::parse($value)->age < 8) {
-
                         $fail('Usia anak minimal 8 tahun!');
-
                     }
 
                 }
             ],
-
             'gender' => 'nullable|in:L,P',
-
             'school_origin' => 'nullable|string|max:255',
-
             'school_grade' => 'nullable|string|max:20',
-
         ]);
 
-        // PROTEKSI SUPERADMIN
+        // proteksi superadmin lain
         if ($user->hasRole('superadmin') && auth()->id() != $user->id) {
 
             return back()->with(
@@ -197,7 +176,7 @@ class UserController extends Controller
             $data['phone'] = $request->phone;
         }
 
-        // PASSWORD OPTIONAL
+        // ganti password optional
         if ($request->filled('password')) {
 
             $data['password'] = bcrypt($request->password);
@@ -205,11 +184,6 @@ class UserController extends Controller
 
         $user->update($data);
 
-        /*
-        =====================================================
-        UPDATE STUDENT
-        =====================================================
-        */
         if ($user->student) {
 
             $user->student->update([
@@ -225,19 +199,22 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('users.index')
+        $redirectUrl = route('users.index');
+
+        if ($request->filled('redirect_query')) {
+            $redirectUrl .= '?' . $request->redirect_query;
+        }
+
+        return redirect($redirectUrl)
             ->with('success', 'Data user berhasil diperbarui!');
     }
 
-    // 🔷 UPDATE ROLE (CEPAT - DROPDOWN)
     public function updateRole(Request $request, User $user)
     {
         $currentRole = $user->roles->first()->name;
 
         $newRole = $request->role;
 
-        // LARANG JADI SISWA
         if ($newRole == 'siswa') {
 
             return back()->with(
@@ -246,7 +223,6 @@ class UserController extends Controller
             );
         }
 
-        // SUPERADMIN TIDAK BOLEH DIUBAH
         if ($currentRole == 'superadmin') {
 
             return back()->with(
@@ -263,7 +239,6 @@ class UserController extends Controller
         );
     }
 
-    // 🔷 TOGGLE STATUS
     public function toggleStatus(User $user)
     {
         $user->status =
@@ -279,10 +254,9 @@ class UserController extends Controller
         );
     }
 
-    // 🔷 DELETE USER
     public function destroy(User $user)
     {
-        // jangan sampai hapus diri sendiri
+        // jangan hapus diri sendiri
         if ($user->id == auth()->id()) {
 
             return back()->with(

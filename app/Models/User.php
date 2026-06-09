@@ -50,19 +50,18 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // 🔹 Orang tua → punya banyak anak
+    // orang tua punya banyak anak
     public function students()
     {
         return $this->hasMany(Student::class, 'parent_id');
     }
 
-    // 🔹 Jika user adalah siswa
+    // siswa bagian dari user
     public function student()
     {
         return $this->hasOne(Student::class, 'user_id');
     }
 
-    // 🔹 Guru/Admin → membuat absensi
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'created_by');

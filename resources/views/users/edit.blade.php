@@ -73,6 +73,8 @@
                 @csrf
                 @method('PUT')
 
+                <input type="hidden" name="redirect_query" value="{{ request()->getQueryString() }}">
+
                 {{-- NAMA --}}
                 <div class="mb-4">
                     <label class="block mb-1 text-sm font-semibold">

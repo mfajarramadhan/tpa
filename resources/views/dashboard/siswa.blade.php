@@ -11,9 +11,6 @@
                 <h1 class="flex items-center gap-2 m-0">Selamat Datang, {{ Auth::user()->name }} - Kelas {{ Auth::user()->student->classroom->name }} <iconify-icon icon="solar:hand-stars-bold-duotone" class="text-[#FFC107]"></iconify-icon></h1>
                 <p class="text-body mt-1 font-medium text-[var(--text-tertiary)]">Tetap semangat belajar dan jangan lupa kumpulkan tugas tepat waktu!</p>
             </div>
-            {{-- <button class="shadow-sm btn-primary">
-                <iconify-icon icon="solar:printer-bold-duotone" width="20"></iconify-icon> Cetak Ringkasan
-            </button> --}}
         </div>
 
         <div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4 sm:gap-5">

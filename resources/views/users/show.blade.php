@@ -10,7 +10,7 @@
         {{-- BACK BUTTON --}}
         <div class="mb-6">
 
-            <a href="{{ route('users.index') }}"
+            <a href="{{ route('users.index', request()->query()) }}"
                class="flex items-center gap-2 shadow-sm btn-primary">
 
                 <iconify-icon
@@ -319,7 +319,7 @@
 
                 @if(!$user->trashed())
 
-                    <a href="{{ route('users.edit', $user->id) }}"
+                    <a href="{{ route('users.edit', $user->id) . '?' . request()->getQueryString() }}"
                     class="shadow-sm btn-primary">
 
                         Edit

@@ -95,7 +95,7 @@
                         <input type="text"
                             name="name"
                             value="{{ request('name') }}"
-                            placeholder="Cari..."
+                            placeholder="Cari user..."
                             class="input-solid flex-1 md:flex-none md:w-fit md:max-w-40
                             bg-[var(--surface)]
                             rounded-xl
@@ -291,7 +291,7 @@
                                     <div class="flex justify-center gap-2">
 
                                         {{-- DETAIL --}}
-                                        <a href="{{ route('users.show', $user->id) }}"
+                                        <a href="{{ route('users.show', $user->id) . '?' . request()->getQueryString() }}"
                                            class="btn-icon border border-[var(--primary)]" title="Detail">
                                             <iconify-icon icon="solar:eye-bold-duotone"
                                                           class="text-[var(--primary)]"></iconify-icon>
@@ -300,7 +300,7 @@
                                         @if(!$user->trashed())
 
                                             {{-- EDIT --}}
-                                            <a href="{{ route('users.edit', $user->id) }}"
+                                            <a href="{{ route('users.edit', $user->id) . '?' . request()->getQueryString() }}"
                                                title="Edit" class="btn-icon group bg-[var(--warning-light)] border border-[var(--warning-dark)] hover:bg-[var(--warning-dark)]">
                                                 <iconify-icon icon="heroicons:pencil-square"
                                                               class="text-[var(--warning-dark)] group-hover:text-white"></iconify-icon>

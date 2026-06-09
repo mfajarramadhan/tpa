@@ -313,6 +313,106 @@
 
             <h3 class="mb-3 font-semibold">Data Iuran Siswa</h3>
 
+            {{-- FILTER --}}
+            <form method="GET" class="mb-4">
+
+                <div class="flex flex-col gap-3 md:flex-row md:items-center">
+
+                    {{-- SEARCH + KELAS --}}
+                        <div class="flex gap-2 md:contents">
+
+                            {{-- SEARCH --}}
+                            <input type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Cari siswa..."
+                                class="input-solid flex-1 md:flex-none md:w-fit md:max-w-40
+                                bg-[var(--surface)]
+                                rounded-xl
+                                py-2.5 px-3
+                                border-2 border-[var(--border)]
+                                shadow-md
+                                focus:border-[var(--primary)]">
+
+                            {{-- KELAS --}}
+                            <select name="classroom_id"
+                                class="input-solid flex-1 md:flex-none md:w-48
+                                bg-[var(--surface)]
+                                rounded-xl
+                                py-2.5
+                                border-2 border-[var(--border)]
+                                shadow-md
+                                focus:border-[var(--primary)]">
+
+                                <option value="">
+                                    Semua Kelas
+                                </option>
+
+                                @foreach($classrooms as $classroom)
+                                    <option value="{{ $classroom->id }}"
+                                        {{ request('classroom_id') == $classroom->id ? 'selected' : '' }}>
+                                        {{ $classroom->name }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        {{-- BUTTON GROUP --}}
+                        <div class="grid grid-cols-2 gap-2 md:flex md:w-auto">
+
+                            {{-- FILTER --}}
+                            <button
+                                class="btn-outline flex items-center justify-center gap-2
+                                w-full md:w-auto
+                                rounded-xl
+                                py-2.5 px-4
+                                border-2 border-[var(--border)]
+                                shadow-md
+                                hover:bg-[var(--primary-light)]
+                                hover:border-[var(--primary)]
+                                hover:text-[var(--primary)]
+                                transition-all duration-200">
+
+                                <iconify-icon
+                                    icon="solar:filter-bold-duotone"
+                                    width="20">
+                                </iconify-icon>
+
+                                <span>
+                                    Filter
+                                </span>
+
+                            </button>
+
+                            {{-- CLEAR --}}
+                            <a href="{{ route('payments.index') }}"
+                                class="btn-outline flex items-center justify-center
+                                w-full md:w-auto
+                                rounded-xl
+                                py-2.5 px-3
+                                border-2 border-[var(--border)]
+                                shadow-md
+                                hover:bg-[var(--primary-light)]
+                                hover:border-[var(--primary)]
+                                hover:text-[var(--primary)]
+                                transition-all duration-200">
+
+                                <iconify-icon
+                                    icon="solar:close-circle-bold-duotone"
+                                    width="22">
+                                </iconify-icon>
+
+                            </a>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+
             <div class="overflow-hidden card-panel">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm table-custom">
