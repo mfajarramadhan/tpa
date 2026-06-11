@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/learning/classroom/{classroom}/edit', [ClassroomController::class, 'edit'])->name('learning.classroom.edit');
     Route::put('/learning/classroom/{classroom}', [ClassroomController::class, 'update'])->name('learning.classroom.update');
     Route::delete('/learning/classroom/{classroom}', [ClassroomController::class, 'destroy'])->name('learning.classroom.destroy');
+    Route::get('/learning/{classroom}/members', [ClassroomController::class, 'members'])->name('learning.members');
     
     
     // Route Mapel

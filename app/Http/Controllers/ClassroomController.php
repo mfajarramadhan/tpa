@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
@@ -146,6 +147,49 @@ class ClassroomController extends Controller
         return back()->with(
             'success',
             'Kelas berhasil dihapus!'
+        );
+    }
+
+    // Lihat semua anggota kelas
+    public function members(Classroom $classroom)
+    {
+        $user = auth()->user();
+
+        // SISWA
+        if (
+            $user->hasRole('siswa') &&
+            $user->student->classroom_id != $classroom->id
+        ) {
+            abort(403);
+        }
+
+        // ORANG TUA
+        if (
+            $user->hasRole('orang_tua') &&
+            !$user->students
+                ->pluck('classroom_id')
+                ->contains($classroom->id)
+        ) {
+            abort(403);
+        }
+
+        $teachers = User::role('guru')
+            ->where('status', 'aktif')
+            ->orderBy('name')
+            ->get();
+
+        $students = $classroom->students()
+            ->where('status', 'aktif')
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'learning.members',
+            compact(
+                'classroom',
+                'teachers',
+                'students'
+            )
         );
     }
 }
