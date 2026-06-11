@@ -104,11 +104,13 @@ Route::middleware('auth')->group(function () {
         
 
         // Detail pembayaran per siswa
-        Route::get('/students/{student}/payments', [PaymentController::class, 'showStudentPayments'])->name('payments.student.show');        Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
+        Route::get('/students/{student}/payments', [PaymentController::class, 'showStudentPayments'])->name('payments.student.show');        
+        Route::post('/payments/{payment}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
         Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
         // batalkan approve iuran bulanan (unapprove)
         Route::post('/payments/{payment}/unapprove', [PaymentController::class, 'unapprove'])->name('payments.unapprove');
-
+        // Report pdf iuran bulanan siswa
+        Route::get('/payments/cetak-pdf', [PaymentController::class, 'cetakPdf'])->name('payments.cetakPdf')->middleware(['auth', 'role:superadmin']);
 
         // Kelola User
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');

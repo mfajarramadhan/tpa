@@ -129,7 +129,8 @@
 
                         {{-- STATUS --}}
                         <select name="status"
-                            class="input-solid flex-1 md:flex-none md:max-w-40 md:min-w-[150px]
+                            class="input-solid flex-[2]
+                            md:flex-none md:max-w-40 md:min-w-[150px]
                             bg-[var(--surface)]
                             rounded-xl
                             py-2.5
@@ -153,14 +154,15 @@
 
                         {{-- FILTER BUTTON --}}
                         <button
-                            class="btn-outline flex items-center justify-center gap-2
+                            class="flex-1 md:flex-none
+                            flex items-center justify-center gap-2
                             rounded-xl
                             py-2.5 px-4
-                            border-2 border-[var(--border)]
+                            border-2 border-[var(--primary)]
+                            bg-[var(--primary)]
+                            text-white
                             shadow-md
-                            hover:bg-[var(--primary-light)]
-                            hover:border-[var(--primary)]
-                            hover:text-[var(--primary)]
+                            hover:opacity-90
                             transition-all duration-200">
 
                             <iconify-icon
@@ -176,14 +178,16 @@
 
                         {{-- CLEAR --}}
                         <a href="{{ route('users.index') }}"
-                            class="btn-outline flex items-center justify-center
+                            class="flex-1 md:flex-none
+                            flex items-center justify-center
                             rounded-xl
                             py-2.5 px-3
-                            border-2 border-[var(--border)]
+                            border-2 border-gray-500
+                            bg-gray-500
+                            text-white
                             shadow-md
-                            hover:bg-[var(--primary-light)]
-                            hover:border-[var(--primary)]
-                            hover:text-[var(--primary)]
+                            hover:bg-gray-600
+                            hover:border-gray-600
                             transition-all duration-200">
 
                             <iconify-icon

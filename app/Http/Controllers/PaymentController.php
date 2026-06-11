@@ -17,6 +17,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;  
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class PaymentController extends Controller
@@ -115,6 +116,9 @@ class PaymentController extends Controller
 
                     $studentPayments = $student->payments()
                         ->where('type', 'monthly')
+                        ->when(request('month'), function ($q) {
+                            $q->where('month', request('month'));
+                        })
                         ->get();
 
                     $totalTagihan = $studentPayments->sum('original_amount');
@@ -564,5 +568,119 @@ class PaymentController extends Controller
             'success',
             'Pembayaran iuran ditolak! Notifikasi telah dikirim ke orang tua siswa.'
         );
+    }
+
+    public function cetakPdf()
+    {
+        if (!Auth::user()->hasRole('superadmin')) {
+        abort(403);
+        }
+
+        if (!request('month')) {
+            return back()->with('error', 'Pilih filter bulan terlebih dahulu sebelum cetak PDF!');
+        }
+
+        $month = request('month');
+
+        $classroom = null;
+
+        if (request('classroom_id')) {
+            $classroom = Classroom::find(request('classroom_id'));
+        }
+
+        $studentsSummary = Student::with(['parent', 'classroom'])
+            ->where('status', 'aktif')
+            ->when(request('classroom_id'), function ($q) {
+                $q->where('classroom_id', request('classroom_id'));
+            })
+            ->get()
+            ->map(function ($student) use ($month) {
+
+                $studentPayments = $student->payments()
+                    ->where('type', 'monthly')
+                    ->when($month, function ($q) use ($month) {
+                        $q->where('month', $month);
+                    })
+                    ->get();
+
+                $totalTagihan = $studentPayments->sum('original_amount');
+
+                $totalDibayar = $studentPayments
+                    ->where('status', 'paid')
+                    ->sum('original_amount');
+
+                $sisaTagihan = $totalTagihan - $totalDibayar;
+
+                $ditolak = $studentPayments->where('status', 'rejected')->count() > 0;
+
+                $menungguKonfirmasi = $studentPayments
+                    ->where('status', 'pending')
+                    ->whereNotNull('proof_file')
+                    ->count() > 0;
+
+                $belumBayar = $studentPayments
+                    ->where('status', 'pending')
+                    ->whereNull('proof_file')
+                    ->count() > 0;
+
+                $adaTunggakan = $studentPayments
+                    ->where('status', 'pending')
+                    ->whereNull('proof_file')
+                    ->filter(function ($payment) {
+                        return $payment->month < now()->format('Y-m');
+                    })
+                    ->count() > 0;
+
+                if ($ditolak) {
+                    $status = 'Ditolak';
+                } elseif ($menungguKonfirmasi) {
+                    $status = 'Menunggu Konfirmasi';
+                } elseif ($adaTunggakan || ($totalDibayar > 0 && $totalDibayar < $totalTagihan)) {
+                    $status = 'Menunggak';
+                } elseif ($belumBayar) {
+                    $status = 'Belum Bayar';
+                } elseif ($totalDibayar == $totalTagihan && $totalTagihan > 0) {
+                    $status = 'Lunas';
+                } elseif ($totalTagihan == 0) {
+                    $status = 'Tanpa tagihan';
+                } else {
+                    $status = 'Belum Bayar';
+                }
+
+                return [
+                    'student' => $student,
+                    'total_tagihan' => $totalTagihan,
+                    'total_dibayar' => $totalDibayar,
+                    'sisa_tagihan' => $sisaTagihan,
+                    'status' => $status,
+                ];
+            });
+
+        if (request('search')) {
+            $search = strtolower(request('search'));
+
+            $studentsSummary = $studentsSummary->filter(function ($data) use ($search) {
+                $student = $data['student'];
+
+                return str_contains(strtolower($student->name), $search)
+                    || str_contains(strtolower($student->parent->name ?? ''), $search)
+                    || str_contains(strtolower($student->school_origin ?? ''), $search)
+                    || str_contains(strtolower($data['status']), $search);
+            });
+        }
+
+        $totalTagihan = $studentsSummary->sum('total_tagihan');
+        $totalDibayar = $studentsSummary->sum('total_dibayar');
+        $sisaTagihan = $studentsSummary->sum('sisa_tagihan');
+        $pdf = Pdf::loadView('payments.cetak-pdf', compact(
+            'studentsSummary',
+            'month',
+            'classroom',
+            'totalTagihan',
+            'totalDibayar',
+            'sisaTagihan'
+        ))->setPaper('a4', 'landscape');
+
+        return $pdf->stream('laporan-iuran-bulanan.pdf');
     }
 }

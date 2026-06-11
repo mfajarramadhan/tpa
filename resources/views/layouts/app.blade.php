@@ -39,6 +39,32 @@
             {{ $slot }}
         </div>
 
+        {{-- FOOTER --}}
+        <footer class="px-5 py-2 border-t bg-[var(--surface)] border-[var(--border)]">
+
+            <div class="flex items-center justify-end gap-2"> 
+
+                <div class="leading-tight text-right">
+
+                    <div class="text-xs font-medium text-[var(--text-tertiary)]">
+                        Horizon University Indonesia
+                    </div>
+
+                    <div class="text-[10px] text-[var(--text-tertiary)] opacity-70">
+                        © 2026 All Rights Reserved
+                    </div>
+
+                </div>
+                
+                <img
+                    src="{{ asset('storage/logo/logo-horizon.jpeg') }}"
+                    alt="Horizon University Indonesia"
+                    class="object-contain w-7 h-7">
+
+            </div>
+
+        </footer>
+
     </main>
 
 </body>

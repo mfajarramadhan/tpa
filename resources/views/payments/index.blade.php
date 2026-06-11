@@ -315,99 +315,128 @@
 
             {{-- FILTER --}}
             <form method="GET" class="mb-4">
-
+                
                 <div class="flex flex-col gap-3 md:flex-row md:items-center">
 
-                    {{-- SEARCH + KELAS --}}
-                        <div class="flex gap-2 md:contents">
+                    {{-- MOBILE BARIS 1: SEARCH + KELAS --}}
+                    <div class="grid grid-cols-2 gap-2 md:flex md:items-center">
 
-                            {{-- SEARCH --}}
-                            <input type="text"
-                                name="search"
-                                value="{{ request('search') }}"
-                                placeholder="Cari siswa..."
-                                class="input-solid flex-1 md:flex-none md:w-fit md:max-w-40
-                                bg-[var(--surface)]
-                                rounded-xl
-                                py-2.5 px-3
-                                border-2 border-[var(--border)]
-                                shadow-md
-                                focus:border-[var(--primary)]">
+                        {{-- SEARCH --}}
+                        <input type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari siswa..."
+                            class="input-solid w-full md:w-40
+                            bg-[var(--surface)]
+                            rounded-xl
+                            py-2.5 px-3
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            focus:border-[var(--primary)]">
 
-                            {{-- KELAS --}}
-                            <select name="classroom_id"
-                                class="input-solid flex-1 md:flex-none md:w-48
-                                bg-[var(--surface)]
-                                rounded-xl
-                                py-2.5
-                                border-2 border-[var(--border)]
-                                shadow-md
-                                focus:border-[var(--primary)]">
+                        {{-- KELAS --}}
+                        <select name="classroom_id"
+                            class="input-solid w-full md:w-48
+                            bg-[var(--surface)]
+                            rounded-xl
+                            py-2.5
+                            border-2 border-[var(--border)]
+                            shadow-md
+                            focus:border-[var(--primary)]">
 
-                                <option value="">
-                                    Semua Kelas
+                            <option value="">
+                                Semua Kelas
+                            </option>
+
+                            @foreach($classrooms as $classroom)
+                                <option value="{{ $classroom->id }}"
+                                    {{ request('classroom_id') == $classroom->id ? 'selected' : '' }}>
+                                    {{ $classroom->name }}
                                 </option>
+                            @endforeach
 
-                                @foreach($classrooms as $classroom)
-                                    <option value="{{ $classroom->id }}"
-                                        {{ request('classroom_id') == $classroom->id ? 'selected' : '' }}>
-                                        {{ $classroom->name }}
-                                    </option>
-                                @endforeach
+                        </select>
 
-                            </select>
-
-                        </div>
-
-                        {{-- BUTTON GROUP --}}
-                        <div class="grid grid-cols-2 gap-2 md:flex md:w-auto">
-
-                            {{-- FILTER --}}
-                            <button
-                                class="btn-outline flex items-center justify-center gap-2
-                                w-full md:w-auto
-                                rounded-xl
-                                py-2.5 px-4
-                                border-2 border-[var(--border)]
-                                shadow-md
-                                hover:bg-[var(--primary-light)]
-                                hover:border-[var(--primary)]
-                                hover:text-[var(--primary)]
-                                transition-all duration-200">
-
-                                <iconify-icon
-                                    icon="solar:filter-bold-duotone"
-                                    width="20">
-                                </iconify-icon>
-
-                                <span>
-                                    Filter
-                                </span>
-
-                            </button>
-
-                            {{-- CLEAR --}}
-                            <a href="{{ route('payments.index') }}"
-                                class="btn-outline flex items-center justify-center
-                                w-full md:w-auto
-                                rounded-xl
-                                py-2.5 px-3
-                                border-2 border-[var(--border)]
-                                shadow-md
-                                hover:bg-[var(--primary-light)]
-                                hover:border-[var(--primary)]
-                                hover:text-[var(--primary)]
-                                transition-all duration-200">
-
-                                <iconify-icon
-                                    icon="solar:close-circle-bold-duotone"
-                                    width="22">
-                                </iconify-icon>
-
-                            </a>
-
-                        </div>
                     </div>
+
+                    {{-- MOBILE BARIS 2: BULAN + FILTER + CLEAR --}}
+                    <div class="flex gap-2 md:flex md:items-center">
+
+                    {{-- BULAN --}}
+                    <input type="month"
+                        name="month"
+                        value="{{ request('month') }}"
+                        class="input-solid flex-[2]
+                        md:flex-none md:max-w-40 md:min-w-[150px]
+                        bg-[var(--surface)]
+                        rounded-xl
+                        py-2.5 px-3
+                        border-2 border-[var(--border)]
+                        shadow-md
+                        focus:border-[var(--primary)]">
+
+                    {{-- FILTER --}}
+                    <button
+                        class="flex-1 md:flex-none
+                        flex items-center justify-center gap-2
+                        rounded-xl
+                        py-2.5 px-4
+                        border-2 border-[var(--primary)]
+                        bg-[var(--primary)]
+                        text-white
+                        shadow-md
+                        hover:opacity-90
+                        transition-all duration-200">
+
+                        <iconify-icon
+                            icon="solar:filter-bold-duotone"
+                            width="20">
+                        </iconify-icon>
+
+                        <span class="hidden sm:inline">
+                            Filter
+                        </span>
+
+                    </button>
+
+                    {{-- CLEAR --}}
+                    <a href="{{ route('payments.index') }}"
+                        class="flex-1 md:flex-none
+                        flex items-center justify-center
+                        rounded-xl
+                        py-2.5 px-3
+                        border-2 border-gray-500
+                        bg-gray-500
+                        text-white
+                        shadow-md
+                        hover:bg-gray-600
+                        hover:border-gray-600
+                        transition-all duration-200">
+
+                        <iconify-icon
+                            icon="solar:close-circle-bold-duotone"
+                            width="22">
+                        </iconify-icon>
+
+                    </a>
+
+                </div>
+
+                    {{-- MOBILE BARIS 3: CETAK PDF --}}
+                    <a href="{{ route('payments.cetakPdf', request()->query()) }}"
+                        target="_blank"
+                        class="btn-primary flex items-center justify-center gap-2
+                        w-full md:w-auto md:ml-auto
+                        rounded-xl py-2.5 px-4 shadow-md">
+
+                        <iconify-icon
+                            icon="solar:printer-bold-duotone"
+                            width="20">
+                        </iconify-icon>
+
+                        <span>Cetak PDF</span>
+
+                    </a>
 
                 </div>
 

@@ -21,7 +21,7 @@
                 <div class="flex items-start justify-between mb-3">
                     <span class="text-caption">Total Guru</span>
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
-                        <iconify-icon icon="solar:user-bold-duotone" width="18"></iconify-icon>
+                        <iconify-icon icon="solar:user-check-bold-duotone" width="18"></iconify-icon>
                     </div>
                 </div>
                 <div>
@@ -34,7 +34,7 @@
                 <div class="flex items-start justify-between mb-3">
                     <span class="text-caption">Total Orang Tua</span>
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
-                        <iconify-icon icon="solar:people-nearby-bold-duotone" width="18"></iconify-icon>
+                        <iconify-icon icon="solar:user-bold-duotone" width="18"></iconify-icon>
                     </div>
                 </div>
                 <div>

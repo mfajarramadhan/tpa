@@ -13,11 +13,11 @@
         <a href="{{ route('dashboard') }}"
         class="flex items-center gap-3 text-primary-custom">
 
-            <div class="w-10 h-10 rounded-xl bg-[var(--primary)] text-white flex items-center justify-center shadow-md">
-                <iconify-icon
-                    icon="solar:moon-stars-bold-duotone"
-                    width="24">
-                </iconify-icon>
+            <div class="w-10 h-10 overflow-hidden shadow-md rounded-xl">
+                <img
+                    src="{{ asset('storage/logo/logo-albarokah.jpeg') }}"
+                    alt="Logo Al-Barokah"
+                    class="object-cover w-full h-full">
             </div>
 
             <div>
@@ -71,7 +71,7 @@
 
             <a href="/payments"
                 class="nav-item {{ request()->is('payments*') || request()->is('students/*/payments') ? 'active' : '' }}">
-                <iconify-icon icon="solar:wallet-bold-duotone"></iconify-icon>
+                <iconify-icon icon="solar:wallet-money-bold-duotone"></iconify-icon>
                 Iuran Bulanan
             </a>
 

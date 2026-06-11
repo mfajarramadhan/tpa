@@ -19,8 +19,12 @@ class AttendanceController extends Controller
      */
     public function index()
     {
-        // ambil semua kelas + jumlah siswa
-        $classrooms = Classroom::withCount('students')->get();
+        // ambil semua kelas + jumlah siswa aktif
+        $classrooms = Classroom::withCount([
+            'students' => function ($query) {
+                $query->where('status', 'aktif');
+            }
+        ])->get();
 
         return view('attendances.index', compact('classrooms'));
     }
@@ -36,7 +40,8 @@ class AttendanceController extends Controller
 
         $classroom = Classroom::with([
             'students' => function ($query) {
-                $query->orderBy('name', 'asc');
+                $query->where('status', 'aktif')
+                    ->orderBy('name', 'asc');
             }
         ])->findOrFail($classroomId);
 

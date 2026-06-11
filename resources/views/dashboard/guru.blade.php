@@ -68,8 +68,7 @@
                 </div>
 
                 {{-- Total Materi --}}
-                <div class="stat-card"
-                    style="border-left-color: var(--info);">
+                <div class="stat-card">
 
                     <div class="flex items-start justify-between mb-3">
 
@@ -77,7 +76,7 @@
                             Total Materi
                         </span>
 
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--info-light)] text-[var(--info)]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
 
                             <iconify-icon
                                 icon="solar:book-bold-duotone"
@@ -90,7 +89,7 @@
 
                     <div>
 
-                        <div class="text-data text-[var(--info)]">
+                        <div class="text-data">
                             {{ $materials }}
                         </div>
 
@@ -99,8 +98,7 @@
                 </div>
 
                 {{-- Total Tugas --}}
-                <div class="stat-card"
-                    style="border-left-color: var(--warning-dark);">
+                <div class="stat-card">
 
                     <div class="flex items-start justify-between mb-3">
 
@@ -108,7 +106,7 @@
                             Total Tugas
                         </span>
 
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--warning-light)] text-[var(--warning-dark)]">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
 
                             <iconify-icon
                                 icon="solar:clipboard-list-bold-duotone"
@@ -121,7 +119,7 @@
 
                     <div>
 
-                        <div class="text-data text-[var(--warning-dark)]">
+                        <div class="text-data">
                             {{ $tasks }}
                         </div>
 

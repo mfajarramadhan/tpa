@@ -8,14 +8,6 @@ use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
-    /**
-     * 🔹 STEP 1: LIST KELAS (seperti absensi)
-     */
-    
-
-
-    
-
     public function create(Classroom $classroom)
     {
         return view('learning.subject-create', compact('classroom'));
