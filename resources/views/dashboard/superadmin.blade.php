@@ -54,6 +54,19 @@
                     <div class="text-data">{{ $totalStudents }}</div>
                 </div>
             </div>
+            
+            <!-- Pending Iuran -->
+            <div class="stat-card">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-caption">Pending Iuran</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
+                        <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-data">{{ $pendingPayments }}</div>
+                </div>
+            </div>
 
             <!-- Pending Approval -->
             <div class="stat-card">
@@ -65,19 +78,6 @@
                 </div>
                 <div>
                     <div class="text-data">{{ $pendingStudents }}</div>
-                </div>
-            </div>
-
-            <!-- Pending Iuran -->
-            <div class="stat-card">
-                <div class="flex items-start justify-between mb-3">
-                    <span class="text-caption">Pending Iuran</span>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)]">
-                        <iconify-icon icon="solar:wallet-money-bold-duotone" width="18"></iconify-icon>
-                    </div>
-                </div>
-                <div>
-                    <div class="text-data">{{ $pendingPayments }}</div>
                 </div>
             </div>
 

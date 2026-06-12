@@ -36,11 +36,6 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    // public function getFinalAmountAttribute()
-    // {
-    //     return $this->original_amount + $this->adjustment;
-    // }
-
     public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class);

@@ -77,7 +77,7 @@
         {{-- BUTTON --}}
         <div class="mb-6">
 
-            <a href="{{ route('payments.index') }}"
+            <a href="{{ url()->previous() }}"
                class="flex items-center gap-2 shadow-sm btn-primary">
 
                 <iconify-icon

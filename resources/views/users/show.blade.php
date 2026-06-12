@@ -308,6 +308,104 @@
 
                         </div>
 
+                        {{-- KK --}}
+                        <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+
+                            <p class="text-sm font-semibold text-slate-500">
+                                Kartu Keluarga
+                            </p>
+
+                            <div class="flex justify-end">
+                                @if($user->student->kk_file)
+
+                                    @php
+                                        $kkUrl = asset('storage/' . $user->student->kk_file);
+                                        $kkExt = strtolower(pathinfo($user->student->kk_file, PATHINFO_EXTENSION));
+                                    @endphp
+
+                                    @if(in_array($kkExt, ['jpg', 'jpeg', 'png']))
+
+                                        <img src="{{ $kkUrl }}"
+                                            onclick="openDocumentPreview('image', '{{ $kkUrl }}')"
+                                            class="object-cover w-24 h-24 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                    @elseif($kkExt === 'pdf')
+
+                                        <div onclick="openDocumentPreview('pdf', '{{ $kkUrl }}')"
+                                            class="flex flex-col items-center justify-center w-24 h-24 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                            <div class="text-3xl">
+                                                📄
+                                            </div>
+
+                                            <p class="mt-1 text-xs font-semibold text-red-500">
+                                                PDF
+                                            </p>
+
+                                        </div>
+
+                                    @endif
+
+                                @else
+
+                                    <span class="text-sm font-bold text-slate-800">
+                                        -
+                                    </span>
+
+                                @endif
+                            </div>
+
+                        </div>
+
+                        {{-- AKTA --}}
+                        <div class="grid items-center grid-cols-2 gap-4 px-3 py-5">
+
+                            <p class="text-sm font-semibold text-slate-500">
+                                Akta Kelahiran
+                            </p>
+
+                            <div class="flex justify-end">
+                                @if($user->student->birth_certificate_file)
+
+                                    @php
+                                        $aktaUrl = asset('storage/' . $user->student->birth_certificate_file);
+                                        $aktaExt = strtolower(pathinfo($user->student->birth_certificate_file, PATHINFO_EXTENSION));
+                                    @endphp
+
+                                    @if(in_array($aktaExt, ['jpg', 'jpeg', 'png']))
+
+                                        <img src="{{ $aktaUrl }}"
+                                            onclick="openDocumentPreview('image', '{{ $aktaUrl }}')"
+                                            class="object-cover w-24 h-24 transition border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                    @elseif($aktaExt === 'pdf')
+
+                                        <div onclick="openDocumentPreview('pdf', '{{ $aktaUrl }}')"
+                                            class="flex flex-col items-center justify-center w-24 h-24 transition bg-red-100 border rounded-lg cursor-pointer hover:scale-105 hover:shadow-md">
+
+                                            <div class="text-3xl">
+                                                📄
+                                            </div>
+
+                                            <p class="mt-1 text-xs font-semibold text-red-500">
+                                                PDF
+                                            </p>
+
+                                        </div>
+
+                                    @endif
+
+                                @else
+
+                                    <span class="text-sm font-bold text-slate-800">
+                                        -
+                                    </span>
+
+                                @endif
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -334,4 +432,83 @@
 
     </div>
 
+    {{-- ================= DOCUMENT PREVIEW MODAL ================= --}}
+    <div id="documentPreviewModal"
+        style="display:none"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm">
+
+        {{-- CLOSE --}}
+        <button onclick="closeDocumentPreview()"
+            class="absolute z-50 text-3xl text-white top-4 right-6 hover:text-red-400">
+            ✕
+        </button>
+
+        <div class="w-full max-w-6xl px-4">
+
+            {{-- IMAGE --}}
+            <img id="documentPreviewImage"
+                class="hidden object-contain w-full max-h-[90vh] rounded-lg shadow-2xl">
+
+            {{-- PDF --}}
+            <iframe id="documentPreviewPdf"
+                class="hidden w-full bg-white rounded-lg h-[90vh] shadow-2xl">
+            </iframe>
+
+        </div>
+
+    </div>
 </x-app-layout>
+
+<script>
+
+    function openDocumentPreview(type, src) {
+
+        const modal = document.getElementById('documentPreviewModal');
+
+        const image = document.getElementById('documentPreviewImage');
+        const pdf = document.getElementById('documentPreviewPdf');
+
+        // reset
+        image.classList.add('hidden');
+        pdf.classList.add('hidden');
+
+        // IMAGE
+        if (type === 'image') {
+
+            image.src = src;
+            image.classList.remove('hidden');
+
+        }
+
+        // PDF
+        if (type === 'pdf') {
+
+            pdf.src = src;
+            pdf.classList.remove('hidden');
+
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeDocumentPreview() {
+
+        const modal = document.getElementById('documentPreviewModal');
+
+        document.getElementById('documentPreviewImage').src = '';
+        document.getElementById('documentPreviewPdf').src = '';
+
+        modal.style.display = 'none';
+    }
+
+    // klik backdrop
+    document.getElementById('documentPreviewModal')
+        .addEventListener('click', function(e) {
+
+            if (e.target.id === 'documentPreviewModal') {
+                closeDocumentPreview();
+            }
+
+        });
+
+</script>

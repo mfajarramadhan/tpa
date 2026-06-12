@@ -354,6 +354,8 @@
                             </div>
 
                         </div>
+                        
+                    </div>
 
                     {{-- ACTION --}}
                     <div class="flex items-center justify-end pt-5 mt-5 border-t border-gray-100">

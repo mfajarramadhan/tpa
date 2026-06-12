@@ -80,7 +80,7 @@ class StudentController extends Controller
         // Buat akun siswa
         $user = User::create([
             'name' => $request->name,
-            'email' => strtolower(str_replace(' ', '', $request->name)) . $birthDate . '@mail.com', // gabungkan nama + tanggal lahir
+            'email' => strtolower(str_replace(' ', '', $request->name)) . $birthDate . '@gmail.com', // gabungkan nama + tanggal lahir
             'password' => Hash::make($birthDate), // Generate password dari tanggal lahir
             'status' => 'nonaktif',
             'approval_status' => 'approved',
@@ -334,7 +334,8 @@ class StudentController extends Controller
             ],
             'birth_date' => 'required|date',
             'gender' => 'required|in:L,P',
-            'school_origin' => 'required'
+            'school_origin' => 'required',
+            'school_grade' => 'required|string|max:10',
         ]);
 
         // HANDLE FILE KK
@@ -364,6 +365,7 @@ class StudentController extends Controller
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
             'school_origin' => $request->school_origin,
+            'school_grade'  => $request->school_grade,
             'status' => 'nonaktif', // balik ke pending
             'approved_at' => null,
             'kk_file' => $kkPath,

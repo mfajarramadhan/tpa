@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             FeeSeeder::class,
             StudentSeeder::class,
+            AlumniSeeder::class,
+            TeacherSeeder::class,
+            PaymentSeeder::class,
             SubjectSeeder::class,
         ]);
     }

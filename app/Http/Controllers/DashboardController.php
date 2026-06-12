@@ -25,7 +25,7 @@ class DashboardController extends Controller
         // superadmin
         if ($user->hasRole('superadmin')) {
 
-            $totalStudents = Student::count();
+            $totalStudents = Student::where('status', 'aktif')->count();
             $totalTeachers = User::role('guru')->count();
             $totalParents = User::role('orang_tua')->count();
 

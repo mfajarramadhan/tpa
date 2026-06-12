@@ -257,18 +257,41 @@
                                 {{-- ROLE --}}
                                 <td>
                                     @php
-                                        $roleLabels = [
-                                            'siswa' => 'Siswa',
-                                            'guru' => 'Guru',
-                                            'orang_tua' => 'Orang Tua',
-                                            'superadmin' => 'Superadmin',
+                                        $role = $user->roles->first()->name ?? '';
+
+                                        $roleConfig = [
+                                            'superadmin' => [
+                                                'label' => 'Superadmin',
+                                                'class' => 'badge-danger',
+                                                'icon' => 'solar:shield-user-bold-duotone',
+                                            ],
+                                            'guru' => [
+                                                'label' => 'Guru',
+                                                'class' => 'badge-warning',
+                                                'icon' => 'solar:user-check-bold-duotone',
+                                            ],
+                                            'orang_tua' => [
+                                                'label' => 'Orang Tua',
+                                                'class' => 'badge-success',
+                                                'icon' => 'solar:user-bold-duotone',
+                                            ],
+                                            'siswa' => [
+                                                'label' => 'Siswa',
+                                                'class' => 'badge-info',
+                                                'icon' => 'solar:people-nearby-bold-duotone',
+                                            ],
+                                        ];
+
+                                        $config = $roleConfig[$role] ?? [
+                                            'label' => '-',
+                                            'class' => 'badge-secondary',
+                                            'icon' => 'solar:user-id-bold-duotone',
                                         ];
                                     @endphp
 
-                                    <span class="badge badge-info">
-                                        <iconify-icon icon="solar:user-id-bold-duotone"></iconify-icon>
-
-                                        {{ $roleLabels[$user->roles->first()->name ?? ''] ?? '-' }}
+                                    <span class="badge {{ $config['class'] }}">
+                                        <iconify-icon icon="{{ $config['icon'] }}"></iconify-icon>
+                                        {{ $config['label'] }}
                                     </span>
                                 </td>
 

@@ -125,7 +125,7 @@
                                 <div class="p-3 rounded-xl bg-gray-50">
 
                                     <p class="text-xs font-semibold text-slate-500">
-                                        Kelas di Sekolah
+                                        Tingkat Kelas
                                     </p>
 
                                     <p class="mt-1 font-bold truncate text-slate-800"
@@ -339,6 +339,8 @@
                             </div>
 
                         </div>
+
+                    </div>
 
                     {{-- ACTION --}}
                     <div class="flex items-center justify-between pt-5 mt-5 border-t border-gray-100">

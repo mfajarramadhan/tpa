@@ -130,6 +130,55 @@
                         required>
                 </div>
 
+                {{-- KELAS DI SEKOLAH --}}
+                <div class="mb-3">
+
+                    <label class="block mb-1 text-sm font-semibold">
+                        Tingkat Kelas di Sekolah
+                    </label>
+
+                    <select name="school_grade"
+                            class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-200"
+                            required>
+
+                        <option value="">
+                            Pilih Kelas
+                        </option>
+
+                        <option value="1 SD" {{ $student->school_grade == '1 SD' ? 'selected' : '' }}>
+                            1 SD
+                        </option>
+
+                        <option value="2 SD" {{ $student->school_grade == '2 SD' ? 'selected' : '' }}>
+                            2 SD
+                        </option>
+
+                        <option value="3 SD" {{ $student->school_grade == '3 SD' ? 'selected' : '' }}>
+                            3 SD
+                        </option>
+
+                        <option value="4 SD" {{ $student->school_grade == '4 SD' ? 'selected' : '' }}>
+                            4 SD
+                        </option>
+
+                        <option value="5 SD" {{ $student->school_grade == '5 SD' ? 'selected' : '' }}>
+                            5 SD
+                        </option>
+
+                        <option value="6 SD" {{ $student->school_grade == '6 SD' ? 'selected' : '' }}>
+                            6 SD
+                        </option>
+
+                    </select>
+
+                    @error('school_grade')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
+                </div>
+
                 {{-- KK --}}
                 <div class="mt-4">
                     <label class="block text-sm font-semibold">Kartu Keluarga</label>

@@ -128,7 +128,12 @@
                     <input type="text"
                         name="name"
                         value="{{ old('name', $user->name) }}"
-                        class="w-full p-2 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+                        @if($user->student) readonly @endif
+                        class="w-full p-2 border rounded-lg
+                        focus:ring focus:ring-[var(--primary-light)]
+                        @if($user->student)
+                            bg-gray-100 text-gray-500 cursor-not-allowed
+                        @endif">
 
                     @error('name')
                         <p class="mt-1 text-sm text-red-500">
@@ -146,7 +151,12 @@
                     <input type="email"
                         name="email"
                         value="{{ old('email', $user->email) }}"
-                        class="w-full p-2 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+                        @if($user->student) readonly @endif
+                        class="w-full p-2 border rounded-lg
+                        focus:ring focus:ring-[var(--primary-light)]
+                        @if($user->student)
+                            bg-gray-100 text-gray-500 cursor-not-allowed
+                        @endif">
 
                     @error('email')
                         <p class="mt-1 text-sm text-red-500">
@@ -207,65 +217,74 @@
 
                 <div x-data="{ showPassword: false, showConfirm: false }">
 
-                {{-- PASSWORD --}}
-                <div class="relative mb-4">
-                    <input
-                        :type="showConfirm ? 'text' : 'password'"
-                        name="password_confirmation"
-                        placeholder="Konfirmasi password"
-                        autocomplete="new-password"
-                        autocorrect="off"
-                        autocapitalize="off"
-                        spellcheck="false"
-                        class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+                    {{-- PASSWORD --}}
+                    <div class="mb-4">
 
-                    <button type="button"
-                            @click="showPassword = !showPassword"
-                            class="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-[var(--primary)]">
+                        <div class="relative">
+                            <input
+                                :type="showPassword ? 'text' : 'password'"
+                                name="password"
+                                placeholder="Password baru"
+                                autocomplete="new-password"
+                                autocorrect="off"
+                                autocapitalize="off"
+                                spellcheck="false"
+                                class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
 
-                        <iconify-icon
-                            :icon="showPassword ? 'solar:eye-closed-bold' : 'solar:eye-bold'"
-                            class="text-2xl">
-                        </iconify-icon>
+                            <button type="button"
+                                    @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-[var(--primary)]">
 
-                    </button>
-                    
-                    @error('password')
-                        <p class="mt-1 text-sm text-red-500">
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
+                                <iconify-icon
+                                    :icon="showPassword ? 'solar:eye-closed-bold' : 'solar:eye-bold'"
+                                    class="text-2xl">
+                                </iconify-icon>
 
+                            </button>
+                        </div>
 
-                {{-- CONFIRM PASSWORD --}}
-                <div class="relative mb-4">
-                    <input
-                        :type="showConfirm ? 'text' : 'password'"
-                        name="password_confirmation"
-                        placeholder="Konfirmasi password"
-                        autocomplete="new-password"
-                        autocorrect="off"
-                        autocapitalize="off"
-                        spellcheck="false"
-                        class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-500">
+                                {{ $message }}
+                            </p>
+                        @enderror
 
-                    <button type="button"
-                            @click="showConfirm = !showConfirm"
-                            class="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-[var(--primary)]">
+                    </div>
 
-                        <iconify-icon
-                            :icon="showConfirm ? 'solar:eye-closed-bold' : 'solar:eye-bold'"
-                            class="text-2xl">
-                        </iconify-icon>
+                    {{-- CONFIRM PASSWORD --}}
+                    <div class="mb-4">
 
-                    </button>
-                    
-                    @error('password_confirmation')
-                        <p class="mt-1 text-sm text-red-500">
-                            {{ $message }}
-                        </p>
-                    @enderror
+                        <div class="relative">
+                            <input
+                                :type="showConfirm ? 'text' : 'password'"
+                                name="password_confirmation"
+                                placeholder="Konfirmasi password"
+                                autocomplete="new-password"
+                                autocorrect="off"
+                                autocapitalize="off"
+                                spellcheck="false"
+                                class="w-full p-2 pr-10 border rounded-lg focus:ring focus:ring-[var(--primary-light)]">
+
+                            <button type="button"
+                                    @click="showConfirm = !showConfirm"
+                                    class="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-[var(--primary)]">
+
+                                <iconify-icon
+                                    :icon="showConfirm ? 'solar:eye-closed-bold' : 'solar:eye-bold'"
+                                    class="text-2xl">
+                                </iconify-icon>
+
+                            </button>
+                        </div>
+
+                        @error('password_confirmation')
+                            <p class="mt-1 text-sm text-red-500">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
                 </div>
 
 
