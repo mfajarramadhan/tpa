@@ -65,7 +65,7 @@ class SubmissionController extends Controller
     {
         $request->validate([
             // 'material_id' => 'required' tidak perlu, sudah pakai route model binding
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'link' => 'nullable|url'
         ]);
 

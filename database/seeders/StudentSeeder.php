@@ -265,7 +265,7 @@ class StudentSeeder extends Seeder
                 'nisn' => '3275062017',
                 'parent' => 'Rina Marlina',
                 'classroom' => 'DTA 3',
-                'birth_date' => Carbon::now()->subYears(12)->format('Y-m-d'),
+                'birth_date' => '2014-06-12',
                 'school_origin' => 'SDN Lamaran 2',
                 'school_grade' => '6 SD',
                 'status' => 'aktif',

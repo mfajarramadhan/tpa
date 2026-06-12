@@ -144,7 +144,7 @@
                         class="w-full p-2 bg-[var(--surface)] border-2 border-[var(--border)] shadow-sm rounded-xl text-[var(--text-main)]">
 
                     <p class="mt-1 text-xs text-[var(--text-tertiary)]">
-                        Hanya PDF/JPG/PNG/JPEG
+                        Maksimal ukuran file 10MB
                     </p>
 
                 </div>

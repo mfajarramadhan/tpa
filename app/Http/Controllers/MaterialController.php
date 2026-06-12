@@ -75,7 +75,7 @@ class MaterialController extends Controller
             'subject_id' => 'required',
             'title' => 'required',
             'description' => 'nullable',
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'youtube_link' => 'nullable|string|max:255',
         ]);
 
@@ -144,7 +144,7 @@ class MaterialController extends Controller
         $request->validate([
             'title' => 'required|max:100',
             'description' => 'nullable',
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'youtube_link' => 'nullable|string'
         ]);
 
