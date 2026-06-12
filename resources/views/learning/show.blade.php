@@ -263,12 +263,6 @@
 
                                         <div class="flex items-center min-w-0 gap-4">
 
-                                            {{-- MINI PREVIEW --}}
-                                            <iframe
-                                                src="{{ $fileUrl }}#toolbar=0"
-                                                class="flex-shrink-0 hidden w-32 border rounded bg-surface h-18 md:block border-custom">
-                                            </iframe>
-
                                             {{-- THUMB --}}
                                             <div class="flex items-center justify-center flex-shrink-0 w-16 h-16 text-sm font-bold text-red-500 border rounded-lg bg-surface border-custom">
                                                 PDF

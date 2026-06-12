@@ -159,25 +159,18 @@
                     <input type="text"
                         name="youtube_link"
                         id="youtubeInput"
-                        placeholder="Contoh: rzbjF2DRv1c"
+                        placeholder="Contoh: VULHwJ3KqdI"
                         class="input-solid w-full bg-[var(--surface)] border-2 border-[var(--border)] shadow-sm rounded-xl focus:border-[var(--primary)]">
 
                     <div class="p-4 mt-3 rounded-xl border border-custom bg-[var(--bg)] text-sm text-[var(--text-secondary)]">
 
                         <p class="font-semibold text-[var(--text-main)] mb-2">
-                            Masukkan kode unik link YouTube, bukan link utuh!
+                            Cukup masukkan kode unik link YouTube nya saja, bukan link penuh!
                         </p>
 
                         <p class="mb-1 break-all">
-                            Contoh 1:
-                            https://youtu.be/<b>BJu1Qcul7ig</b>?si=tmDo0cJ8kL3AzWH0
-                            → <b>(BJu1Qcul7ig)</b>
-                        </p>
-
-                        <p class="break-all">
-                            Contoh 2:
-                            https://youtube.com/shorts/<b>ujryWPV3_iI</b>?si=Ro8SpBbkyX4ap47W
-                            → <b>(ujryWPV3_iI)</b>
+                            <span class="font-bold">Contoh:</span>
+                            https://youtu.be/<span class="text-xl italic font-bold">VULHwJ3KqdI</span>?si=4iUdt8_mbf_Kylw6
                         </p>
 
                     </div>

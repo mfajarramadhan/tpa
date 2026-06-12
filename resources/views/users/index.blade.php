@@ -146,6 +146,10 @@
                                 Nonaktif
                             </option>
 
+                            <option value="alumni" {{ $status === 'alumni' ? 'selected' : '' }}>
+                                Alumni
+                            </option>
+
                             <option value="deleted" {{ $status === 'deleted' ? 'selected' : '' }}>
                                 Dihapus
                             </option>

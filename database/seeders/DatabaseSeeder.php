@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             PaymentSeeder::class,
             SubjectSeeder::class,
+            MaterialSeeder::class,
+            SubmissionSeeder::class,
+            AttendanceSeeder::class,
         ]);
     }
 }

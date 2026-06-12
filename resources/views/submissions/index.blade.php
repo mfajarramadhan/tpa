@@ -41,7 +41,7 @@
                 </div>
 
                 {{-- RIGHT --}}
-                <div class="text-sm font-semibold text-[var(--primary)] whitespace-nowrap">
+                <div class="text-lg font-semibold text-[var(--primary)] whitespace-nowrap">
 
                     {{ $material->subject->classroom->name }}
 
@@ -206,16 +206,17 @@
                     {{-- ROW 2 MOBILE --}}
                     <div class="flex gap-2 md:contents">
 
-                        {{-- FILTER BUTTON --}}
+                        {{-- FILTER --}}
                         <button
-                            class="btn-outline flex items-center justify-center gap-2
+                            class="flex-1 md:flex-none
+                            flex items-center justify-center gap-2
                             rounded-xl
                             py-2.5 px-4
-                            border-2 border-[var(--border)]
+                            border-2 border-[var(--primary)]
+                            bg-[var(--primary)]
+                            text-white
                             shadow-md
-                            hover:bg-[var(--primary-light)]
-                            hover:border-[var(--primary)]
-                            hover:text-[var(--primary)]
+                            hover:opacity-90
                             transition-all duration-200">
 
                             <iconify-icon
@@ -231,14 +232,16 @@
 
                         {{-- CLEAR --}}
                         <a href="{{ route('materials.submissions', $material->id) }}"
-                            class="btn-outline flex items-center justify-center
+                            class="flex-1 md:flex-none
+                            flex items-center justify-center
                             rounded-xl
                             py-2.5 px-3
-                            border-2 border-[var(--border)]
+                            border-2 border-gray-500
+                            bg-gray-500
+                            text-white
                             shadow-md
-                            hover:bg-[var(--primary-light)]
-                            hover:border-[var(--primary)]
-                            hover:text-[var(--primary)]
+                            hover:bg-gray-600
+                            hover:border-gray-600
                             transition-all duration-200">
 
                             <iconify-icon
@@ -261,15 +264,20 @@
                     $statusMap = [
                         'terkirim' => [
                             'label' => 'Menunggu',
-                            'class' => 'badge badge-warning'
+                            'class' => 'badge-warning',
+                            'icon' => 'solar:clock-circle-bold-duotone',
                         ],
+
                         'perbaiki' => [
                             'label' => 'Perbaiki',
-                            'class' => 'badge badge-danger'
+                            'class' => 'badge-danger',
+                            'icon' => 'solar:danger-triangle-bold-duotone',
                         ],
+
                         'selesai' => [
                             'label' => 'Selesai',
-                            'class' => 'badge badge-success'
+                            'class' => 'badge-success',
+                            'icon' => 'solar:check-circle-bold-duotone',
                         ],
                     ];
                 @endphp
@@ -342,27 +350,11 @@
 
                                     @if($submission)
 
-                                        <span class="{{ $statusMap[$submission->status]['class'] }}">
+                                        <span class="badge {{ $statusMap[$submission->status]['class'] }}">
 
-                                            @if($submission->status == 'selesai')
-
-                                                <iconify-icon
-                                                    icon="solar:check-circle-bold-duotone">
-                                                </iconify-icon>
-
-                                            @elseif($submission->status == 'perbaiki')
-
-                                                <iconify-icon
-                                                    icon="solar:close-circle-bold-duotone">
-                                                </iconify-icon>
-
-                                            @else
-
-                                                <iconify-icon
-                                                    icon="solar:clock-circle-bold-duotone">
-                                                </iconify-icon>
-
-                                            @endif
+                                            <iconify-icon
+                                                icon="{{ $statusMap[$submission->status]['icon'] }}">
+                                            </iconify-icon>
 
                                             {{ $statusMap[$submission->status]['label'] }}
 
@@ -370,10 +362,10 @@
 
                                     @else
 
-                                        <span class="badge badge-secondary">
+                                        <span class="badge badge-purple">
 
                                             <iconify-icon
-                                                icon="solar:close-circle-bold-duotone">
+                                                icon="solar:question-circle-bold-duotone">
                                             </iconify-icon>
 
                                             Belum Submit

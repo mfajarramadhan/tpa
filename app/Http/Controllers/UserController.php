@@ -53,6 +53,14 @@ class UserController extends Controller
             $query->where('status', 'aktif')->whereNull('deleted_at');
         } elseif ($status === 'nonaktif') {
             $query->where('status', 'nonaktif')->whereNull('deleted_at');
+        } elseif ($status === 'alumni') {
+            $query->whereHas('roles', function ($q) {
+                $q->where('name', 'siswa');
+            })
+            ->whereHas('student', function ($q) {
+                $q->where('status', 'alumni');
+            })
+            ->whereNull('deleted_at');
         }
 
         $users = $query->with(['roles', 'student.classroom'])->latest()->paginate(10)->withQueryString();
