@@ -15,7 +15,7 @@ class MaterialSeeder extends Seeder
 
         $subjects = Subject::with('classroom')->get();
 
-        $youtubeLink = 'VULHwJ3KqdI';
+        $youtubeLink = 'https://youtu.be/VULHwJ3KqdI?si=4iUdt8_mbf_Kylw6';
 
         $descriptions = [
             'Fiqih' => 'Fiqih adalah ilmu yang mempelajari tata cara beribadah dan berperilaku sesuai ajaran Islam agar dapat dilaksanakan dengan benar dalam kehidupan sehari-hari.',

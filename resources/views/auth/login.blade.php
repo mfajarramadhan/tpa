@@ -178,7 +178,7 @@
                         </button>
                     </div>
 
-                    <p class="mt-12 text-sm text-center text-gray-500">
+                    <p class="mt-2 text-sm text-center text-gray-500">
                         Belum punya akun?
                         <a href="{{ route('register') }}" class="text-[var(--primary)] hover:underline">Registrasi</a>
                     </p>

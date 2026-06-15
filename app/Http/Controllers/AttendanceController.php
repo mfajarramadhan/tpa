@@ -519,9 +519,20 @@ class AttendanceController extends Controller
             $month = $request->month ?? now()->month;
             $year = $request->year ?? now()->year;
 
-            // Ambil siswa aktif di kelas saat ini
             // Alumni / siswa naik kelas history rekap absensi tidak ditampilkan (tersimpan di DB)
-            $students = Student::where('classroom_id', $classroomId)
+            // Ambil siswa aktif di kelas saat ini
+            $studentsQuery = Student::where('classroom_id', $classroomId)
+                ->where('status', 'aktif');
+
+            if ($user->hasRole('orang_tua')) {
+                $studentsQuery->where('parent_id', $user->id);
+            }
+
+            if ($user->hasRole('siswa')) {
+                $studentsQuery->where('id', $user->student->id);
+            }
+
+            $students = $studentsQuery
                 ->orderBy('name')
                 ->get();
 
@@ -607,9 +618,20 @@ class AttendanceController extends Controller
             // filter
             $year = $request->year ?? now()->year;
 
-            // Ambil siswa aktif di kelas saat ini
             // Alumni / siswa naik kelas history rekap absensi tidak ditampilkan (tersimpan di DB)
-            $students = Student::where('classroom_id', $classroomId)
+            // Ambil siswa aktif di kelas saat ini
+            $studentsQuery = Student::where('classroom_id', $classroomId)
+                ->where('status', 'aktif');
+
+            if ($user->hasRole('orang_tua')) {
+                $studentsQuery->where('parent_id', $user->id);
+            }
+
+            if ($user->hasRole('siswa')) {
+                $studentsQuery->where('id', $user->student->id);
+            }
+
+            $students = $studentsQuery
                 ->orderBy('name')
                 ->get();
 

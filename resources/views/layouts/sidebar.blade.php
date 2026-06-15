@@ -177,13 +177,6 @@
 
         <!-- ================= SISWA ================= -->
         @if($user->hasRole('siswa'))
-        
-{{--         
-            <a href="{{ route('attendance.recap') }}"
-                class="nav-item {{ request()->is('attendance-recaps*') ? 'active' : '' }}">
-                <iconify-icon icon="solar:clipboard-list-bold-duotone"></iconify-icon>
-                Rekap Absensi
-            </a> --}}
 
             <a href="/learning"
                 class="nav-item {{ request()->is('learning*') ? 'active' : '' }}">

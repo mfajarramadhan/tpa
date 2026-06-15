@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
 
             [
                 'name' => 'Muhammad Fajar Ramadhan',
-                'phone' => '0822586673921',
+                'phone' => '0895333530959',
                 'email' => 'muhammadfajar@gmail.com',
                 'password' => 'muhammadfajar12345',
                 'address' => 'Perum Palumbonsari Blok B5 No. 8, Karawang',

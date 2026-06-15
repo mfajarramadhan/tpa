@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
         $admin = User::firstOrCreate(
             [
                 'email' => 'puspita@gmail.com',
-                'phone' => '0895333530959',
+                'phone' => '0822586673921',
                 'name' => 'Puspita Winarti',
                 'address' => 'Perum Palumbonsari Blok A1 No. 10, Karawang',
                 'password' => Hash::make('puspita12345'),
