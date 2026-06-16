@@ -381,14 +381,12 @@ class AttendanceController extends Controller
         */
         if ($user->hasAnyRole('guru')) {
 
-            // dropdown semua kelas
             $classrooms = Classroom::orderBy('id', 'asc')->get();
 
-        /*
-        =====================================================
-        ORANG TUA
-        =====================================================
-        */
+            if (!$classroomId && $classrooms->count()) {
+                $classroomId = $classrooms->first()->id;
+            }
+       
         } elseif ($user->hasRole('orang_tua')) {
 
             // hanya kelas anaknya
@@ -706,6 +704,60 @@ class AttendanceController extends Controller
             }
         }
 
+        /*
+        =====================================================
+        REKAP HARIAN MODE BULANAN
+        =====================================================
+        */
+        $dailyMatrix = collect();
+        $daysInMonth = collect();
+
+        if ($tab == 'daily' && $classroomId) {
+
+            $month = $request->month ?? now()->month;
+            $year = $request->year ?? now()->year;
+
+            $daysInMonth = collect(range(1, Carbon::create($year, $month)->daysInMonth));
+
+            $studentsQuery = Student::where('classroom_id', $classroomId)
+                ->where('status', 'aktif');
+
+            if ($user->hasRole('orang_tua')) {
+                $studentsQuery->where('parent_id', $user->id);
+            }
+
+            if ($user->hasRole('siswa')) {
+                $studentsQuery->where('id', $user->student->id);
+            }
+
+            $students = $studentsQuery
+                ->orderBy('name')
+                ->get();
+
+            foreach ($students as $student) {
+
+                $attendanceDetails = AttendanceDetail::where('student_id', $student->id)
+                    ->whereHas('attendance', function ($q) use ($classroomId, $month, $year) {
+                        $q->where('classroom_id', $classroomId)
+                            ->whereMonth('date', $month)
+                            ->whereYear('date', $year);
+                    })
+                    ->with('attendance')
+                    ->get()
+                    ->groupBy(fn ($item) => Carbon::parse($item->attendance->date)->day)
+                    ->map(function ($items) {
+                        return $items
+                            ->sortByDesc(fn ($item) => $item->attendance->session == 'sore')
+                            ->first();
+                    });
+
+                $dailyMatrix->push([
+                    'student' => $student,
+                    'attendances' => $attendanceDetails,
+                ]);
+            }
+        }
+
         return view('attendance-recaps.index', compact(
             'classrooms',
             'details',
@@ -713,7 +765,11 @@ class AttendanceController extends Controller
             'classroomId',
             'tab',
             'monthlyData',
-            'yearlyData'
+            'yearlyData',
+            'dailyMatrix',
+            'daysInMonth',
+            'month',
+            'year',
         ));
     }
 
@@ -728,11 +784,8 @@ class AttendanceController extends Controller
         $oldStatus = $detail->status;
         $oldAttendanceId = $detail->attendance_id;
 
-        // ambil header absensi saat ini
         $attendance = $detail->attendance;
 
-        // cari header absensi tujuan
-        // jika belum ada, sistem membuat header baru
         $targetAttendance = Attendance::firstOrCreate(
             [
                 'classroom_id' => $attendance->classroom_id,
@@ -745,14 +798,39 @@ class AttendanceController extends Controller
             ]
         );
 
-        // update detail absensi siswa
-        // yang dipindahkan adalah attendance_id pada attendance_details
-        $detail->update([
-            'attendance_id' => $targetAttendance->id,
-            'status' => $request->status,
-            'note' => $request->status === 'hadir' ? null : $request->note,
-            'updated_by' => auth()->id(),
-        ]);
+        DB::transaction(function () use ($request, $detail, $targetAttendance, &$updatedDetail) {
+
+            $existingTargetDetail = AttendanceDetail::where([
+                    'attendance_id' => $targetAttendance->id,
+                    'student_id' => $detail->student_id,
+                ])
+                ->where('id', '!=', $detail->id)
+                ->first();
+
+            if ($existingTargetDetail) {
+
+                $existingTargetDetail->update([
+                    'status' => $request->status,
+                    'note' => $request->status === 'hadir' ? null : $request->note,
+                    'updated_by' => auth()->id(),
+                ]);
+
+                $detail->delete();
+
+                $updatedDetail = $existingTargetDetail;
+
+            } else {
+
+                $detail->update([
+                    'attendance_id' => $targetAttendance->id,
+                    'status' => $request->status,
+                    'note' => $request->status === 'hadir' ? null : $request->note,
+                    'updated_by' => auth()->id(),
+                ]);
+
+                $updatedDetail = $detail;
+            }
+        });
 
         if (
             $this->shouldSendAttendanceWhatsApp(
@@ -763,7 +841,7 @@ class AttendanceController extends Controller
                 newAttendanceId: $targetAttendance->id
             )
         ) {
-            SendAttendanceWhatsAppJob::dispatch($detail->fresh())
+            SendAttendanceWhatsAppJob::dispatch($updatedDetail->fresh())
                 ->delay(now()->addSeconds(2));
         }
 

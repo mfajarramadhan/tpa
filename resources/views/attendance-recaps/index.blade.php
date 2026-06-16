@@ -173,77 +173,83 @@
             {{-- ================= FILTER HARIAN ================= --}}
             @if(request('tab', 'daily') == 'daily')
 
-                <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
+            <div class="p-5 border shadow-sm bg-surface border-custom rounded-2xl">
 
-                    <form method="GET"
-                        action="{{ route('attendance.recap') }}"
-                        x-data="{ classroomId: '{{ $classroomId }}' }">
+                <form method="GET"
+                    action="{{ route('attendance.recap') }}"
+                    x-data="{ classroomId: '{{ request('classroom_id', $classroomId) }}' }">
 
-                        <input type="hidden" name="tab" value="daily">
+                    <input type="hidden" name="tab" value="daily">
 
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-                            {{-- TANGGAL --}}
-                            <div>
-                                <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
-                                    Tanggal
-                                </label>
+                        {{-- BULAN --}}
+                        <div>
+                            <label class="block mb-2 text-sm font-semibold">
+                                Bulan
+                            </label>
 
-                                <input type="date"
-                                    name="date"
-                                    value="{{ $date }}"
-                                    class="input-solid w-full bg-[var(--surface)] border-2 border-[var(--border)] shadow-sm rounded-xl">
-                            </div>
-
-                            {{-- KELAS --}}
-                            @role('guru')
-                                <div>
-                                    <label class="block mb-2 text-sm font-semibold text-[var(--text-main)]">
-                                        Kelas
-                                    </label>
-
-                                    <select name="classroom_id"
-                                            x-model="classroomId"
-                                            required
-                                            class="input-solid w-full bg-[var(--surface)] border-2 border-[var(--border)] shadow-sm rounded-xl">
-
-                                        <option value="">----------</option>
-
-                                        @foreach($classrooms as $classroom)
-                                            <option value="{{ $classroom->id }}">
-                                                {{ $classroom->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-
-                                    <p x-show="!classroomId"
-                                    class="mt-1 text-sm text-red-500">
-                                        Pilih kelas!
-                                    </p>
-                                </div>
-                            @else
-                                <input type="hidden" name="classroom_id" value="{{ $classroomId }}">
-                            @endrole
-
-
-                        </div>
-                        {{-- BUTTON --}}
-                        <div class="flex items-end mt-8">
-                            <button type="submit"
-                                    :disabled="!classroomId"
-                                    :class="!classroomId ? 'opacity-50 cursor-not-allowed' : ''"
-                                    class="w-full shadow-sm btn-primary">
-
-                                <iconify-icon icon="solar:chart-bold-duotone" width="20"></iconify-icon>
-
-                                Tampilkan
-                            </button>
+                            <select name="month" class="w-full input-solid rounded-xl">
+                                @foreach(range(1,12) as $monthLoop)
+                                    <option value="{{ $monthLoop }}"
+                                        {{ request('month', now()->month) == $monthLoop ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::create()->month($monthLoop)->translatedFormat('F') }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        
-                    </form>
+                        {{-- TAHUN --}}
+                        <div>
+                            <label class="block mb-2 text-sm font-semibold">
+                                Tahun
+                            </label>
 
-                </div>
+                            <select name="year" class="w-full input-solid rounded-xl">
+                                @foreach(range(now()->year, now()->year - 5) as $yearLoop)
+                                    <option value="{{ $yearLoop }}"
+                                        {{ request('year', now()->year) == $yearLoop ? 'selected' : '' }}>
+                                        {{ $yearLoop }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- KELAS --}}
+                        @role('guru')
+                        <div>
+                            <label class="block mb-2 text-sm font-semibold">
+                                Kelas
+                            </label>
+
+                            <select name="classroom_id"
+                                x-model="classroomId"
+                                class="w-full input-solid rounded-xl">
+
+                                @foreach($classrooms as $classroom)
+                                    <option value="{{ $classroom->id }}"
+                                        {{ $classroomId == $classroom->id ? 'selected' : '' }}>
+                                        {{ $classroom->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @else
+                            <input type="hidden" name="classroom_id" value="{{ $classroomId }}">
+                        @endrole
+
+                    </div>
+
+                    <div class="flex items-end mt-8">
+                        <button type="submit" class="w-full shadow-sm btn-primary">
+                            <iconify-icon icon="solar:chart-bold-duotone" width="20"></iconify-icon>
+                            Tampilkan
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
 
             @endif
 
@@ -497,250 +503,121 @@
 
             @endif
 
-            {{-- ================= TABLE REKAP HARIAN ================= --}}
+            {{-- ================= TABLE REKAP HARIAN BULANAN ================= --}}
             @if(request('tab', 'daily') == 'daily')
 
-                <div class="overflow-hidden bg-white shadow-sm rounded-xl">
+            <div class="overflow-hidden bg-white shadow-sm rounded-xl">
 
-                    <div class="overflow-x-auto">
+                <div class="overflow-x-auto">
 
-                        <table class="w-full">
+                    <table class="w-full text-sm border-collapse">
 
-                            {{-- HEADER --}}
-                            <thead class="bg-gray-50">
+                        <thead class="bg-gray-50">
 
-                                <tr class="text-sm text-gray-600">
+                            <tr class="text-gray-600">
 
-                                    <th class="p-3 text-left">
-                                        Nama Siswa
+                                <th class="sticky left-0 z-20 p-3 text-left bg-gray-50 min-w-48">
+                                    Nama Siswa
+                                </th>
+
+                                @foreach($daysInMonth as $day)
+                                    <th class="p-3 text-center min-w-12">
+                                        {{ $day }}
                                     </th>
+                                @endforeach
 
-                                    <th class="p-3 text-center">
-                                        Status
-                                    </th>
+                            </tr>
 
-                                    <th class="p-3 text-center">
-                                        Keterangan
-                                    </th>
+                        </thead>
 
-                                    <th class="p-3 text-center">
-                                        Sesi
-                                    </th>
+                        <tbody>
 
-                                    @role('guru')
-                                    <th class="p-3 text-center">
-                                        Aksi
-                                    </th>
-                                    @endrole
+                            @forelse($dailyMatrix as $row)
 
-                                </tr>
+                                <tr class="border-t">
 
-                            </thead>
+                                    <td class="sticky left-0 z-10 p-3 font-semibold bg-white min-w-48">
+                                        {{ $row['student']->name }}
+                                    </td>
 
-                            {{-- BODY --}}
-                            <tbody>
-                                @if($details->count())
-                                    @foreach($details as $detail)
+                                    @foreach($daysInMonth as $day)
 
-                                        <tr class="border-t">
+                                        @php
+                                            $detail = $row['attendances'][$day] ?? null;
 
-                                            {{-- NAMA --}}
-                                            <td class="p-3">
-                                                {{ $detail->student->name }}
-                                            </td>
+                                            $statusLabel = [
+                                                'hadir' => '✓',
+                                                'sakit' => 'S',
+                                                'izin' => 'I',
+                                                'alpha' => 'A',
+                                            ];
 
-                                            {{-- STATUS --}}
-                                            <td class="p-3 text-center">
+                                            $statusColor = [
+                                                'hadir' => 'text-green-600 bg-green-50',
+                                                'sakit' => 'text-blue-600 bg-blue-50',
+                                                'izin' => 'text-yellow-600 bg-yellow-50',
+                                                'alpha' => 'text-red-600 bg-red-50',
+                                            ];
+                                        @endphp
 
-                                                @php
-                                                    $statusColor = [
-                                                        'hadir' => 'bg-green-100 text-green-700',
-                                                        'izin' => 'bg-yellow-100 text-yellow-700',
-                                                        'sakit' => 'bg-blue-100 text-blue-700',
-                                                        'alpha' => 'bg-red-100 text-red-700',
-                                                    ];
-                                                @endphp
+                                        <td class="p-2 text-center border-l">
 
-                                                <span class="px-2 py-1 text-xs rounded {{ $statusColor[$detail->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                            @if($detail)
 
-                                                    {{ ucfirst($detail->status) }}
+                                                @role('guru')
+                                                    <button type="button"
+                                                        onclick="openEditModal(
+                                                            {{ $detail->id }},
+                                                            '{{ $detail->status }}',
+                                                            @js($detail->note ?? ''),
+                                                            '{{ $detail->attendance->session }}'
+                                                        )"
+                                                        class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-lg
+                                                        {{ $statusColor[$detail->status] ?? 'bg-gray-50 text-gray-500' }}">
 
-                                                </span>
+                                                        {{ $statusLabel[$detail->status] ?? '-' }}
 
-                                            </td>
+                                                    </button>
+                                                @else
+                                                    <span class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-lg
+                                                        {{ $statusColor[$detail->status] ?? 'bg-gray-50 text-gray-500' }}">
 
-                                            {{-- KETERANGAN --}}
-                                            <td class="p-3 text-sm text-center">
+                                                        {{ $statusLabel[$detail->status] ?? '-' }}
 
-                                                {{ $detail->note ?? '-' }}
+                                                    </span>
+                                                @endrole
 
-                                            </td>
+                                            @else
 
-                                            {{-- SESI --}}
-                                            <td class="p-3 text-center">
+                                                <span class="text-gray-300">-</span>
 
-                                                <span class="text-xs text-gray-600">
-
-                                                    {{ ucfirst($detail->session) }}
-
-                                                </span>
-
-                                            </td>
-
-                                            {{-- AKSI --}}
-                                            @role('guru')
-                                            <td class="p-3 text-center">
-
-                                                <button
-                                                    onclick="toggleEdit({{ $detail->id }})"
-                                                    title="Edit"
-                                                    class="btn-icon group bg-[var(--warning-light)] border border-[var(--warning-dark)] hover:bg-[var(--warning-dark)]">
-
-                                                    <iconify-icon
-                                                        icon="heroicons:pencil-square"
-                                                        class="text-[var(--warning-dark)] group-hover:text-white">
-                                                    </iconify-icon>
-
-                                                </button>
-
-                                            </td>
-                                            @endrole
-
-                                        </tr>
-
-                                        {{-- ================= INLINE EDIT ================= --}}
-                                        @role('guru')
-                                        <tr id="edit-row-{{ $detail->id }}"
-                                            class="hidden bg-gray-50">
-
-                                            <td colspan="5"
-                                                class="p-4">
-
-                                                <form method="POST"
-                                                    action="{{ route('attendance.recap.update', $detail->id) }}">
-
-                                                    @csrf
-
-                                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-
-                                                        {{-- STATUS --}}
-                                                        <div>
-
-                                                            <label class="block mb-1 text-sm">
-                                                                Status
-                                                            </label>
-
-                                                            <select name="status"
-                                                                id="status-{{ $detail->id }}"
-                                                                onchange="toggleNote({{ $detail->id }})"
-                                                                class="w-full border-gray-300 rounded-lg">
-
-                                                                <option value="hadir"
-                                                                    {{ $detail->status == 'hadir' ? 'selected' : '' }}>
-                                                                    Hadir
-                                                                </option>
-
-                                                                <option value="izin"
-                                                                    {{ $detail->status == 'izin' ? 'selected' : '' }}>
-                                                                    Izin
-                                                                </option>
-
-                                                                <option value="sakit"
-                                                                    {{ $detail->status == 'sakit' ? 'selected' : '' }}>
-                                                                    Sakit
-                                                                </option>
-
-                                                                <option value="alpha"
-                                                                    {{ $detail->status == 'alpha' ? 'selected' : '' }}>
-                                                                    Alpha
-                                                                </option>
-
-                                                            </select>
-
-                                                        </div>
-
-                                                        {{-- NOTE --}}
-                                                        <div>
-
-                                                            <label class="block mb-1 text-sm">
-                                                                Keterangan
-                                                            </label>
-
-                                                            <input type="text"
-                                                                id="note-{{ $detail->id }}"
-                                                                name="note"
-                                                                value="{{ $detail->status == 'hadir' ? '' : $detail->note }}"
-                                                                class="w-full border-gray-300 rounded-lg disabled:bg-gray-100 disabled:text-gray-400"
-                                                                placeholder="Keterangan..."
-                                                                {{ $detail->status == 'hadir' ? 'disabled' : '' }}>
-
-                                                        </div>
-
-                                                        {{-- STATUS --}}
-                                                        <div>
-
-                                                            <label class="block mb-1 text-sm">
-                                                                Sesi
-                                                            </label>
-
-                                                            <select name="session"
-                                                                class="w-full border-gray-300 rounded-lg">
-
-                                                                <option value="pagi"
-                                                                    {{ $detail->session == 'pagi' ? 'selected' : '' }}>
-                                                                    Pagi
-                                                                </option>
-
-                                                                <option value="sore"
-                                                                    {{ $detail->session == 'sore' ? 'selected' : '' }}>
-                                                                    Sore
-                                                                </option>
-
-                                                            </select>
-
-                                                        </div>
-
-                                                        {{-- BUTTON --}}
-                                                        <div class="flex items-end">
-
-                                                            <button class="w-full btn-primary">
-
-                                                                Simpan
-
-                                                            </button>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                </form>
-
-                                            </td>
-
-                                        </tr>
-                                        @endrole
-
-                                    @endforeach
-                                @else
-                                    <tr>
-
-                                        <td colspan="5"
-                                            class="p-10 text-center text-gray-500">
-
-                                            Belum ada data absensi harian
+                                            @endif
 
                                         </td>
 
-                                    </tr>
-                                @endif
-                            </tbody>
+                                    @endforeach
 
-                        </table>
+                                </tr>
 
-                    </div>
+                            @empty
+
+                                <tr>
+                                    <td colspan="{{ $daysInMonth->count() + 1 }}"
+                                        class="p-10 text-center text-gray-500">
+                                        Belum ada data absensi harian
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
 
                 </div>
-                
+
+            </div>
+
             @endif
             
             {{-- ================= TABLE BULANAN ================= --}}
@@ -960,41 +837,141 @@
 
     </div>
 
+    @role('guru')
+    <div id="editAttendanceModal"
+        onclick="closeEditModalOutside(event)"
+        class="fixed inset-0 z-50 items-center justify-center hidden bg-black/60">
+
+        <div class="w-full max-w-4xl p-6 mx-4 bg-white shadow-xl rounded-2xl">
+
+            <div class="flex items-center justify-between mb-6">
+
+                <h3 class="text-lg font-bold">
+                    Edit Absensi Siswa
+                </h3>
+
+                <button type="button"
+                    onclick="closeEditModal()"
+                    class="flex items-center justify-center text-white bg-red-500 rounded-lg w-9 h-9 hover:bg-red-600">
+                    ✕
+                </button>
+
+            </div>
+
+            <form id="editAttendanceForm" method="POST">
+
+                @csrf
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+
+                    {{-- STATUS --}}
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold">
+                            Status
+                        </label>
+
+                        <select name="status"
+                            id="modalStatus"
+                            onchange="toggleModalNote()"
+                            class="w-full border-gray-300 rounded-lg">
+
+                            <option value="hadir">Hadir</option>
+                            <option value="izin">Izin</option>
+                            <option value="sakit">Sakit</option>
+                            <option value="alpha">Alpha</option>
+
+                        </select>
+                    </div>
+
+                    {{-- NOTE --}}
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold">
+                            Keterangan
+                        </label>
+
+                        <input type="text"
+                            id="modalNote"
+                            name="note"
+                            class="w-full border-gray-300 rounded-lg disabled:bg-gray-100 disabled:text-gray-400"
+                            placeholder="Keterangan...">
+                    </div>
+
+                    {{-- SESI --}}
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold">
+                            Sesi
+                        </label>
+
+                        <select name="session"
+                            id="modalSession"
+                            class="w-full border-gray-300 rounded-lg">
+
+                            <option value="pagi">Pagi</option>
+                            <option value="sore">Sore</option>
+
+                        </select>
+                    </div>
+
+                    {{-- BUTTON --}}
+                    <div class="flex items-end">
+                        <button class="w-full btn-primary">
+                            Simpan
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+    @endrole
+
 </x-app-layout>
+    <script>
+        function openEditModal(id, status, note, session)
+        {
+            const modal = document.getElementById('editAttendanceModal');
+            const form = document.getElementById('editAttendanceForm');
 
-<script>
+            form.action = `/attendance-recaps/update/${id}`;
 
-    function toggleEdit(id)
-    {
-        const currentRow = document.getElementById('edit-row-' + id);
+            document.getElementById('modalStatus').value = status;
+            document.getElementById('modalNote').value = status === 'hadir' ? '' : note;
+            document.getElementById('modalSession').value = session;
 
-        // tutup semua row edit
-        document.querySelectorAll('[id^="edit-row-"]').forEach(row => {
+            toggleModalNote();
 
-            if (row.id !== 'edit-row-' + id) {
-                row.classList.add('hidden');
-            }
-
-        });
-
-        // toggle row yang dipilih
-        currentRow.classList.toggle('hidden');
-    }
-
-    function toggleNote(id)
-    {
-        const status = document.getElementById('status-' + id);
-        const note = document.getElementById('note-' + id);
-
-        if (status.value === 'hadir') {
-
-            note.value = '';
-            note.disabled = true;
-
-        } else {
-
-            note.disabled = false;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
-    }
 
-</script>
+        function closeEditModal()
+        {
+            const modal = document.getElementById('editAttendanceModal');
+
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeEditModalOutside(event)
+        {
+            if (event.target.id === 'editAttendanceModal') {
+                closeEditModal();
+            }
+        }
+
+        function toggleModalNote()
+        {
+            const status = document.getElementById('modalStatus');
+            const note = document.getElementById('modalNote');
+
+            if (status.value === 'hadir') {
+                note.value = '';
+                note.disabled = true;
+            } else {
+                note.disabled = false;
+            }
+        }
+    </script>
